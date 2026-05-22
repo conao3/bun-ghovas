@@ -16,15 +16,7 @@ function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }
   const offsetY = ((panY % scaledGrid) + scaledGrid) % scaledGrid;
 
   return (
-    <svg
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-      }}
-    >
+    <svg className="absolute inset-0 w-full h-full pointer-events-none">
       <defs>
         <pattern
           id="grid"
@@ -37,7 +29,7 @@ function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }
           <path
             d={`M ${scaledGrid} 0 L 0 0 0 ${scaledGrid}`}
             fill="none"
-            stroke="rgba(128,128,128,0.3)"
+            stroke="var(--color-border)"
             strokeWidth="0.5"
           />
         </pattern>
@@ -278,14 +270,8 @@ export function Canvas({
       onMouseMove={handleMouseMove}
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
-      style={{
-        position: "absolute",
-        inset: 0,
-        overflow: "hidden",
-        cursor: dragging.current ? "grabbing" : "grab",
-        background: "#1a1a1a",
-        userSelect: "none",
-      }}
+      className="absolute inset-0 overflow-hidden bg-surface-deep select-none"
+      style={{ cursor: dragging.current ? "grabbing" : "grab" }}
     >
       <Grid panX={canvasState.panX} panY={canvasState.panY} zoom={canvasState.zoom} />
       {canvasState.windows.map((win) => (
@@ -311,16 +297,7 @@ export function Canvas({
       />
       <div
         onMouseDown={(e) => e.stopPropagation()}
-        style={{
-          position: "absolute",
-          bottom: 12,
-          left: 12,
-          display: "flex",
-          background: "rgba(0,0,0,0.6)",
-          borderRadius: 4,
-          overflow: "hidden",
-          zIndex: 5,
-        }}
+        className="absolute bottom-3 left-3 flex bg-black/60 rounded overflow-hidden z-[5]"
       >
         {ZOOM_PRESETS.map((preset) => {
           const pct = Math.round(preset * 100);
@@ -329,17 +306,10 @@ export function Canvas({
             <button
               key={pct}
               onClick={() => handleZoomPreset(preset)}
-              style={{
-                background: isActive ? "rgba(74,158,255,0.35)" : "transparent",
-                color: isActive ? "#fff" : "#ccc",
-                border: "none",
-                borderRight: "1px solid rgba(255,255,255,0.1)",
-                fontFamily: "monospace",
-                fontSize: 12,
-                padding: "4px 8px",
-                cursor: "pointer",
-                lineHeight: 1.6,
-              }}
+              className={[
+                "border-0 border-r border-solid border-white/10 font-mono text-[12px] px-2 py-1 cursor-pointer leading-[1.6]",
+                isActive ? "bg-accent/35 text-white" : "bg-transparent text-text-muted-light",
+              ].join(" ")}
             >
               {pct}%
             </button>
@@ -355,21 +325,7 @@ export function Canvas({
         containerHeight={containerRef.current?.clientHeight ?? 0}
         onPanTo={handlePanTo}
       />
-      <div
-        style={{
-          position: "absolute",
-          bottom: 12,
-          right: 12,
-          background: "rgba(0,0,0,0.6)",
-          color: "#ccc",
-          fontFamily: "monospace",
-          fontSize: 12,
-          padding: "4px 8px",
-          borderRadius: 4,
-          pointerEvents: "none",
-          lineHeight: 1.6,
-        }}
-      >
+      <div className="absolute bottom-3 right-3 bg-black/60 text-text-muted-light font-mono text-[12px] py-1 px-2 rounded pointer-events-none leading-[1.6]">
         <div>{zoomPct}%</div>
         <div>
           {viewX}, {viewY}

@@ -79,44 +79,27 @@ export function Minimap({
   return (
     <div
       onPointerDown={handlePointerDown}
-      style={{
-        position: "absolute",
-        bottom: 40,
-        right: 16,
-        width: MINIMAP_W,
-        height: MINIMAP_H,
-        background: "rgba(20,20,20,0.85)",
-        border: "1px solid rgba(255,255,255,0.15)",
-        borderRadius: 4,
-        zIndex: 5,
-        overflow: "hidden",
-        cursor: "crosshair",
-      }}
+      className="absolute bottom-10 right-4 w-40 h-25 bg-surface-deep/85 border border-white/15 rounded z-[5] overflow-hidden cursor-crosshair"
     >
       {windows.map((w) => (
         <div
           key={w.id}
+          className="absolute pointer-events-none bg-accent/40"
           style={{
-            position: "absolute",
             left: toMapX(w.x),
             top: toMapY(w.y),
             width: w.width * scale,
             height: w.height * scale,
-            background: "rgba(74,158,255,0.4)",
-            pointerEvents: "none",
           }}
         />
       ))}
       <div
+        className="absolute pointer-events-none box-border border-[1.5px] border-accent"
         style={{
-          position: "absolute",
           left: vpMapX,
           top: vpMapY,
           width: vpMapW,
           height: vpMapH,
-          border: "1.5px solid #4a9eff",
-          pointerEvents: "none",
-          boxSizing: "border-box",
         }}
       />
     </div>

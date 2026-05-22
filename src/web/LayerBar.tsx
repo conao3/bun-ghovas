@@ -111,14 +111,8 @@ function HorizontalStrip({
     <>
       <div
         ref={ctx.menuAnchorRef}
-        style={{
-          position: "fixed",
-          left: ctx.menuPos.x,
-          top: ctx.menuPos.y,
-          width: 0,
-          height: 0,
-          pointerEvents: "none",
-        }}
+        className="fixed w-0 h-0 pointer-events-none"
+        style={{ left: ctx.menuPos.x, top: ctx.menuPos.y }}
       />
       <ContextMenu
         isOpen={ctx.menuOpen}
@@ -131,14 +125,14 @@ function HorizontalStrip({
         <MenuItem id="delete">Delete</MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="flex flex-col gap-3">
           <TextField
             value={ctx.renameValue}
             onChange={ctx.setRenameValue}
             aria-label="Canvas name"
             autoFocus
           />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <div className="flex gap-2 justify-end">
             <Button variant="secondary" onPress={() => ctx.setRenameOpen(false)}>
               Cancel
             </Button>
@@ -149,22 +143,12 @@ function HorizontalStrip({
         </div>
       </Modal>
       <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          borderBottom: isLast ? "none" : "1px solid rgba(255,255,255,0.06)",
-        }}
+        className={[
+          "flex items-center",
+          isLast ? "" : "border-b border-border-subtle",
+        ].join(" ")}
       >
-        <span
-          style={{
-            color: "#555",
-            fontSize: 11,
-            fontFamily: "monospace",
-            padding: "0 4px",
-            minWidth: 24,
-            userSelect: "none",
-          }}
-        >
+        <span className="text-text-faint text-[11px] font-mono px-1 min-w-6 select-none">
           L{level}
         </span>
         <Button
@@ -184,14 +168,14 @@ function HorizontalStrip({
         <Tabs
           selectedKey={activeId}
           onSelectionChange={(key) => onSelectionChange(key as string)}
-          style={{ flex: 1 }}
+          className="flex-1"
         >
           <TabList items={layer.canvases}>
             {(canvas) => (
               <Tab id={canvas.id}>
                 <span
                   onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-                  style={{ display: "block", margin: "-6px -14px", padding: "6px 14px" }}
+                  className="block -my-1.5 -mx-3.5 py-1.5 px-3.5"
                 >
                   {canvas.name ?? canvas.id}
                 </span>
@@ -234,14 +218,8 @@ function VerticalColumn({
     <>
       <div
         ref={ctx.menuAnchorRef}
-        style={{
-          position: "fixed",
-          left: ctx.menuPos.x,
-          top: ctx.menuPos.y,
-          width: 0,
-          height: 0,
-          pointerEvents: "none",
-        }}
+        className="fixed w-0 h-0 pointer-events-none"
+        style={{ left: ctx.menuPos.x, top: ctx.menuPos.y }}
       />
       <ContextMenu
         isOpen={ctx.menuOpen}
@@ -254,14 +232,14 @@ function VerticalColumn({
         <MenuItem id="delete">Delete</MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="flex flex-col gap-3">
           <TextField
             value={ctx.renameValue}
             onChange={ctx.setRenameValue}
             aria-label="Canvas name"
             autoFocus
           />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <div className="flex gap-2 justify-end">
             <Button variant="secondary" onPress={() => ctx.setRenameOpen(false)}>
               Cancel
             </Button>
@@ -271,31 +249,9 @@ function VerticalColumn({
           </div>
         </div>
       </Modal>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          borderRight: "1px solid rgba(255,255,255,0.06)",
-          padding: "4px 0",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            gap: 2,
-            padding: "0 2px 4px",
-          }}
-        >
-          <span
-            style={{
-              color: "#555",
-              fontSize: 11,
-              fontFamily: "monospace",
-              userSelect: "none",
-            }}
-          >
+      <div className="flex flex-col border-r border-border-subtle py-1">
+        <div className="flex flex-col items-center gap-0.5 px-0.5 pb-1">
+          <span className="text-text-faint text-[11px] font-mono select-none">
             L{level}
           </span>
           <Button
@@ -323,7 +279,7 @@ function VerticalColumn({
               <Tab id={canvas.id} orientation="vertical">
                 <span
                   onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-                  style={{ display: "block", margin: "-6px -14px", padding: "6px 14px" }}
+                  className="block -my-1.5 -mx-3.5 py-1.5 px-3.5"
                 >
                   {canvas.name ?? canvas.id}
                 </span>
@@ -377,13 +333,10 @@ export function LayerBar({
   return (
     <>
       <div
-        style={{
-          gridArea: "top",
-          background: "#1e1e1e",
-          borderBottom:
-            horizontalLevels.length > 0 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-          flexShrink: 0,
-        }}
+        className={[
+          "[grid-area:top] bg-surface shrink-0",
+          horizontalLevels.length > 0 ? "border-b border-border" : "",
+        ].join(" ")}
       >
         {horizontalLevels.map((level, i) => (
           <HorizontalStrip
@@ -402,13 +355,10 @@ export function LayerBar({
         ))}
       </div>
       <div
-        style={{
-          gridArea: "left",
-          background: "#1e1e1e",
-          borderRight: verticalLevels.length > 0 ? "1px solid rgba(255,255,255,0.12)" : undefined,
-          display: "flex",
-          flexDirection: "row",
-        }}
+        className={[
+          "[grid-area:left] bg-surface flex flex-row",
+          verticalLevels.length > 0 ? "border-r border-border" : "",
+        ].join(" ")}
       >
         {verticalLevels.map((level) => (
           <VerticalColumn
@@ -426,16 +376,7 @@ export function LayerBar({
         ))}
       </div>
       {hiddenLevels.length > 0 && (
-        <div
-          style={{
-            position: "fixed",
-            top: 4,
-            right: 4,
-            display: "flex",
-            gap: 4,
-            zIndex: 100,
-          }}
-        >
+        <div className="fixed top-1 right-1 flex gap-1 z-[100]">
           {hiddenLevels.map((level) => (
             <Button
               key={level}

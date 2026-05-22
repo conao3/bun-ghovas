@@ -288,14 +288,8 @@ export function Window({
     <>
       <div
         ref={menuAnchorRef}
-        style={{
-          position: "fixed",
-          left: menuPos.x,
-          top: menuPos.y,
-          width: 0,
-          height: 0,
-          pointerEvents: "none",
-        }}
+        className="fixed w-0 h-0 pointer-events-none"
+        style={{ left: menuPos.x, top: menuPos.y }}
       />
       <ContextMenu
         isOpen={menuOpen}
@@ -308,14 +302,14 @@ export function Window({
         <MenuItem id="close">Close</MenuItem>
       </ContextMenu>
       <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div className="flex flex-col gap-3">
           <TextField
             value={renameValue}
             onChange={setRenameValue}
             aria-label="Window title"
             autoFocus
           />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <div className="flex gap-2 justify-end">
             <Button variant="secondary" onPress={() => setRenameOpen(false)}>
               Cancel
             </Button>
@@ -327,56 +321,31 @@ export function Window({
       </Modal>
       <div
         onMouseDown={handleWindowMouseDown}
+        className={[
+          "absolute box-border rounded-[6px] bg-surface-raised flex flex-col overflow-visible",
+          isFocused ? "border-[1.5px] border-accent" : "border border-white/15",
+        ].join(" ")}
         style={{
-          position: "absolute",
           left: screenX,
           top: screenY,
           width: screenW,
           height: screenH,
           zIndex: isFocused ? 100 : 10,
-          boxSizing: "border-box",
-          border: isFocused ? "1.5px solid #4a9eff" : "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 6,
-          background: "#242424",
-          display: "flex",
-          flexDirection: "column",
-          overflow: "visible",
         }}
       >
         <div
           onMouseDown={handleTitleMouseDown}
           onContextMenu={handleTitleContextMenu}
-          style={{
-            height: TITLE_BAR_HEIGHT,
-            minHeight: TITLE_BAR_HEIGHT,
-            background: isFocused ? "#2d2d2d" : "#222",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 4px 0 12px",
-            cursor: "move",
-            userSelect: "none",
-            borderBottom: "1px solid rgba(255,255,255,0.08)",
-            flexShrink: 0,
-            borderRadius: "5px 5px 0 0",
-            overflow: "hidden",
-          }}
+          className={[
+            "h-8 min-h-8 flex items-center justify-between pr-1 pl-3 cursor-move select-none",
+            "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
+            isFocused ? "bg-surface-active" : "bg-surface-panel",
+          ].join(" ")}
         >
-          <span
-            style={{
-              fontSize: 13,
-              fontFamily: "monospace",
-              color: "#ccc",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-              flex: 1,
-              minWidth: 0,
-            }}
-          >
+          <span className="text-[13px] font-mono text-text-muted-light overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
             {win.title}
           </span>
-          <div onMouseDown={(e) => e.stopPropagation()} style={{ flexShrink: 0 }}>
+          <div onMouseDown={(e) => e.stopPropagation()} className="shrink-0">
             <Button
               variant="ghost"
               onPress={() => onClose(win.id)}
@@ -384,7 +353,7 @@ export function Window({
                 padding: "0 4px",
                 fontSize: 16,
                 lineHeight: 1,
-                color: "#888",
+                color: "var(--color-text-muted)",
                 minWidth: 24,
                 height: 24,
               }}
@@ -395,20 +364,11 @@ export function Window({
         </div>
 
         {win.kind === "iframe" ? (
-          <div
-            style={{
-              flex: 1,
-              overflow: "hidden",
-              background: "#1e1e1e",
-              display: "flex",
-              flexDirection: "column",
-              borderRadius: "0 0 5px 5px",
-            }}
-          >
+          <div className="flex-1 overflow-hidden bg-surface flex flex-col rounded-b-[5px]">
             <form
               onSubmit={handleUrlSubmit}
               onMouseDown={(e) => e.stopPropagation()}
-              style={{ padding: "4px 8px", flexShrink: 0 }}
+              className="px-2 py-1 shrink-0"
             >
               <TextField
                 value={urlInput}
@@ -417,44 +377,22 @@ export function Window({
                 inputStyle={{ width: "100%" }}
               />
             </form>
-            <div style={{ flex: 1, position: "relative" }}>
+            <div className="flex-1 relative">
               <iframe
                 src={win.url ?? "about:blank"}
                 sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                 onLoad={handleIframeLoad}
                 onError={handleIframeError}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  border: "none",
-                  width: "100%",
-                  height: "100%",
-                }}
+                className="absolute inset-0 border-0 w-full h-full"
               />
               {(iframeState === "failed" || iframeState === "likely-blocked") && (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    background: "rgba(30,30,30,0.92)",
-                    borderTop: "1px solid rgba(255,255,255,0.1)",
-                    padding: "8px 12px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 8,
-                    fontFamily: "monospace",
-                    fontSize: 12,
-                    color: "rgba(255,255,255,0.5)",
-                  }}
-                >
+                <div className="absolute bottom-0 left-0 right-0 bg-surface/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
                   <span>This page may not allow embedding.</span>
                   <a
                     href={win.url}
                     target="_blank"
                     rel="noreferrer"
-                    style={{ color: "#4a9eff", textDecoration: "none" }}
+                    className="text-accent no-underline"
                   >
                     Open in new tab
                   </a>
@@ -464,12 +402,7 @@ export function Window({
           </div>
         ) : (
           <div
-            style={{
-              flex: 1,
-              overflow: "hidden",
-              background: "#1e1e1e",
-              borderRadius: "0 0 5px 5px",
-            }}
+            className="flex-1 overflow-hidden bg-surface rounded-b-[5px]"
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
@@ -477,18 +410,7 @@ export function Window({
             {win.sessionId ? (
               <Terminal sessionId={win.sessionId} />
             ) : (
-              <div
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "rgba(255,255,255,0.2)",
-                  fontFamily: "monospace",
-                  fontSize: 12,
-                }}
-              >
+              <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
                 no session bound
               </div>
             )}
@@ -499,11 +421,8 @@ export function Window({
           <div
             key={dir}
             onMouseDown={handleResizeMouseDown(dir)}
-            style={{
-              position: "absolute",
-              ...style,
-              zIndex: 20,
-            }}
+            className="absolute z-20"
+            style={style}
           />
         ))}
       </div>
