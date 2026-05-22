@@ -217,7 +217,7 @@ Use this only when completion is blocked by missing required tools or missing au
 11. Before moving to `Merging`, poll PR feedback and checks:
     - Read any PR `Manual QA Plan` comment (when present) and use it to sharpen UI/runtime test coverage for the current change.
     - Run the full PR feedback sweep protocol.
-    - Confirm PR checks are passing (green) after the latest changes.
+    - Confirm PR checks have run and are green on the latest pushed commit. If checks are still pending, wait. If checks did not run because the CI workflow was added to `master` after this branch was created, rebase onto `master` and push to trigger them, then wait for green.
     - Confirm every required ticket-provided validation/test-plan item is explicitly marked complete in the workpad.
     - Repeat this check-address-verify loop until no outstanding comments remain and checks are fully passing.
     - Re-open and refresh the workpad before state transition so `Plan`, `Acceptance Criteria`, and `Validation` exactly match completed work.
@@ -252,7 +252,8 @@ Use this only when completion is blocked by missing required tools or missing au
 - Acceptance criteria and required ticket-provided validation items are complete.
 - Validation/tests are green for the latest commit.
 - PR feedback sweep is complete and no actionable comments remain.
-- PR checks are green, branch is pushed, and PR is linked on the issue.
+- PR checks have run and are green on the latest pushed commit. If checks are missing because the CI workflow landed on `master` after this branch was created, rebase onto `master` and push to trigger them, then wait for green before transitioning.
+- Branch is pushed and PR is linked on the issue.
 - Required PR metadata is present (`symphony` label).
 
 ## Guardrails
@@ -267,6 +268,7 @@ Use this only when completion is blocked by missing required tools or missing au
 - Never call `gh pr merge` outside the `Merging` flow.
 - Never amend or force-push history that is already on `origin`. Make a new commit for fixes.
 - Do not move to `Merging` unless the `Completion bar before Merging` is satisfied.
+- Do not transition to `Merging` while PR checks are pending, failing, or absent on the latest pushed commit.
 - `Human Review` is reserved for the blocked-access escape hatch; do not route there from the normal completion flow.
 - If state is terminal (`Done`), do nothing and shut down.
 - Keep issue text concise, specific, and reviewer-oriented.
