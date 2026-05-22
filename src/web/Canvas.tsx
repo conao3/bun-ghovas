@@ -7,6 +7,7 @@ import { Minimap } from "./Minimap";
 const GRID_SIZE = 40;
 const MIN_ZOOM = 0.25;
 const MAX_ZOOM = 2;
+const ZOOM_PRESETS = [0.25, 0.5, 1, 2] as const;
 
 function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }) {
   const scaledGrid = GRID_SIZE * zoom;
@@ -196,6 +197,14 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
     [onCanvasChange],
   );
 
+  const handleZoomPreset = useCallback(
+    (preset: number) => {
+      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, preset));
+      onCanvasChange({ ...stateRef.current, zoom: newZoom });
+    },
+    [onCanvasChange],
+  );
+
   const handleCreateTerminalWindow = useCallback(() => {
     const container = containerRef.current;
     const containerW = container?.clientWidth ?? 800;
@@ -285,6 +294,43 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
         />
       ))}
       <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} onCreateTerminalWindow={handleCreateTerminalWindow} />
+      <div
+        onMouseDown={(e) => e.stopPropagation()}
+        style={{
+          position: "absolute",
+          bottom: 12,
+          left: 12,
+          display: "flex",
+          background: "rgba(0,0,0,0.6)",
+          borderRadius: 4,
+          overflow: "hidden",
+          zIndex: 5,
+        }}
+      >
+        {ZOOM_PRESETS.map((preset) => {
+          const pct = Math.round(preset * 100);
+          const isActive = zoomPct === pct;
+          return (
+            <button
+              key={pct}
+              onClick={() => handleZoomPreset(preset)}
+              style={{
+                background: isActive ? "rgba(74,158,255,0.35)" : "transparent",
+                color: isActive ? "#fff" : "#ccc",
+                border: "none",
+                borderRight: "1px solid rgba(255,255,255,0.1)",
+                fontFamily: "monospace",
+                fontSize: 12,
+                padding: "4px 8px",
+                cursor: "pointer",
+                lineHeight: 1.6,
+              }}
+            >
+              {pct}%
+            </button>
+          );
+        })}
+      </div>
       <Minimap
         windows={canvasState.windows}
         panX={canvasState.panX}
