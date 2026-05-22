@@ -32,6 +32,7 @@ function saveRecentCommands(recentIds: string[], id: string): string[] {
 export interface Command {
   id: string;
   label: string;
+  confirm?: string;
   run: () => void;
 }
 
@@ -45,12 +46,14 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   const [query, setQuery] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
   const [recentIds, setRecentIds] = useState<string[]>(() => loadRecentCommands());
+  const [pendingConfirm, setPendingConfirm] = useState<Command | null>(null);
 
   useEffect(() => {
     if (isOpen) {
       setQuery("");
       setHighlightIndex(0);
       setRecentIds(loadRecentCommands());
+      setPendingConfirm(null);
     }
   }, [isOpen]);
 
@@ -66,9 +69,24 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
       : commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()));
 
   const runCommand = (cmd: Command) => {
+    if (cmd.confirm) {
+      setPendingConfirm(cmd);
+      return;
+    }
     setRecentIds((prev) => saveRecentCommands(prev, cmd.id));
     cmd.run();
     onClose();
+  };
+
+  const handleConfirm = () => {
+    if (!pendingConfirm) return;
+    setRecentIds((prev) => saveRecentCommands(prev, pendingConfirm.id));
+    pendingConfirm.run();
+    onClose();
+  };
+
+  const handleCancel = () => {
+    setPendingConfirm(null);
   };
 
   const handleQueryChange = (value: string) => {
@@ -94,58 +112,107 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div onKeyDown={handleKeyDown}>
-        <TextField
-          autoFocus
-          value={query}
-          onChange={handleQueryChange}
-          aria-label="コマンド検索"
-          style={{ width: 440 }}
-        />
-        <div style={{ marginTop: 8, maxHeight: 320, overflowY: "auto" }}>
-          {filtered.map((cmd, i) => (
-            <div
-              key={cmd.id}
-              onClick={() => runCommand(cmd)}
-              onMouseEnter={() => setHighlightIndex(i)}
+      {pendingConfirm ? (
+        <div style={{ width: 440 }}>
+          <div
+            style={{
+              color: "#ccc",
+              fontFamily: "monospace",
+              fontSize: 13,
+              marginBottom: 16,
+              lineHeight: 1.5,
+            }}
+          >
+            {pendingConfirm.confirm}
+          </div>
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <button
+              onClick={handleCancel}
               style={{
-                padding: "6px 10px",
+                padding: "5px 14px",
                 borderRadius: 3,
-                cursor: "pointer",
-                background: i === highlightIndex ? "rgba(255,255,255,0.12)" : "transparent",
+                border: "1px solid rgba(255,255,255,0.2)",
+                background: "transparent",
                 color: "#ccc",
                 fontFamily: "monospace",
                 fontSize: 13,
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
+                cursor: "pointer",
               }}
             >
-              <span>{cmd.label}</span>
-              {(() => {
-                const def = SHORTCUTS.find((s) => s.id === cmd.id);
-                return def ? (
-                  <span style={{ color: "rgba(255,255,255,0.4)", marginLeft: 16 }}>
-                    {formatShortcut(def)}
-                  </span>
-                ) : null;
-              })()}
-            </div>
-          ))}
-          {filtered.length === 0 && (
-            <div
+              Cancel
+            </button>
+            <button
+              autoFocus
+              onClick={handleConfirm}
               style={{
-                padding: "6px 10px",
-                color: "rgba(255,255,255,0.4)",
+                padding: "5px 14px",
+                borderRadius: 3,
+                border: "none",
+                background: "#c0392b",
+                color: "#fff",
                 fontFamily: "monospace",
                 fontSize: 13,
+                cursor: "pointer",
               }}
             >
-              No commands found
-            </div>
-          )}
+              Confirm
+            </button>
+          </div>
         </div>
-      </div>
+      ) : (
+        <div onKeyDown={handleKeyDown}>
+          <TextField
+            autoFocus
+            value={query}
+            onChange={handleQueryChange}
+            aria-label="コマンド検索"
+            style={{ width: 440 }}
+          />
+          <div style={{ marginTop: 8, maxHeight: 320, overflowY: "auto" }}>
+            {filtered.map((cmd, i) => (
+              <div
+                key={cmd.id}
+                onClick={() => runCommand(cmd)}
+                onMouseEnter={() => setHighlightIndex(i)}
+                style={{
+                  padding: "6px 10px",
+                  borderRadius: 3,
+                  cursor: "pointer",
+                  background: i === highlightIndex ? "rgba(255,255,255,0.12)" : "transparent",
+                  color: "#ccc",
+                  fontFamily: "monospace",
+                  fontSize: 13,
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                }}
+              >
+                <span>{cmd.label}</span>
+                {(() => {
+                  const def = SHORTCUTS.find((s) => s.id === cmd.id);
+                  return def ? (
+                    <span style={{ color: "rgba(255,255,255,0.4)", marginLeft: 16 }}>
+                      {formatShortcut(def)}
+                    </span>
+                  ) : null;
+                })()}
+              </div>
+            ))}
+            {filtered.length === 0 && (
+              <div
+                style={{
+                  padding: "6px 10px",
+                  color: "rgba(255,255,255,0.4)",
+                  fontFamily: "monospace",
+                  fontSize: 13,
+                }}
+              >
+                No commands found
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </Modal>
   );
 }

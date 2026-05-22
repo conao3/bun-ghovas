@@ -277,6 +277,15 @@ export function App() {
 
   const commands: Command[] = [
     {
+      id: "reset-workspace",
+      label: "Reset workspace to default",
+      confirm: "This resets all layers and windows to the default workspace. Continue?",
+      run: () => {
+        setWorkspace(INITIAL_WORKSPACE);
+        setActiveIds(INITIAL_ACTIVE);
+      },
+    },
+    {
       id: "open-settings",
       label: "Open Settings",
       run: () => setSettingsOpen(true),
