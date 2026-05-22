@@ -51,7 +51,7 @@ Description:
 ## Tools
 
 - Linear MCP server is connected (OAuth). Use `mcp__linear__save_issue` to update state (pass `state` by name: `"In Progress"`, `"Human Review"`, `"Done"`) and to attach PR URLs via `links: [{ url, title }]`. Use `mcp__linear__get_issue` / `mcp__linear__list_issues` for reads.
-- `gh` CLI is preconfigured against `conao3` via `~/.config/gh/hosts.yml`. Use it for all GitHub operations.
+- `gh` CLI is available and authenticated. Use it for all GitHub operations.
 
 Branch name convention: `issue-{{ issue.identifier | downcase }}`.
 
