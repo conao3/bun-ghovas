@@ -18,6 +18,7 @@ export type LayerUiMode = "horizontal-tabs" | "floating" | "vertical-tabs";
 
 export interface CanvasState {
   id: string;
+  name?: string;
   windows: WindowState[];
   panX: number;
   panY: number;
