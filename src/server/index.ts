@@ -6,6 +6,16 @@ const startedAt = Date.now();
 const indexHtmlPath = new URL("../web/index.html", import.meta.url);
 const indexHtml = await Bun.file(indexHtmlPath).text();
 
+const buildResult = await Bun.build({
+  entrypoints: [new URL("../web/main.tsx", import.meta.url).pathname],
+  target: "browser",
+});
+if (!buildResult.success) {
+  for (const msg of buildResult.logs) console.error(msg);
+  process.exit(1);
+}
+const mainJs = await buildResult.outputs[0].text();
+
 const server = Bun.serve({
   port: PORT,
   fetch(req, server) {
@@ -20,6 +30,11 @@ const server = Bun.serve({
     if (url.pathname === "/" || url.pathname === "/index.html") {
       return new Response(indexHtml, {
         headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+    if (url.pathname === "/main.js") {
+      return new Response(mainJs, {
+        headers: { "content-type": "text/javascript; charset=utf-8" },
       });
     }
     return new Response("not found", { status: 404 });
