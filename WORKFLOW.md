@@ -53,7 +53,7 @@ Description:
 These env vars are already exported in the shell:
 
 - `LINEAR_API_KEY` — Linear GraphQL `https://api.linear.app/graphql` with `Authorization: $LINEAR_API_KEY` (no Bearer prefix)
-- `GITHUB_TOKEN` — `gh` CLI is preconfigured
+- `gh` CLI is preconfigured against `conao3` via `~/.config/gh/hosts.yml`. Use it for all GitHub operations; no `GITHUB_TOKEN` env var is set.
 
 Helper to move the Linear issue by state name:
 
