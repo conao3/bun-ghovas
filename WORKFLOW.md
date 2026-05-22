@@ -19,7 +19,7 @@ workspace:
   root: ~/code/symphony-workspaces
 hooks:
   after_create: |
-    git clone --depth 1 git@github.com:conao3/bun-ghovas.git .
+    gh repo clone conao3/bun-ghovas . -- --depth 1
 agent:
   max_concurrent_agents: 1
   max_turns: 10
