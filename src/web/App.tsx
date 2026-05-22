@@ -144,6 +144,70 @@ export function App() {
     }));
   }, []);
 
+  const handleRenameCanvas = useCallback((level: LayerLevel, canvasId: string, name: string) => {
+    setWorkspace((prev) => ({
+      ...prev,
+      layers: {
+        ...prev.layers,
+        [level]: {
+          ...prev.layers[level],
+          canvases: prev.layers[level].canvases.map((c) =>
+            c.id === canvasId ? { ...c, name } : c,
+          ),
+        },
+      },
+    }));
+  }, []);
+
+  const handleDuplicateCanvas = useCallback((level: LayerLevel, canvasId: string) => {
+    setWorkspace((prev) => {
+      const layer = prev.layers[level];
+      const idx = layer.canvases.findIndex((c) => c.id === canvasId);
+      if (idx === -1) return prev;
+      const orig = layer.canvases[idx];
+      const clone: CanvasState = {
+        ...orig,
+        id: crypto.randomUUID(),
+        name: (orig.name ?? orig.id) + " copy",
+        windows: orig.windows.map((w) => ({
+          ...w,
+          id: crypto.randomUUID(),
+          ...(w.kind === "terminal" ? { sessionId: crypto.randomUUID() } : {}),
+        })),
+      };
+      const next = [...layer.canvases];
+      next.splice(idx + 1, 0, clone);
+      return {
+        ...prev,
+        layers: {
+          ...prev.layers,
+          [level]: { ...layer, canvases: next },
+        },
+      };
+    });
+  }, []);
+
+  const handleDeleteCanvas = useCallback((level: LayerLevel, canvasId: string) => {
+    setWorkspace((prev) => {
+      const layer = prev.layers[level];
+      if (layer.canvases.length <= 1) return prev;
+      const next = layer.canvases.filter((c) => c.id !== canvasId);
+      return {
+        ...prev,
+        layers: {
+          ...prev.layers,
+          [level]: { ...layer, canvases: next },
+        },
+      };
+    });
+    setActiveIds((prev) => {
+      const layer = workspace.layers[level];
+      if (prev[level] !== canvasId) return prev;
+      const sibling = layer.canvases.find((c) => c.id !== canvasId);
+      return sibling ? { ...prev, [level]: sibling.id } : prev;
+    });
+  }, [workspace.layers]);
+
   const activeCanvas =
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
@@ -238,6 +302,9 @@ export function App() {
           onActiveChange={handleActiveChange}
           onUiModeChange={handleUiModeChange}
           onVisibilityChange={handleVisibilityChange}
+          onRenameCanvas={handleRenameCanvas}
+          onDuplicateCanvas={handleDuplicateCanvas}
+          onDeleteCanvas={handleDeleteCanvas}
         />
         <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
           <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} focusedWindowId={focusedWindowId} onFocusWindow={handleFocusWindow} />
