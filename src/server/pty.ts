@@ -14,6 +14,8 @@ const native = loadNativeModule("pty");
 const ptyNative = native.module;
 const helperPath = path.resolve(native.dir, "spawn-helper");
 
+const SCROLLBACK_CAP = 1024 * 1024;
+
 interface NativePty {
   fork(
     file: string,
@@ -47,11 +49,15 @@ interface WsSend {
   send(data: string): void;
 }
 
+const nullWs: WsSend = { send: () => {} };
+
 interface Session {
   fd: number;
   pid: number;
   ws: WsSend;
   alive: boolean;
+  scrollback: Buffer[];
+  scrollbackSize: number;
 }
 
 function buildEnv(extra: Partial<Record<string, string>> = {}): string[] {
@@ -84,12 +90,26 @@ export function createPtyManager() {
     ws.send(JSON.stringify(msg));
   }
 
+  function appendScrollback(session: Session, chunk: Buffer) {
+    session.scrollback.push(chunk);
+    session.scrollbackSize += chunk.byteLength;
+    while (session.scrollbackSize > SCROLLBACK_CAP && session.scrollback.length > 0) {
+      const dropped = session.scrollback.shift()!;
+      session.scrollbackSize -= dropped.byteLength;
+    }
+  }
+
   function openSession(ws: WsSend, msg: Extract<ClientMessage, { type: "open" }>) {
     const { sessionId, shell, cols, rows } = msg;
 
     if (sessions.has(sessionId)) {
-      sessions.get(sessionId)!.ws = ws;
+      const session = sessions.get(sessionId)!;
+      session.ws = ws;
       send(ws, { type: "open", sessionId });
+      if (session.scrollback.length > 0) {
+        const data = Buffer.concat(session.scrollback).toString("utf8");
+        send(ws, { type: "output", sessionId, data });
+      }
       return;
     }
 
@@ -123,12 +143,15 @@ export function createPtyManager() {
         },
       );
 
-      const session: Session = { fd: result.fd, pid: result.pid, ws, alive: true };
+      const session: Session = { fd: result.fd, pid: result.pid, ws, alive: true, scrollback: [], scrollbackSize: 0 };
       sessions.set(sessionId, session);
 
       pollRead(session, sessionId, (data) => {
         const s = sessions.get(sessionId);
-        if (s) send(s.ws, { type: "output", sessionId, data });
+        if (s) {
+          appendScrollback(s, Buffer.from(data, "utf8"));
+          send(s.ws, { type: "output", sessionId, data });
+        }
       });
 
       send(ws, { type: "open", sessionId });
@@ -170,6 +193,8 @@ export function createPtyManager() {
         const s = sessions.get(msg.sessionId);
         if (s) {
           s.alive = false;
+          s.scrollback = [];
+          s.scrollbackSize = 0;
           try { process.kill(s.pid, "SIGHUP"); } catch {}
           sessions.delete(msg.sessionId);
         }
@@ -179,11 +204,9 @@ export function createPtyManager() {
   }
 
   function cleanup(ws: WsSend) {
-    for (const [sessionId, session] of sessions.entries()) {
+    for (const session of sessions.values()) {
       if (session.ws === ws) {
-        session.alive = false;
-        try { process.kill(session.pid, "SIGHUP"); } catch {}
-        sessions.delete(sessionId);
+        session.ws = nullWs;
       }
     }
   }
