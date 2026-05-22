@@ -1,3 +1,4 @@
+import tailwind from "bun-plugin-tailwind";
 import { createPtyManager } from "./pty";
 import { loadWorkspace, saveWorkspace } from "./workspaceStore";
 import type { WorkspaceState } from "../shared/types";
@@ -11,14 +12,19 @@ const indexHtmlPath = new URL("../web/index.html", import.meta.url);
 const indexHtml = await Bun.file(indexHtmlPath).text();
 
 const buildResult = await Bun.build({
-  entrypoints: [new URL("../web/main.tsx", import.meta.url).pathname],
+  entrypoints: [
+    new URL("../web/main.tsx", import.meta.url).pathname,
+    new URL("../web/index.css", import.meta.url).pathname,
+  ],
   target: "browser",
+  plugins: [tailwind],
 });
 if (!buildResult.success) {
   for (const msg of buildResult.logs) console.error(msg);
   process.exit(1);
 }
-const mainJs = await buildResult.outputs[0].text();
+const mainJs = await buildResult.outputs.find((o) => o.path.endsWith(".js"))!.text();
+const mainCss = await buildResult.outputs.find((o) => o.path.endsWith(".css"))!.text();
 
 const ptyManager = createPtyManager();
 console.log("node-pty native module loaded successfully");
@@ -42,6 +48,11 @@ const server = Bun.serve({
     if (url.pathname === "/main.js") {
       return new Response(mainJs, {
         headers: { "content-type": "text/javascript; charset=utf-8" },
+      });
+    }
+    if (url.pathname === "/main.css") {
+      return new Response(mainCss, {
+        headers: { "content-type": "text/css; charset=utf-8" },
       });
     }
     if (url.pathname === "/workspace" && req.method === "GET") {

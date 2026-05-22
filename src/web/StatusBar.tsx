@@ -12,20 +12,8 @@ export function StatusBar({ activeIds, zoom, focusedWindowTitle }: StatusBarProp
 
   return (
     <div
-      style={{
-        gridArea: "bottom",
-        height: 22,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 8px",
-        background: "#1e1e1e",
-        borderTop: "1px solid rgba(255,255,255,0.12)",
-        color: "#888",
-        fontSize: 11,
-        fontFamily: "monospace",
-        userSelect: "none",
-      }}
+      className="[grid-area:bottom] h-[22px] flex items-center justify-between px-2
+        bg-surface border-t border-border text-text-muted text-[11px] font-mono select-none"
     >
       <span>{layerText}</span>
       <span>{focusedWindowTitle ?? "—"}</span>
