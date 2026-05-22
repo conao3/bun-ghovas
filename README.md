@@ -1,20 +1,64 @@
 # bun-ghovas
 
-ブラウザ上の無限キャンバスにターミナルウィンドウを自由配置する browser-native window manager。プロダクト名は `ghovas`。
+Browser-native window manager: an infinite canvas where terminal and iframe windows live side by side in a multi-layer workspace.
 
-構想の全体像は [`conao3/idea` の projects/bun-ghovas.md](https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md) を参照。
+Concept: [`conao3/idea` projects/bun-ghovas.md](https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md)
 
-## 開発環境
+## Features
 
-Bun ランタイムを Nix flake で固定している。
+- **L0 infinite canvas** — pan, zoom, drag-place windows (`src/web/Canvas.tsx`)
+- **L1 / L2 / L3 layer switching** — per-layer UI mode (horizontal-tabs / vertical-tabs / floating capsule) and per-layer visibility (`src/web/LayerBar.tsx`, `src/web/LayerStripFloating.tsx`)
+- **Terminal windows** — backed by ghostty-web + node-pty; per-session scrollback ring buffer and reattach replay (`src/web/components/Terminal.tsx`, `src/web/lib/ptyClient.ts`, `src/server/pty.ts`)
+- **Iframe windows** — with URL bar (`src/web/Window.tsx`)
+- **Window-create FAB** — popover to launch iframe or terminal windows (`src/web/CreateWindowFab.tsx`)
+- **`Mod+K` command palette** (`src/web/CommandPalette.tsx`)
+- **Bottom status bar** — active L0/L1/L2/L3 IDs and zoom percentage (`src/web/StatusBar.tsx`)
+- **Workspace persistence** — `GET` / `PUT /workspace`, debounce auto-save, boot load (`src/server/workspaceStore.ts`, `src/web/lib/workspaceClient.ts`, `src/web/lib/useWorkspacePersistence.ts`)
+
+## Architecture
+
+The frontend is React 19, bundled by `Bun.build` and served from `/main.js`. React Aria Components (RAC) primitives are wrapped in `src/web/components/`. The backend runs under `Bun.serve`, handling HTTP and WebSocket on the same port. A PTY manager (`src/server/pty.ts`) uses the node-pty native module to spawn shells; the workspace store (`src/server/workspaceStore.ts`) persists state to `data/workspace.json`. Terminal sessions communicate over `/ws` with a JSON wire protocol (`open` / `input` / `resize` / `close` / `output` / `exit` / `error`) — see `src/server/pty.ts` for the full message shapes.
+
+```text
+src/
+├── server/
+│   ├── index.ts              # Bun.serve entry — HTTP + WebSocket routing
+│   ├── pty.ts                # PTY manager, node-pty native, /ws handler
+│   └── workspaceStore.ts     # GET/PUT /workspace, data/workspace.json
+├── shared/
+│   └── types.ts              # Shared TypeScript types
+└── web/
+    ├── main.tsx              # React entry point
+    ├── App.tsx               # Root layout, keyboard bindings
+    ├── Canvas.tsx            # L0 infinite canvas (pan / zoom / drag)
+    ├── LayerBar.tsx          # L1–L3 layer strips (horizontal/vertical/floating)
+    ├── LayerStripFloating.tsx # Draggable floating capsule strip
+    ├── Window.tsx            # Iframe window + URL bar
+    ├── CreateWindowFab.tsx   # FAB + popover for window creation
+    ├── CommandPalette.tsx    # Mod+K command palette
+    ├── StatusBar.tsx         # Bottom bar (layers + zoom)
+    ├── components/           # Wrapped RAC primitives
+    │   ├── Button.tsx
+    │   ├── Modal.tsx
+    │   ├── Tabs.tsx
+    │   ├── Terminal.tsx      # ghostty-web terminal component
+    │   └── TextField.tsx
+    └── lib/
+        ├── ptyClient.ts               # WebSocket PTY client
+        ├── workspaceClient.ts         # HTTP workspace API client
+        └── useWorkspacePersistence.ts # Auto-save hook
+```
+
+## Development
+
+Requires Nix flake + direnv (`nix develop` activates the devShell with Bun and node-pty build dependencies).
 
 ```sh
-nix develop
 bun install
 bun run dev
 ```
 
-`bun run dev` でローカル開発サーバが起動する (既定 port `3000`)。
+`bun run dev` starts the server with watch/rebuild on port 3000. Note: node-pty under Bun requires a `tty.ReadStream` EAGAIN workaround; the implementation is in `src/server/pty.ts`.
 
 ## Running
 
@@ -26,7 +70,21 @@ bun run src/server/index.ts
 bun run scripts/pty-smoke.ts
 ```
 
-### Workspace persistence
+## Testing
+
+```sh
+bun test
+```
+
+Currently exercises `workspaceStore`.
+
+## Keyboard Shortcuts
+
+| Shortcut | Action                |
+|----------|-----------------------|
+| `Mod+K`  | Open command palette  |
+
+## Workspace Persistence
 
 ```sh
 # Save workspace state
@@ -38,6 +96,11 @@ curl -X PUT -H 'content-type: application/json' \
 curl http://localhost:3000/workspace
 ```
 
-## ライセンス
+## Related Docs
+
+- [Concept: conao3/idea projects/bun-ghovas.md](https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md)
+- [Design prompt: conao3/idea projects/bun-ghovas-design.md](https://github.com/conao3/idea/blob/master/projects/bun-ghovas-design.md)
+
+## License
 
 Apache-2.0
