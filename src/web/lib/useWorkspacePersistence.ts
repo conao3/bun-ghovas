@@ -11,14 +11,16 @@ export function useWorkspacePersistence(
   const toast = useToast();
 
   useEffect(() => {
-    loadWorkspace().then((loaded) => {
-      if (loaded !== null) setWorkspace(loaded);
-      hydratedRef.current = true;
-    }).catch((err) => {
-      console.warn("Failed to load workspace:", err);
-      toast.show("warning", "workspace load failed: " + err.message);
-      hydratedRef.current = true;
-    });
+    loadWorkspace()
+      .then((loaded) => {
+        if (loaded !== null) setWorkspace(loaded);
+        hydratedRef.current = true;
+      })
+      .catch((err) => {
+        console.warn("Failed to load workspace:", err);
+        toast.show("warning", "workspace load failed: " + err.message);
+        hydratedRef.current = true;
+      });
   }, []);
 
   useEffect(() => {

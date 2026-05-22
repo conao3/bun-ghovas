@@ -1,4 +1,4 @@
-export type WindowKind = "terminal" | "iframe";
+type WindowKind = "terminal" | "iframe";
 
 export interface WindowState {
   id: string;

@@ -3,11 +3,7 @@ import {
   Label as RACLabel,
   Input as RACInput,
 } from "react-aria-components";
-import type {
-  TextFieldProps as RACTextFieldProps,
-  LabelProps,
-  InputProps,
-} from "react-aria-components";
+import type { TextFieldProps as RACTextFieldProps } from "react-aria-components";
 import type { CSSProperties } from "react";
 
 interface TextFieldProps extends RACTextFieldProps {
@@ -56,6 +52,3 @@ export function TextField({ label, inputStyle, style, ...props }: TextFieldProps
     </RACTextField>
   );
 }
-
-export { RACLabel as Label, RACInput as Input };
-export type { LabelProps, InputProps };

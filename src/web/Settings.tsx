@@ -21,7 +21,14 @@ interface SettingsProps {
   onWorkspaceReplace: (next: WorkspaceState) => void;
 }
 
-export function Settings({ isOpen, onClose, workspace, onUiModeChange, onVisibilityChange, onWorkspaceReplace }: SettingsProps) {
+export function Settings({
+  isOpen,
+  onClose,
+  workspace,
+  onUiModeChange,
+  onVisibilityChange,
+  onWorkspaceReplace,
+}: SettingsProps) {
   const [selected, setSelected] = useState<NavEntry>("General");
 
   return (

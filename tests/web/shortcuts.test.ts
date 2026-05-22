@@ -2,10 +2,26 @@ import { describe, test, expect } from "bun:test";
 import { matchesShortcut, formatShortcut } from "../../src/web/lib/shortcuts";
 import type { ShortcutDef } from "../../src/web/lib/shortcuts";
 
-const def: ShortcutDef = { id: "test", label: "Test", mod: true, shift: false, alt: false, key: "k" };
+const def: ShortcutDef = {
+  id: "test",
+  label: "Test",
+  mod: true,
+  shift: false,
+  alt: false,
+  key: "k",
+};
 
-function makeEvent(overrides: Partial<Pick<KeyboardEvent, "metaKey" | "ctrlKey" | "shiftKey" | "altKey" | "key">>): KeyboardEvent {
-  return { metaKey: false, ctrlKey: false, shiftKey: false, altKey: false, key: "k", ...overrides } as KeyboardEvent;
+function makeEvent(
+  overrides: Partial<Pick<KeyboardEvent, "metaKey" | "ctrlKey" | "shiftKey" | "altKey" | "key">>,
+): KeyboardEvent {
+  return {
+    metaKey: false,
+    ctrlKey: false,
+    shiftKey: false,
+    altKey: false,
+    key: "k",
+    ...overrides,
+  } as KeyboardEvent;
 }
 
 describe("matchesShortcut", () => {

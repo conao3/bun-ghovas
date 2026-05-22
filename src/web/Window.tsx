@@ -104,7 +104,7 @@ const RESIZE_HANDLES: ResizeHandleDef[] = [
   },
 ];
 
-export interface WindowCallbacks {
+interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
   onMove: (id: string, x: number, y: number) => void;
@@ -122,7 +122,20 @@ interface WindowProps extends WindowCallbacks {
   isFocused: boolean;
 }
 
-export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onMove, onResize, onUrlChange, onRename, onDuplicate }: WindowProps) {
+export function Window({
+  win,
+  panX,
+  panY,
+  zoom,
+  isFocused,
+  onFocus,
+  onClose,
+  onMove,
+  onResize,
+  onUrlChange,
+  onRename,
+  onDuplicate,
+}: WindowProps) {
   const [urlInput, setUrlInput] = useState(win.url ?? "");
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [menuOpen, setMenuOpen] = useState(false);
@@ -275,7 +288,14 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
     <>
       <div
         ref={menuAnchorRef}
-        style={{ position: "fixed", left: menuPos.x, top: menuPos.y, width: 0, height: 0, pointerEvents: "none" }}
+        style={{
+          position: "fixed",
+          left: menuPos.x,
+          top: menuPos.y,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
       />
       <ContextMenu
         isOpen={menuOpen}

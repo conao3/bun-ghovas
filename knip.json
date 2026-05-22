@@ -1,0 +1,19 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "entry": [
+    "src/server/index.ts",
+    "src/web/main.tsx",
+    "tests/**/*.test.ts",
+    "scripts/**/*.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "tests/**/*.{ts,tsx}",
+    "scripts/**/*.ts"
+  ],
+  "ignoreDependencies": [
+    "node-pty",
+    "oxlint",
+    "oxfmt"
+  ]
+}

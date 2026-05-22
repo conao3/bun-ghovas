@@ -8,7 +8,14 @@ export type ShortcutDef = {
 };
 
 export const SHORTCUTS: ShortcutDef[] = [
-  { id: "toggle-command-palette", label: "Toggle command palette", mod: true, shift: false, alt: false, key: "k" },
+  {
+    id: "toggle-command-palette",
+    label: "Toggle command palette",
+    mod: true,
+    shift: false,
+    alt: false,
+    key: "k",
+  },
   { id: "open-settings", label: "Open settings", mod: true, shift: false, alt: false, key: "," },
 ];
 

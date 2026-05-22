@@ -65,14 +65,10 @@ export function Tab({
         cursor: "pointer",
         ...(orientation === "vertical"
           ? {
-              borderRight: renderProps.isSelected
-                ? "2px solid #4a9eff"
-                : "2px solid transparent",
+              borderRight: renderProps.isSelected ? "2px solid #4a9eff" : "2px solid transparent",
             }
           : {
-              borderBottom: renderProps.isSelected
-                ? "2px solid #4a9eff"
-                : "2px solid transparent",
+              borderBottom: renderProps.isSelected ? "2px solid #4a9eff" : "2px solid transparent",
             }),
         color: renderProps.isSelected ? "#4a9eff" : "#999",
         background: "transparent",
