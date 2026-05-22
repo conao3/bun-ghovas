@@ -1,9 +1,11 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
 import { TextField } from "./components/TextField";
 import { Terminal } from "./components/Terminal";
+import { ContextMenu, MenuItem } from "./components/Menu";
+import { Modal } from "./components/Modal";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
@@ -107,6 +109,8 @@ export interface WindowCallbacks {
   onMove: (id: string, x: number, y: number) => void;
   onResize: (id: string, x: number, y: number, width: number, height: number) => void;
   onUrlChange: (id: string, url: string) => void;
+  onRename: (id: string, title: string) => void;
+  onDuplicate: (id: string) => void;
 }
 
 interface WindowProps extends WindowCallbacks {
@@ -117,8 +121,13 @@ interface WindowProps extends WindowCallbacks {
   isFocused: boolean;
 }
 
-export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onMove, onResize, onUrlChange }: WindowProps) {
+export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onMove, onResize, onUrlChange, onRename, onDuplicate }: WindowProps) {
   const [urlInput, setUrlInput] = useState(win.url ?? "");
+  const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [renameOpen, setRenameOpen] = useState(false);
+  const [renameValue, setRenameValue] = useState("");
+  const menuAnchorRef = useRef<HTMLDivElement>(null);
 
   const screenX = panX + win.x * zoom;
   const screenY = panY + win.y * zoom;
@@ -168,6 +177,38 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
     [win.id, win.x, win.y, zoom, onFocus, onMove],
   );
 
+  const handleTitleContextMenu = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      onFocus(win.id);
+      setMenuPos({ x: e.clientX, y: e.clientY });
+      setMenuOpen(true);
+    },
+    [win.id, onFocus],
+  );
+
+  const handleMenuAction = useCallback(
+    (key: string) => {
+      if (key === "rename") {
+        setRenameValue(win.title);
+        setRenameOpen(true);
+      } else if (key === "duplicate") {
+        onDuplicate(win.id);
+      } else if (key === "close") {
+        onClose(win.id);
+      }
+    },
+    [win.id, win.title, onDuplicate, onClose],
+  );
+
+  const handleRenameCommit = useCallback(() => {
+    if (renameValue.trim()) {
+      onRename(win.id, renameValue.trim());
+      setRenameOpen(false);
+    }
+  }, [win.id, renameValue, onRename]);
+
   const handleResizeMouseDown = useCallback(
     (dir: ResizeDir) => (e: React.MouseEvent) => {
       if (e.button !== 0) return;
@@ -212,151 +253,186 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
   );
 
   return (
-    <div
-      onMouseDown={handleWindowMouseDown}
-      style={{
-        position: "absolute",
-        left: screenX,
-        top: screenY,
-        width: screenW,
-        height: screenH,
-        zIndex: isFocused ? 100 : 10,
-        boxSizing: "border-box",
-        border: isFocused ? "1.5px solid #4a9eff" : "1px solid rgba(255,255,255,0.15)",
-        borderRadius: 6,
-        background: "#242424",
-        display: "flex",
-        flexDirection: "column",
-        overflow: "visible",
-      }}
-    >
+    <>
       <div
-        onMouseDown={handleTitleMouseDown}
+        ref={menuAnchorRef}
+        style={{ position: "fixed", left: menuPos.x, top: menuPos.y, width: 0, height: 0, pointerEvents: "none" }}
+      />
+      <ContextMenu
+        isOpen={menuOpen}
+        onOpenChange={setMenuOpen}
+        triggerRef={menuAnchorRef}
+        onAction={handleMenuAction}
+      >
+        <MenuItem id="rename">Rename</MenuItem>
+        <MenuItem id="duplicate">Duplicate</MenuItem>
+        <MenuItem id="close">Close</MenuItem>
+      </ContextMenu>
+      <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <TextField
+            value={renameValue}
+            onChange={setRenameValue}
+            aria-label="Window title"
+            autoFocus
+          />
+          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+            <Button variant="secondary" onPress={() => setRenameOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="primary" onPress={handleRenameCommit}>
+              OK
+            </Button>
+          </div>
+        </div>
+      </Modal>
+      <div
+        onMouseDown={handleWindowMouseDown}
         style={{
-          height: TITLE_BAR_HEIGHT,
-          minHeight: TITLE_BAR_HEIGHT,
-          background: isFocused ? "#2d2d2d" : "#222",
+          position: "absolute",
+          left: screenX,
+          top: screenY,
+          width: screenW,
+          height: screenH,
+          zIndex: isFocused ? 100 : 10,
+          boxSizing: "border-box",
+          border: isFocused ? "1.5px solid #4a9eff" : "1px solid rgba(255,255,255,0.15)",
+          borderRadius: 6,
+          background: "#242424",
           display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "0 4px 0 12px",
-          cursor: "move",
-          userSelect: "none",
-          borderBottom: "1px solid rgba(255,255,255,0.08)",
-          flexShrink: 0,
-          borderRadius: "5px 5px 0 0",
-          overflow: "hidden",
+          flexDirection: "column",
+          overflow: "visible",
         }}
       >
-        <span
-          style={{
-            fontSize: 13,
-            fontFamily: "monospace",
-            color: "#ccc",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            whiteSpace: "nowrap",
-            flex: 1,
-            minWidth: 0,
-          }}
-        >
-          {win.title}
-        </span>
-        <div onMouseDown={(e) => e.stopPropagation()} style={{ flexShrink: 0 }}>
-          <Button
-            variant="ghost"
-            onPress={() => onClose(win.id)}
-            style={{
-              padding: "0 4px",
-              fontSize: 16,
-              lineHeight: 1,
-              color: "#888",
-              minWidth: 24,
-              height: 24,
-            }}
-          >
-            ×
-          </Button>
-        </div>
-      </div>
-
-      {win.kind === "iframe" ? (
         <div
+          onMouseDown={handleTitleMouseDown}
+          onContextMenu={handleTitleContextMenu}
           style={{
-            flex: 1,
-            overflow: "hidden",
-            background: "#1e1e1e",
+            height: TITLE_BAR_HEIGHT,
+            minHeight: TITLE_BAR_HEIGHT,
+            background: isFocused ? "#2d2d2d" : "#222",
             display: "flex",
-            flexDirection: "column",
-            borderRadius: "0 0 5px 5px",
-          }}
-        >
-          <form
-            onSubmit={handleUrlSubmit}
-            onMouseDown={(e) => e.stopPropagation()}
-            style={{ padding: "4px 8px", flexShrink: 0 }}
-          >
-            <TextField
-              value={urlInput}
-              onChange={setUrlInput}
-              aria-label="URL"
-              inputStyle={{ width: "100%" }}
-            />
-          </form>
-          <iframe
-            src={win.url ?? "about:blank"}
-            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-            style={{
-              flex: 1,
-              border: "none",
-              width: "100%",
-            }}
-          />
-        </div>
-      ) : (
-        <div
-          style={{
-            flex: 1,
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "0 4px 0 12px",
+            cursor: "move",
+            userSelect: "none",
+            borderBottom: "1px solid rgba(255,255,255,0.08)",
+            flexShrink: 0,
+            borderRadius: "5px 5px 0 0",
             overflow: "hidden",
-            background: "#1e1e1e",
-            borderRadius: "0 0 5px 5px",
           }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onWheel={(e) => e.stopPropagation()}
-          onKeyDown={(e) => e.stopPropagation()}
         >
-          {win.sessionId ? (
-            <Terminal sessionId={win.sessionId} />
-          ) : (
-            <div
+          <span
+            style={{
+              fontSize: 13,
+              fontFamily: "monospace",
+              color: "#ccc",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            {win.title}
+          </span>
+          <div onMouseDown={(e) => e.stopPropagation()} style={{ flexShrink: 0 }}>
+            <Button
+              variant="ghost"
+              onPress={() => onClose(win.id)}
               style={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color: "rgba(255,255,255,0.2)",
-                fontFamily: "monospace",
-                fontSize: 12,
+                padding: "0 4px",
+                fontSize: 16,
+                lineHeight: 1,
+                color: "#888",
+                minWidth: 24,
+                height: 24,
               }}
             >
-              no session bound
-            </div>
-          )}
+              ×
+            </Button>
+          </div>
         </div>
-      )}
 
-      {RESIZE_HANDLES.map(({ dir, style }) => (
-        <div
-          key={dir}
-          onMouseDown={handleResizeMouseDown(dir)}
-          style={{
-            position: "absolute",
-            ...style,
-            zIndex: 20,
-          }}
-        />
-      ))}
-    </div>
+        {win.kind === "iframe" ? (
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              background: "#1e1e1e",
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: "0 0 5px 5px",
+            }}
+          >
+            <form
+              onSubmit={handleUrlSubmit}
+              onMouseDown={(e) => e.stopPropagation()}
+              style={{ padding: "4px 8px", flexShrink: 0 }}
+            >
+              <TextField
+                value={urlInput}
+                onChange={setUrlInput}
+                aria-label="URL"
+                inputStyle={{ width: "100%" }}
+              />
+            </form>
+            <iframe
+              src={win.url ?? "about:blank"}
+              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+              style={{
+                flex: 1,
+                border: "none",
+                width: "100%",
+              }}
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              flex: 1,
+              overflow: "hidden",
+              background: "#1e1e1e",
+              borderRadius: "0 0 5px 5px",
+            }}
+            onPointerDown={(e) => e.stopPropagation()}
+            onWheel={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
+          >
+            {win.sessionId ? (
+              <Terminal sessionId={win.sessionId} />
+            ) : (
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  color: "rgba(255,255,255,0.2)",
+                  fontFamily: "monospace",
+                  fontSize: 12,
+                }}
+              >
+                no session bound
+              </div>
+            )}
+          </div>
+        )}
+
+        {RESIZE_HANDLES.map(({ dir, style }) => (
+          <div
+            key={dir}
+            onMouseDown={handleResizeMouseDown(dir)}
+            style={{
+              position: "absolute",
+              ...style,
+              zIndex: 20,
+            }}
+          />
+        ))}
+      </div>
+    </>
   );
 }

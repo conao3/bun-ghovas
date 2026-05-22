@@ -75,6 +75,50 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
     [onCanvasChange],
   );
 
+  const handleWindowRename = useCallback(
+    (id: string, title: string) => {
+      const prev = stateRef.current;
+      onCanvasChange({
+        ...prev,
+        windows: prev.windows.map((w) => (w.id === id ? { ...w, title } : w)),
+      });
+    },
+    [onCanvasChange],
+  );
+
+  const handleWindowDuplicate = useCallback(
+    (id: string) => {
+      const prev = stateRef.current;
+      const src = prev.windows.find((w) => w.id === id);
+      if (!src) return;
+      const copy =
+        src.kind === "terminal"
+          ? {
+              id: crypto.randomUUID(),
+              kind: "terminal" as const,
+              sessionId: crypto.randomUUID(),
+              title: `${src.title} (copy)`,
+              x: src.x + 30,
+              y: src.y + 30,
+              width: src.width,
+              height: src.height,
+            }
+          : {
+              id: crypto.randomUUID(),
+              kind: "iframe" as const,
+              url: src.url,
+              title: `${src.title} (copy)`,
+              x: src.x + 30,
+              y: src.y + 30,
+              width: src.width,
+              height: src.height,
+            };
+      onCanvasChange({ ...prev, windows: [...prev.windows, copy] });
+      setFocusedWindowId(copy.id);
+    },
+    [onCanvasChange],
+  );
+
   const handleWindowMove = useCallback(
     (id: string, x: number, y: number) => {
       const prev = stateRef.current;
@@ -241,6 +285,8 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
           onMove={handleWindowMove}
           onResize={handleWindowResize}
           onUrlChange={onUrlChange}
+          onRename={handleWindowRename}
+          onDuplicate={handleWindowDuplicate}
         />
       ))}
       <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} onCreateTerminalWindow={handleCreateTerminalWindow} />
