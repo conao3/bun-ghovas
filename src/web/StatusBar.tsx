@@ -3,9 +3,10 @@ import type { LayerLevel } from "../shared/types";
 interface StatusBarProps {
   activeIds: Record<LayerLevel, string>;
   zoom: number;
+  focusedWindowTitle: string | null;
 }
 
-export function StatusBar({ activeIds, zoom }: StatusBarProps) {
+export function StatusBar({ activeIds, zoom, focusedWindowTitle }: StatusBarProps) {
   const zoomPct = Math.round(zoom * 100);
   const layerText = `L3:${activeIds[3]}  L2:${activeIds[2]}  L1:${activeIds[1]}  L0:${activeIds[0]}`;
 
@@ -27,6 +28,7 @@ export function StatusBar({ activeIds, zoom }: StatusBarProps) {
       }}
     >
       <span>{layerText}</span>
+      <span>{focusedWindowTitle ?? "—"}</span>
       <span>zoom {zoomPct}%</span>
     </div>
   );
