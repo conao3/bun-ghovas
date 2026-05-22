@@ -1,5 +1,6 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import type { CanvasState } from "../shared/types";
+import { Window } from "./Window";
 
 const GRID_SIZE = 40;
 const MIN_ZOOM = 0.25;
@@ -45,15 +46,46 @@ function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }
 export function Canvas() {
   const [state, setState] = useState<CanvasState>({
     id: "canvas-0",
-    windows: [],
+    windows: [
+      { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1" },
+      { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2" },
+      { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser" },
+    ],
     panX: 0,
     panY: 0,
     zoom: 1,
   });
+  const [focusedWindowId, setFocusedWindowId] = useState<string | null>("w1");
 
   const dragging = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleWindowFocus = useCallback((id: string) => {
+    setFocusedWindowId(id);
+  }, []);
+
+  const handleWindowClose = useCallback((id: string) => {
+    setState((prev) => ({ ...prev, windows: prev.windows.filter((w) => w.id !== id) }));
+    setFocusedWindowId((prev) => (prev === id ? null : prev));
+  }, []);
+
+  const handleWindowMove = useCallback((id: string, x: number, y: number) => {
+    setState((prev) => ({
+      ...prev,
+      windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y } : w)),
+    }));
+  }, []);
+
+  const handleWindowResize = useCallback(
+    (id: string, x: number, y: number, width: number, height: number) => {
+      setState((prev) => ({
+        ...prev,
+        windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y, width, height } : w)),
+      }));
+    },
+    [],
+  );
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
     if (e.button !== 0) return;
@@ -120,6 +152,20 @@ export function Canvas() {
       }}
     >
       <Grid panX={state.panX} panY={state.panY} zoom={state.zoom} />
+      {state.windows.map((win) => (
+        <Window
+          key={win.id}
+          win={win}
+          panX={state.panX}
+          panY={state.panY}
+          zoom={state.zoom}
+          isFocused={focusedWindowId === win.id}
+          onFocus={handleWindowFocus}
+          onClose={handleWindowClose}
+          onMove={handleWindowMove}
+          onResize={handleWindowResize}
+        />
+      ))}
       <div
         style={{
           position: "absolute",
