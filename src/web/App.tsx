@@ -397,13 +397,7 @@ export function App() {
   return (
     <ToastProvider>
       <div
-        style={{
-          display: "grid",
-          gridTemplateRows: "auto 1fr auto",
-          gridTemplateColumns: "auto 1fr",
-          gridTemplateAreas: '"top top" "left center" "bottom bottom"',
-          height: "100vh",
-        }}
+        className="grid h-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
       >
         <LayerBar
           workspace={workspace}
@@ -415,7 +409,7 @@ export function App() {
           onDuplicateCanvas={handleDuplicateCanvas}
           onDeleteCanvas={handleDeleteCanvas}
         />
-        <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
+        <div className="[grid-area:center] relative overflow-hidden">
           <Canvas
             canvasState={activeCanvas}
             onCanvasChange={handleCanvasChange}

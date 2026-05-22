@@ -1,4 +1,5 @@
 import { useState } from "react";
+import clsx from "clsx";
 import { Modal } from "./components/Modal";
 import { GeneralPanel } from "./settings/GeneralPanel";
 import { LayersPanel } from "./settings/LayersPanel";
@@ -33,34 +34,22 @@ export function Settings({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div style={{ display: "flex", gap: 0, minWidth: 560, minHeight: 360 }}>
-        <nav
-          style={{
-            width: 140,
-            borderRight: "1px solid rgba(255,255,255,0.1)",
-            paddingRight: 12,
-            marginRight: 12,
-          }}
-        >
+      <div className="flex gap-0 min-w-[560px] min-h-[360px]">
+        <nav className="w-[140px] border-r border-white/10 pr-3 mr-3">
           {NAV_ENTRIES.map((entry) => (
             <div
               key={entry}
               onClick={() => setSelected(entry)}
-              style={{
-                padding: "6px 10px",
-                borderRadius: 3,
-                cursor: "pointer",
-                fontFamily: "monospace",
-                fontSize: 13,
-                color: selected === entry ? "#fff" : "rgba(255,255,255,0.5)",
-                background: selected === entry ? "rgba(255,255,255,0.12)" : "transparent",
-              }}
+              className={clsx(
+                "px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px]",
+                selected === entry ? "text-white bg-white/12" : "text-white/50 bg-transparent",
+              )}
             >
               {entry}
             </div>
           ))}
         </nav>
-        <div style={{ flex: 1 }}>
+        <div className="flex-1">
           {selected === "General" && <GeneralPanel />}
           {selected === "Layers" && (
             <LayersPanel

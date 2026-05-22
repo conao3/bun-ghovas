@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
+import clsx from "clsx";
 
 export type ToastKind = "success" | "warning" | "error";
 
@@ -9,10 +10,10 @@ type ToastContextValue = { show: (kind: ToastKind, message: string) => void };
 
 const ToastContext = createContext<ToastContextValue | null>(null);
 
-const KIND_COLORS: Record<ToastKind, string> = {
-  success: "#3aaf5c",
-  warning: "#d6a83f",
-  error: "#c4564f",
+const KIND_BG_CLASSES: Record<ToastKind, string> = {
+  success: "bg-status-success",
+  warning: "bg-status-warning",
+  error: "bg-status-error",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -34,33 +35,15 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <div
-        style={{
-          position: "fixed",
-          top: 16,
-          right: 16,
-          zIndex: 1000,
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          pointerEvents: "none",
-        }}
-      >
+      <div className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none">
         {toasts.map((toast) => (
           <div
             key={toast.id}
             onClick={() => dismiss(toast.id)}
-            style={{
-              width: 280,
-              backgroundColor: KIND_COLORS[toast.kind],
-              color: "#fff",
-              padding: "8px 12px",
-              borderRadius: 4,
-              boxShadow: "0 2px 8px rgba(0,0,0,0.4)",
-              fontSize: 12,
-              cursor: "pointer",
-              pointerEvents: "auto",
-            }}
+            className={clsx(
+              "w-[280px] text-white py-2 px-3 rounded shadow-[0_2px_8px_var(--tw-shadow-color)] shadow-black/40 text-[12px] cursor-pointer pointer-events-auto",
+              KIND_BG_CLASSES[toast.kind],
+            )}
           >
             {toast.message}
           </div>
