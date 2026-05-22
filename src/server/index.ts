@@ -1,3 +1,5 @@
+import { createPtyManager } from "./pty";
+
 const PORT = Number(process.env.PORT ?? 3000);
 
 const { version } = await Bun.file(new URL("../../package.json", import.meta.url)).json();
@@ -15,6 +17,9 @@ if (!buildResult.success) {
   process.exit(1);
 }
 const mainJs = await buildResult.outputs[0].text();
+
+const ptyManager = createPtyManager();
+console.log("node-pty native module loaded successfully");
 
 const server = Bun.serve({
   port: PORT,
@@ -40,11 +45,12 @@ const server = Bun.serve({
     return new Response("not found", { status: 404 });
   },
   websocket: {
-    open(ws) {
-      ws.send(JSON.stringify({ type: "hello", from: "ghovas" }));
-    },
+    open(_ws) {},
     message(ws, msg) {
-      ws.send(msg);
+      ptyManager.handleMessage(ws, msg);
+    },
+    close(ws) {
+      ptyManager.cleanup(ws);
     },
   },
 });

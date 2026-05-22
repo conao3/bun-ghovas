@@ -30,6 +30,9 @@
               pkgs.gh
               pkgs.git
               pkgs.jq
+              pkgs.python3
+              pkgs.gcc
+              pkgs.gnumake
             ];
           };
 

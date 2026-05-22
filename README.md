@@ -16,6 +16,16 @@ bun run dev
 
 `bun run dev` でローカル開発サーバが起動する (既定 port `3000`)。
 
+## Running
+
+```sh
+bun run src/server/index.ts
+```
+
+```sh
+bun run scripts/pty-smoke.ts
+```
+
 ## ライセンス
 
 Apache-2.0
