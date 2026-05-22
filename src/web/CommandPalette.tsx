@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
+import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 
 const LS_KEY = "ghovas.recentCommands";
 const MAX_RECENT = 8;
@@ -115,9 +116,20 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                 color: "#ccc",
                 fontFamily: "monospace",
                 fontSize: 13,
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
               }}
             >
-              {cmd.label}
+              <span>{cmd.label}</span>
+              {(() => {
+                const def = SHORTCUTS.find((s) => s.id === cmd.id);
+                return def ? (
+                  <span style={{ color: "rgba(255,255,255,0.4)", marginLeft: 16 }}>
+                    {formatShortcut(def)}
+                  </span>
+                ) : null;
+              })()}
             </div>
           ))}
           {filtered.length === 0 && (
