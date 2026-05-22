@@ -179,16 +179,7 @@ Before transitioning to `Merging`, confirm CI on the latest pushed commit:
 1. List checks with `gh pr checks <pr-number>`.
 2. If any check reports `pending` / `in_progress` / `queued`, wait. `gh pr checks <pr-number> --watch` blocks until every check finishes.
 3. If any check reports `failure` / `cancelled` / `timed_out`, fix the cause with a new commit, push, and restart from step 1.
-4. If `gh pr checks <pr-number>` reports no checks at all (empty list, or exits non-zero with "no checks reported"), the CI workflow most likely landed on `master` after this branch was created. Pull `master` into the branch to bring the workflow file in, then push to trigger CI:
-
-   ```bash
-   git fetch origin master
-   git merge --no-edit origin/master
-   git push origin HEAD
-   ```
-
-   Resolve any merge conflicts and re-push if needed, then restart from step 1.
-5. Inspect the full rollup once everything finishes:
+4. Inspect the full rollup once everything finishes:
 
    ```bash
    gh pr view <pr-number> --json statusCheckRollup \
@@ -196,7 +187,7 @@ Before transitioning to `Merging`, confirm CI on the latest pushed commit:
    ```
 
    Every entry must have `status: "COMPLETED"` and `conclusion: "SUCCESS"`. Record any `SKIPPED` / `NEUTRAL` results explicitly in the workpad with a one-line justification before proceeding.
-6. Only when every check on the latest pushed commit is green may the issue transition to `Merging`.
+5. Only when every check on the latest pushed commit is green may the issue transition to `Merging`.
 
 ## Blocked-access escape hatch (required behavior)
 
