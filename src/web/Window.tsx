@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
@@ -14,6 +14,7 @@ const HANDLE_SIZE = 8;
 const CORNER_SIZE = 12;
 
 type ResizeDir = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
+type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
 interface ResizeHandleDef {
   dir: ResizeDir;
@@ -127,12 +128,30 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
   const [menuOpen, setMenuOpen] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+  const [iframeState, setIframeState] = useState<IframeLoadState>("idle");
   const menuAnchorRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (win.kind !== "iframe") return;
+    setIframeState("loading");
+    const timer = setTimeout(() => {
+      setIframeState((prev) => (prev === "loading" ? "likely-blocked" : prev));
+    }, 6000);
+    return () => clearTimeout(timer);
+  }, [win.url, win.kind]);
 
   const screenX = panX + win.x * zoom;
   const screenY = panY + win.y * zoom;
   const screenW = win.width * zoom;
   const screenH = win.height * zoom;
+
+  const handleIframeLoad = useCallback(() => {
+    setIframeState("loaded");
+  }, []);
+
+  const handleIframeError = useCallback(() => {
+    setIframeState("failed");
+  }, []);
 
   const handleUrlSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -378,15 +397,50 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
                 inputStyle={{ width: "100%" }}
               />
             </form>
-            <iframe
-              src={win.url ?? "about:blank"}
-              sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-              style={{
-                flex: 1,
-                border: "none",
-                width: "100%",
-              }}
-            />
+            <div style={{ flex: 1, position: "relative" }}>
+              <iframe
+                src={win.url ?? "about:blank"}
+                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                onLoad={handleIframeLoad}
+                onError={handleIframeError}
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  border: "none",
+                  width: "100%",
+                  height: "100%",
+                }}
+              />
+              {(iframeState === "failed" || iframeState === "likely-blocked") && (
+                <div
+                  style={{
+                    position: "absolute",
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    background: "rgba(30,30,30,0.92)",
+                    borderTop: "1px solid rgba(255,255,255,0.1)",
+                    padding: "8px 12px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 8,
+                    fontFamily: "monospace",
+                    fontSize: 12,
+                    color: "rgba(255,255,255,0.5)",
+                  }}
+                >
+                  <span>This page may not allow embedding.</span>
+                  <a
+                    href={win.url}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ color: "#4a9eff", textDecoration: "none" }}
+                  >
+                    Open in new tab
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         ) : (
           <div
