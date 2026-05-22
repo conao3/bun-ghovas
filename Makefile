@@ -7,7 +7,7 @@ typecheck:
 	bun x tsc --noEmit
 
 test:
-	bun test
+	bunx vitest run
 
 fmt:
 	nix fmt
