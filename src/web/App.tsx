@@ -10,8 +10,8 @@ const INITIAL_WORKSPACE: WorkspaceState = {
         {
           id: "canvas-1",
           windows: [
-            { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1" },
-            { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2" },
+            { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1", sessionId: "seed-w1" },
+            { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2", sessionId: "seed-w2" },
             { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser", url: "https://example.com" },
           ],
           panX: 0,

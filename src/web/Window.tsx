@@ -3,6 +3,7 @@ import type { CSSProperties } from "react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
 import { TextField } from "./components/TextField";
+import { Terminal } from "./components/Terminal";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
@@ -318,16 +319,30 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
             flex: 1,
             overflow: "hidden",
             background: "#1e1e1e",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: "rgba(255,255,255,0.2)",
-            fontFamily: "monospace",
-            fontSize: 12,
             borderRadius: "0 0 5px 5px",
           }}
+          onPointerDown={(e) => e.stopPropagation()}
+          onWheel={(e) => e.stopPropagation()}
+          onKeyDown={(e) => e.stopPropagation()}
         >
-          {win.kind}
+          {win.sessionId ? (
+            <Terminal sessionId={win.sessionId} />
+          ) : (
+            <div
+              style={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "rgba(255,255,255,0.2)",
+                fontFamily: "monospace",
+                fontSize: 12,
+              }}
+            >
+              no session bound
+            </div>
+          )}
         </div>
       )}
 

@@ -17,6 +17,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "ghostty-web": "^0.4.0",
     "node-pty": "^1",
     "react": "^19.2.6",
     "react-aria-components": "^1.17.0",
