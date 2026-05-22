@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import type { CanvasState, WindowState } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
+import { Minimap } from "./Minimap";
 
 const GRID_SIZE = 40;
 const MIN_ZOOM = 0.25;
@@ -149,6 +150,13 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
     [onAddWindow],
   );
 
+  const handlePanTo = useCallback(
+    (newPanX: number, newPanY: number) => {
+      onCanvasChange({ ...stateRef.current, panX: newPanX, panY: newPanY });
+    },
+    [onCanvasChange],
+  );
+
   const handleCreateTerminalWindow = useCallback(() => {
     const container = containerRef.current;
     const containerW = container?.clientWidth ?? 800;
@@ -236,6 +244,15 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
         />
       ))}
       <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} onCreateTerminalWindow={handleCreateTerminalWindow} />
+      <Minimap
+        windows={canvasState.windows}
+        panX={canvasState.panX}
+        panY={canvasState.panY}
+        zoom={canvasState.zoom}
+        containerWidth={containerRef.current?.clientWidth ?? 0}
+        containerHeight={containerRef.current?.clientHeight ?? 0}
+        onPanTo={handlePanTo}
+      />
       <div
         style={{
           position: "absolute",
