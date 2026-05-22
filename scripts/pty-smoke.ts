@@ -83,11 +83,13 @@ async function main() {
   await waitForOpen(ws1);
 
   const firstPromise = collectUntilText(ws1, "first");
-  ws1.send(JSON.stringify({
-    type: "input",
-    sessionId: SESSION_ID,
-    data: "bash -c 'echo first; sleep 0.5; echo second; sleep 5'\n",
-  }));
+  ws1.send(
+    JSON.stringify({
+      type: "input",
+      sessionId: SESSION_ID,
+      data: "bash -c 'echo first; sleep 0.5; echo second; sleep 5'\n",
+    }),
+  );
   await firstPromise;
 
   ws1.close();

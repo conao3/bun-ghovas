@@ -4,7 +4,13 @@ import { LayerBar } from "./LayerBar";
 import { StatusBar } from "./StatusBar";
 import { CommandPalette } from "./CommandPalette";
 import type { Command } from "./CommandPalette";
-import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
+import type {
+  WorkspaceState,
+  LayerLevel,
+  LayerUiMode,
+  CanvasState,
+  WindowState,
+} from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { ToastProvider } from "./lib/toast";
 import { Settings } from "./Settings";
@@ -26,9 +32,36 @@ const INITIAL_WORKSPACE: WorkspaceState = {
         {
           id: "canvas-1",
           windows: [
-            { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1", sessionId: "seed-w1" },
-            { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2", sessionId: "seed-w2" },
-            { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser", url: "https://example.com" },
+            {
+              id: "w1",
+              kind: "terminal",
+              x: 80,
+              y: 60,
+              width: 420,
+              height: 300,
+              title: "Terminal 1",
+              sessionId: "seed-w1",
+            },
+            {
+              id: "w2",
+              kind: "terminal",
+              x: 540,
+              y: 100,
+              width: 400,
+              height: 280,
+              title: "Terminal 2",
+              sessionId: "seed-w2",
+            },
+            {
+              id: "w3",
+              kind: "iframe",
+              x: 180,
+              y: 420,
+              width: 460,
+              height: 320,
+              title: "Browser",
+              url: "https://example.com",
+            },
           ],
           panX: 0,
           panY: 0,
@@ -217,26 +250,29 @@ export function App() {
     });
   }, []);
 
-  const handleDeleteCanvas = useCallback((level: LayerLevel, canvasId: string) => {
-    setWorkspace((prev) => {
-      const layer = prev.layers[level];
-      if (layer.canvases.length <= 1) return prev;
-      const next = layer.canvases.filter((c) => c.id !== canvasId);
-      return {
-        ...prev,
-        layers: {
-          ...prev.layers,
-          [level]: { ...layer, canvases: next },
-        },
-      };
-    });
-    setActiveIds((prev) => {
-      const layer = workspace.layers[level];
-      if (prev[level] !== canvasId) return prev;
-      const sibling = layer.canvases.find((c) => c.id !== canvasId);
-      return sibling ? { ...prev, [level]: sibling.id } : prev;
-    });
-  }, [workspace.layers]);
+  const handleDeleteCanvas = useCallback(
+    (level: LayerLevel, canvasId: string) => {
+      setWorkspace((prev) => {
+        const layer = prev.layers[level];
+        if (layer.canvases.length <= 1) return prev;
+        const next = layer.canvases.filter((c) => c.id !== canvasId);
+        return {
+          ...prev,
+          layers: {
+            ...prev.layers,
+            [level]: { ...layer, canvases: next },
+          },
+        };
+      });
+      setActiveIds((prev) => {
+        const layer = workspace.layers[level];
+        if (prev[level] !== canvasId) return prev;
+        const sibling = layer.canvases.find((c) => c.id !== canvasId);
+        return sibling ? { ...prev, [level]: sibling.id } : prev;
+      });
+    },
+    [workspace.layers],
+  );
 
   const activeCanvas =
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
@@ -343,8 +379,10 @@ export function App() {
                   0: {
                     ...prev.layers[0],
                     canvases: prev.layers[0].canvases.map((c) => {
-                      if (c.id === srcId) return { ...c, windows: c.windows.filter((w) => w.id !== wid) };
-                      if (c.id === canvas.id) return { ...c, windows: [...c.windows, focusedWindow] };
+                      if (c.id === srcId)
+                        return { ...c, windows: c.windows.filter((w) => w.id !== wid) };
+                      if (c.id === canvas.id)
+                        return { ...c, windows: [...c.windows, focusedWindow] };
                       return c;
                     }),
                   },
@@ -378,10 +416,25 @@ export function App() {
           onDeleteCanvas={handleDeleteCanvas}
         />
         <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
-          <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} focusedWindowId={focusedWindowId} onFocusWindow={handleFocusWindow} />
+          <Canvas
+            canvasState={activeCanvas}
+            onCanvasChange={handleCanvasChange}
+            onUrlChange={handleUrlChange}
+            onAddWindow={handleAddWindow}
+            focusedWindowId={focusedWindowId}
+            onFocusWindow={handleFocusWindow}
+          />
         </div>
-        <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} focusedWindowTitle={focusedWindowTitle} />
-        <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
+        <StatusBar
+          activeIds={activeIds}
+          zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1}
+          focusedWindowTitle={focusedWindowTitle}
+        />
+        <CommandPalette
+          isOpen={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          commands={commands}
+        />
         {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
         <Settings
           isOpen={settingsOpen}

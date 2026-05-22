@@ -13,7 +13,15 @@ interface MinimapProps {
   onPanTo: (panX: number, panY: number) => void;
 }
 
-export function Minimap({ windows, panX, panY, zoom, containerWidth, containerHeight, onPanTo }: MinimapProps) {
+export function Minimap({
+  windows,
+  panX,
+  panY,
+  zoom,
+  containerWidth,
+  containerHeight,
+  onPanTo,
+}: MinimapProps) {
   let extMinX: number, extMinY: number, extMaxX: number, extMaxY: number;
   if (windows.length === 0) {
     extMinX = -2000;

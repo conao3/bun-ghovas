@@ -9,7 +9,10 @@ interface CreateWindowFabProps {
   onCreateTerminalWindow: () => void;
 }
 
-export function CreateWindowFab({ onCreateIframeWindow, onCreateTerminalWindow }: CreateWindowFabProps) {
+export function CreateWindowFab({
+  onCreateIframeWindow,
+  onCreateTerminalWindow,
+}: CreateWindowFabProps) {
   const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [url, setUrl] = useState("");
 
@@ -102,12 +105,7 @@ export function CreateWindowFab({ onCreateIframeWindow, onCreateTerminalWindow }
           }}
           style={{ display: "flex", flexDirection: "column", gap: 16 }}
         >
-          <TextField
-            label="URL"
-            value={url}
-            onChange={setUrl}
-            autoFocus
-          />
+          <TextField label="URL" value={url} onChange={setUrl} autoFocus />
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Button type="button" variant="secondary" onPress={handleCancel}>
               Cancel

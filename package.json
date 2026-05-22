@@ -16,11 +16,13 @@
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
     "bun-plugin-tailwind": "^0.1.2",
+    "knip": "^6.14.2",
+    "oxfmt": "^0.51.0",
+    "oxlint": "^1.66.0",
     "tailwindcss": "^4.3.0",
     "typescript": "^5.9.3"
   },
   "dependencies": {
-    "clsx": "^2.1.1",
     "ghostty-web": "^0.4.0",
     "node-pty": "^1",
     "react": "^19.2.6",

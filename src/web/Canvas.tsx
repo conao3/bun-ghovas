@@ -56,7 +56,14 @@ interface CanvasProps {
   onFocusWindow: (id: string) => void;
 }
 
-export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, focusedWindowId, onFocusWindow }: CanvasProps) {
+export function Canvas({
+  canvasState,
+  onCanvasChange,
+  onUrlChange,
+  onAddWindow,
+  focusedWindowId,
+  onFocusWindow,
+}: CanvasProps) {
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
 
@@ -168,7 +175,13 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
       const containerH = container?.clientHeight ?? 600;
       const width = 480;
       const height = 320;
-      const { x, y } = centeredWindowPosition(containerW, containerH, stateRef.current, width, height);
+      const { x, y } = centeredWindowPosition(
+        containerW,
+        containerH,
+        stateRef.current,
+        width,
+        height,
+      );
       let title = "Browser";
       try {
         title = new URL(url).host;
@@ -209,7 +222,13 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
     const containerH = container?.clientHeight ?? 600;
     const width = 560;
     const height = 360;
-    const { x, y } = centeredWindowPosition(containerW, containerH, stateRef.current, width, height);
+    const { x, y } = centeredWindowPosition(
+      containerW,
+      containerH,
+      stateRef.current,
+      width,
+      height,
+    );
     const win: WindowState = {
       id: crypto.randomUUID(),
       kind: "terminal",
@@ -286,7 +305,10 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
           onDuplicate={handleWindowDuplicate}
         />
       ))}
-      <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} onCreateTerminalWindow={handleCreateTerminalWindow} />
+      <CreateWindowFab
+        onCreateIframeWindow={handleCreateIframeWindow}
+        onCreateTerminalWindow={handleCreateTerminalWindow}
+      />
       <div
         onMouseDown={(e) => e.stopPropagation()}
         style={{

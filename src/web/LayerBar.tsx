@@ -5,7 +5,13 @@ import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 import { LayerStripFloating } from "./LayerStripFloating";
-import type { WorkspaceState, LayerLevel, LayerState, LayerUiMode, CanvasState } from "../shared/types";
+import type {
+  WorkspaceState,
+  LayerLevel,
+  LayerState,
+  LayerUiMode,
+  CanvasState,
+} from "../shared/types";
 
 interface LayerBarProps {
   workspace: WorkspaceState;
@@ -105,16 +111,33 @@ function HorizontalStrip({
     <>
       <div
         ref={ctx.menuAnchorRef}
-        style={{ position: "fixed", left: ctx.menuPos.x, top: ctx.menuPos.y, width: 0, height: 0, pointerEvents: "none" }}
+        style={{
+          position: "fixed",
+          left: ctx.menuPos.x,
+          top: ctx.menuPos.y,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
       />
-      <ContextMenu isOpen={ctx.menuOpen} onOpenChange={ctx.setMenuOpen} triggerRef={ctx.menuAnchorRef} onAction={ctx.handleMenuAction}>
+      <ContextMenu
+        isOpen={ctx.menuOpen}
+        onOpenChange={ctx.setMenuOpen}
+        triggerRef={ctx.menuAnchorRef}
+        onAction={ctx.handleMenuAction}
+      >
         <MenuItem id="rename">Rename</MenuItem>
         <MenuItem id="duplicate">Duplicate</MenuItem>
         <MenuItem id="delete">Delete</MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <TextField value={ctx.renameValue} onChange={ctx.setRenameValue} aria-label="Canvas name" autoFocus />
+          <TextField
+            value={ctx.renameValue}
+            onChange={ctx.setRenameValue}
+            aria-label="Canvas name"
+            autoFocus
+          />
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Button variant="secondary" onPress={() => ctx.setRenameOpen(false)}>
               Cancel
@@ -211,16 +234,33 @@ function VerticalColumn({
     <>
       <div
         ref={ctx.menuAnchorRef}
-        style={{ position: "fixed", left: ctx.menuPos.x, top: ctx.menuPos.y, width: 0, height: 0, pointerEvents: "none" }}
+        style={{
+          position: "fixed",
+          left: ctx.menuPos.x,
+          top: ctx.menuPos.y,
+          width: 0,
+          height: 0,
+          pointerEvents: "none",
+        }}
       />
-      <ContextMenu isOpen={ctx.menuOpen} onOpenChange={ctx.setMenuOpen} triggerRef={ctx.menuAnchorRef} onAction={ctx.handleMenuAction}>
+      <ContextMenu
+        isOpen={ctx.menuOpen}
+        onOpenChange={ctx.setMenuOpen}
+        triggerRef={ctx.menuAnchorRef}
+        onAction={ctx.handleMenuAction}
+      >
         <MenuItem id="rename">Rename</MenuItem>
         <MenuItem id="duplicate">Duplicate</MenuItem>
         <MenuItem id="delete">Delete</MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          <TextField value={ctx.renameValue} onChange={ctx.setRenameValue} aria-label="Canvas name" autoFocus />
+          <TextField
+            value={ctx.renameValue}
+            onChange={ctx.setRenameValue}
+            aria-label="Canvas name"
+            autoFocus
+          />
           <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
             <Button variant="secondary" onPress={() => ctx.setRenameOpen(false)}>
               Cancel
@@ -365,8 +405,7 @@ export function LayerBar({
         style={{
           gridArea: "left",
           background: "#1e1e1e",
-          borderRight:
-            verticalLevels.length > 0 ? "1px solid rgba(255,255,255,0.12)" : undefined,
+          borderRight: verticalLevels.length > 0 ? "1px solid rgba(255,255,255,0.12)" : undefined,
           display: "flex",
           flexDirection: "row",
         }}

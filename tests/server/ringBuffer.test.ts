@@ -1,5 +1,5 @@
-import { describe, test, expect, beforeEach } from "bun:test";
-import { createRingBuffer, type RingBuffer } from "../../src/server/ringBuffer.js";
+import { describe, test, expect } from "bun:test";
+import { createRingBuffer } from "../../src/server/ringBuffer.js";
 
 describe("createRingBuffer", () => {
   test("empty buffer returns [] and byteLength 0", () => {

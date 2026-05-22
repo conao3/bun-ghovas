@@ -1,4 +1,9 @@
-import { Menu as RACMenu, MenuItem as RACMenuItem, MenuTrigger, Popover } from "react-aria-components";
+import {
+  Menu as RACMenu,
+  MenuItem as RACMenuItem,
+  MenuTrigger,
+  Popover,
+} from "react-aria-components";
 import type { MenuItemProps } from "react-aria-components";
 import type { RefObject, ReactNode } from "react";
 
@@ -10,7 +15,13 @@ interface ContextMenuProps {
   children: ReactNode;
 }
 
-export function ContextMenu({ isOpen, onOpenChange, triggerRef, onAction, children }: ContextMenuProps) {
+export function ContextMenu({
+  isOpen,
+  onOpenChange,
+  triggerRef,
+  onAction,
+  children,
+}: ContextMenuProps) {
   return (
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
       <button

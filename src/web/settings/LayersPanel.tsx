@@ -35,9 +35,7 @@ export function LayersPanel(props: {
                 <td style={tdStyle}>
                   <select
                     value={layer.uiMode}
-                    onChange={(e) =>
-                      props.onUiModeChange(level, e.target.value as LayerUiMode)
-                    }
+                    onChange={(e) => props.onUiModeChange(level, e.target.value as LayerUiMode)}
                     style={selectStyle}
                   >
                     {UI_MODE_OPTIONS.map((opt) => (

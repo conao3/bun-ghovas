@@ -7,7 +7,11 @@ import type { WorkspaceState } from "../../src/shared/types";
 
 const STATE_A: WorkspaceState = {
   layers: {
-    0: { canvases: [{ id: "c1", windows: [], panX: 0, panY: 0, zoom: 1 }], uiMode: "floating", visible: true },
+    0: {
+      canvases: [{ id: "c1", windows: [], panX: 0, panY: 0, zoom: 1 }],
+      uiMode: "floating",
+      visible: true,
+    },
     1: { canvases: [], uiMode: "horizontal-tabs", visible: false },
     2: { canvases: [], uiMode: "horizontal-tabs", visible: false },
     3: { canvases: [], uiMode: "horizontal-tabs", visible: false },
@@ -16,7 +20,11 @@ const STATE_A: WorkspaceState = {
 
 const STATE_B: WorkspaceState = {
   layers: {
-    0: { canvases: [{ id: "c2", windows: [], panX: 10, panY: 20, zoom: 2 }], uiMode: "horizontal-tabs", visible: true },
+    0: {
+      canvases: [{ id: "c2", windows: [], panX: 10, panY: 20, zoom: 2 }],
+      uiMode: "horizontal-tabs",
+      visible: true,
+    },
     1: { canvases: [], uiMode: "floating", visible: false },
     2: { canvases: [], uiMode: "horizontal-tabs", visible: false },
     3: { canvases: [], uiMode: "horizontal-tabs", visible: false },

@@ -64,7 +64,11 @@ function buildEnv(extra: Partial<Record<string, string>> = {}): string[] {
   return Object.entries({ ...process.env, ...extra }).map(([k, v]) => `${k}=${v ?? ""}`);
 }
 
-async function pollRead(session: Session, sessionId: string, onData: (data: string) => void): Promise<void> {
+async function pollRead(
+  session: Session,
+  sessionId: string,
+  onData: (data: string) => void,
+): Promise<void> {
   const buf = Buffer.allocUnsafe(65536);
   while (session.alive) {
     try {
@@ -122,7 +126,9 @@ export function createPtyManager() {
           const s = sessions.get(sessionId);
           if (s) {
             s.alive = false;
-            try { fs.closeSync(s.fd); } catch {}
+            try {
+              fs.closeSync(s.fd);
+            } catch {}
             send(s.ws, {
               type: "exit",
               sessionId,
@@ -134,7 +140,13 @@ export function createPtyManager() {
         },
       );
 
-      const session: Session = { fd: result.fd, pid: result.pid, ws, alive: true, scrollback: createRingBuffer(SCROLLBACK_CAP_BYTES) };
+      const session: Session = {
+        fd: result.fd,
+        pid: result.pid,
+        ws,
+        alive: true,
+        scrollback: createRingBuffer(SCROLLBACK_CAP_BYTES),
+      };
       sessions.set(sessionId, session);
 
       pollRead(session, sessionId, (data) => {
@@ -169,14 +181,18 @@ export function createPtyManager() {
         const s = sessions.get(msg.sessionId);
         if (s?.alive) {
           const buf = Buffer.from(msg.data, "utf8");
-          try { fs.writeSync(s.fd, buf, 0, buf.length, null); } catch {}
+          try {
+            fs.writeSync(s.fd, buf, 0, buf.length, null);
+          } catch {}
         }
         break;
       }
       case "resize": {
         const s = sessions.get(msg.sessionId);
         if (s?.alive) {
-          try { ptyNative.resize(s.fd, msg.cols, msg.rows); } catch {}
+          try {
+            ptyNative.resize(s.fd, msg.cols, msg.rows);
+          } catch {}
         }
         break;
       }
@@ -185,7 +201,9 @@ export function createPtyManager() {
         if (s) {
           s.alive = false;
           s.scrollback.clear();
-          try { process.kill(s.pid, "SIGHUP"); } catch {}
+          try {
+            process.kill(s.pid, "SIGHUP");
+          } catch {}
           sessions.delete(msg.sessionId);
         }
         break;
