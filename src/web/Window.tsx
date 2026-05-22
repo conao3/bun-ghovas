@@ -1,7 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import type { CSSProperties } from "react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
+import { TextField } from "./components/TextField";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
@@ -104,6 +105,7 @@ export interface WindowCallbacks {
   onClose: (id: string) => void;
   onMove: (id: string, x: number, y: number) => void;
   onResize: (id: string, x: number, y: number, width: number, height: number) => void;
+  onUrlChange: (id: string, url: string) => void;
 }
 
 interface WindowProps extends WindowCallbacks {
@@ -114,11 +116,21 @@ interface WindowProps extends WindowCallbacks {
   isFocused: boolean;
 }
 
-export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onMove, onResize }: WindowProps) {
+export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onMove, onResize, onUrlChange }: WindowProps) {
+  const [urlInput, setUrlInput] = useState(win.url ?? "");
+
   const screenX = panX + win.x * zoom;
   const screenY = panY + win.y * zoom;
   const screenW = win.width * zoom;
   const screenH = win.height * zoom;
+
+  const handleUrlSubmit = useCallback(
+    (e: React.FormEvent) => {
+      e.preventDefault();
+      onUrlChange(win.id, urlInput);
+    },
+    [win.id, urlInput, onUrlChange],
+  );
 
   const handleWindowMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -267,22 +279,57 @@ export function Window({ win, panX, panY, zoom, isFocused, onFocus, onClose, onM
         </div>
       </div>
 
-      <div
-        style={{
-          flex: 1,
-          overflow: "hidden",
-          background: "#1e1e1e",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "rgba(255,255,255,0.2)",
-          fontFamily: "monospace",
-          fontSize: 12,
-          borderRadius: "0 0 5px 5px",
-        }}
-      >
-        {win.kind}
-      </div>
+      {win.kind === "iframe" ? (
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            background: "#1e1e1e",
+            display: "flex",
+            flexDirection: "column",
+            borderRadius: "0 0 5px 5px",
+          }}
+        >
+          <form
+            onSubmit={handleUrlSubmit}
+            onMouseDown={(e) => e.stopPropagation()}
+            style={{ padding: "4px 8px", flexShrink: 0 }}
+          >
+            <TextField
+              value={urlInput}
+              onChange={setUrlInput}
+              aria-label="URL"
+              inputStyle={{ width: "100%" }}
+            />
+          </form>
+          <iframe
+            src={win.url ?? "about:blank"}
+            sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+            style={{
+              flex: 1,
+              border: "none",
+              width: "100%",
+            }}
+          />
+        </div>
+      ) : (
+        <div
+          style={{
+            flex: 1,
+            overflow: "hidden",
+            background: "#1e1e1e",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "rgba(255,255,255,0.2)",
+            fontFamily: "monospace",
+            fontSize: 12,
+            borderRadius: "0 0 5px 5px",
+          }}
+        >
+          {win.kind}
+        </div>
+      )}
 
       {RESIZE_HANDLES.map(({ dir, style }) => (
         <div
