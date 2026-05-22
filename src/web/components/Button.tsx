@@ -1,6 +1,5 @@
 import { Button as RACButton } from "react-aria-components";
 import type { ButtonProps as RACButtonProps } from "react-aria-components";
-import type { CSSProperties } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "ghost";
 
@@ -8,50 +7,31 @@ interface ButtonProps extends RACButtonProps {
   variant?: ButtonVariant;
 }
 
-const BASE_STYLE: CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: 6,
-  padding: "4px 12px",
-  borderRadius: 4,
-  fontSize: 13,
-  fontFamily: "monospace",
-  fontWeight: 500,
-  cursor: "pointer",
-  border: "1px solid transparent",
-  outline: "none",
-  transition: "background 0.15s, opacity 0.15s",
+const VARIANT_CLASS: Record<ButtonVariant, string> = {
+  primary: "bg-accent text-white border-accent",
+  secondary: "bg-white/8 text-text-muted-light border-white/15",
+  ghost: "bg-transparent text-text-muted-light border-transparent",
 };
 
-const VARIANT_STYLES: Record<ButtonVariant, CSSProperties> = {
-  primary: {
-    background: "#4a9eff",
-    color: "#fff",
-    borderColor: "#4a9eff",
-  },
-  secondary: {
-    background: "rgba(255,255,255,0.08)",
-    color: "#ccc",
-    borderColor: "rgba(255,255,255,0.15)",
-  },
-  ghost: {
-    background: "transparent",
-    color: "#ccc",
-    borderColor: "transparent",
-  },
-};
-
-export function Button({ variant = "secondary", style, ...props }: ButtonProps) {
+export function Button({ variant = "secondary", className, ...props }: ButtonProps) {
+  const base = [
+    "inline-flex items-center justify-center gap-1.5 py-1 px-3 rounded",
+    "text-[13px] font-mono font-medium cursor-pointer",
+    "border outline-none",
+    "transition-[background,opacity] duration-150",
+    "data-[disabled]:opacity-40",
+    VARIANT_CLASS[variant],
+  ].join(" ");
   return (
     <RACButton
       {...props}
-      style={(renderProps) => ({
-        ...BASE_STYLE,
-        ...VARIANT_STYLES[variant],
-        opacity: renderProps.isDisabled ? 0.4 : 1,
-        ...(typeof style === "function" ? style(renderProps) : style),
-      })}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className}`
+            : base
+      }
     />
   );
 }

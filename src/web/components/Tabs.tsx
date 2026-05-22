@@ -10,89 +10,94 @@ import type {
   TabProps,
   TabPanelProps,
 } from "react-aria-components";
-import type { CSSProperties } from "react";
 
 type Orientation = "horizontal" | "vertical";
 
-export function Tabs({ style, orientation = "horizontal", ...props }: RACTabsProps) {
+export function Tabs({ className, orientation = "horizontal", ...props }: RACTabsProps) {
+  const base = [
+    "flex font-mono text-[13px] text-text-muted-light",
+    orientation === "vertical" ? "flex-row" : "flex-col",
+  ].join(" ");
   return (
     <RACTabs
       {...props}
       orientation={orientation}
-      style={{
-        display: "flex",
-        flexDirection: orientation === "vertical" ? "row" : "column",
-        fontFamily: "monospace",
-        fontSize: 13,
-        color: "#ccc",
-        ...(style as CSSProperties),
-      }}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className}`
+            : base
+      }
     />
   );
 }
 
 export function TabList<T extends object>({
-  style,
+  className,
   orientation = "horizontal",
   ...props
 }: TabListProps<T> & { orientation?: Orientation }) {
+  const base = [
+    "flex",
+    orientation === "vertical"
+      ? "flex-col border-r border-border"
+      : "flex-row border-b border-border",
+  ].join(" ");
   return (
     <RACTabList<T>
       {...props}
-      style={{
-        display: "flex",
-        flexDirection: orientation === "vertical" ? "column" : "row",
-        gap: 0,
-        ...(orientation === "vertical"
-          ? { borderRight: "1px solid rgba(255,255,255,0.12)" }
-          : { borderBottom: "1px solid rgba(255,255,255,0.12)" }),
-        ...(style as CSSProperties),
-      }}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className as string}`
+            : base
+      }
     />
   );
 }
 
 export function Tab({
-  style,
+  className,
   orientation = "horizontal",
   ...props
 }: TabProps & { orientation?: Orientation }) {
+  const base = [
+    "py-1.5 px-3.5 cursor-pointer bg-transparent outline-none",
+    "text-[13px] font-mono text-text-inactive font-normal",
+    "data-[selected]:text-accent data-[selected]:font-medium",
+    "data-[disabled]:opacity-40",
+    orientation === "vertical"
+      ? "border-r-2 border-r-transparent data-[selected]:border-r-accent"
+      : "border-b-2 border-b-transparent data-[selected]:border-b-accent",
+  ].join(" ");
   return (
     <RACTab
       {...props}
-      style={(renderProps) => ({
-        padding: "6px 14px",
-        cursor: "pointer",
-        ...(orientation === "vertical"
-          ? {
-              borderRight: renderProps.isSelected ? "2px solid #4a9eff" : "2px solid transparent",
-            }
-          : {
-              borderBottom: renderProps.isSelected ? "2px solid #4a9eff" : "2px solid transparent",
-            }),
-        color: renderProps.isSelected ? "#4a9eff" : "#999",
-        background: "transparent",
-        outline: "none",
-        fontSize: 13,
-        fontFamily: "monospace",
-        fontWeight: renderProps.isSelected ? 500 : 400,
-        opacity: renderProps.isDisabled ? 0.4 : 1,
-        ...(typeof style === "function" ? style(renderProps) : style),
-      })}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className}`
+            : base
+      }
     />
   );
 }
 
-export function TabPanel({ style, ...props }: TabPanelProps) {
+export function TabPanel({ className, ...props }: TabPanelProps) {
+  const base = "py-3 outline-none text-text-muted-light";
   return (
     <RACTabPanel
       {...props}
-      style={{
-        padding: "12px 0",
-        outline: "none",
-        color: "#ccc",
-        ...(style as CSSProperties),
-      }}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className}`
+            : base
+      }
     />
   );
 }
