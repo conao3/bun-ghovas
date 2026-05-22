@@ -46,9 +46,10 @@ function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }
 interface CanvasProps {
   canvasState: CanvasState;
   onCanvasChange: (next: CanvasState) => void;
+  onUrlChange: (id: string, url: string) => void;
 }
 
-export function Canvas({ canvasState, onCanvasChange }: CanvasProps) {
+export function Canvas({ canvasState, onCanvasChange, onUrlChange }: CanvasProps) {
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
 
   const stateRef = useRef(canvasState);
@@ -176,6 +177,7 @@ export function Canvas({ canvasState, onCanvasChange }: CanvasProps) {
           onClose={handleWindowClose}
           onMove={handleWindowMove}
           onResize={handleWindowResize}
+          onUrlChange={onUrlChange}
         />
       ))}
       <div

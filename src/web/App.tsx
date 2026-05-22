@@ -12,7 +12,7 @@ const INITIAL_WORKSPACE: WorkspaceState = {
           windows: [
             { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1" },
             { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2" },
-            { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser" },
+            { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser", url: "https://example.com" },
           ],
           panX: 0,
           panY: 0,
@@ -87,6 +87,22 @@ export function App() {
     }));
   }, []);
 
+  const handleUrlChange = useCallback((id: string, url: string) => {
+    setWorkspace((prev) => ({
+      ...prev,
+      layers: {
+        ...prev.layers,
+        0: {
+          ...prev.layers[0],
+          canvases: prev.layers[0].canvases.map((c) => ({
+            ...c,
+            windows: c.windows.map((w) => (w.id === id ? { ...w, url } : w)),
+          })),
+        },
+      },
+    }));
+  }, []);
+
   const activeCanvas =
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
@@ -99,7 +115,7 @@ export function App() {
         onActiveChange={handleActiveChange}
       />
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
-        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} />
+        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} />
       </div>
     </div>
   );
