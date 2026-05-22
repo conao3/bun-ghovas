@@ -22,28 +22,10 @@
           pkgs,
           ...
         }:
-        let
-          bun =
-            if pkgs.stdenv.isLinux then
-              pkgs.symlinkJoin {
-                name = "bun";
-                paths = [
-                  (pkgs.writeShellScriptBin "bun" ''
-                    exec systemd-run --user --scope -p MemoryMax=8G -p MemorySwapMax=0 ${pkgs.bun}/bin/bun "$@"
-                  '')
-                  (pkgs.writeShellScriptBin "bunx" ''
-                    exec systemd-run --user --scope -p MemoryMax=8G -p MemorySwapMax=0 ${pkgs.bun}/bin/bunx "$@"
-                  '')
-                  pkgs.bun
-                ];
-              }
-            else
-              pkgs.bun;
-        in
         {
           devShells.default = pkgs.mkShell {
             inputsFrom = [ config.treefmt.build.devShell ];
-            packages = [ bun ];
+            packages = [ pkgs.bun ];
           };
 
           treefmt = {
