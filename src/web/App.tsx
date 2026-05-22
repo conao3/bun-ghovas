@@ -8,7 +8,16 @@ import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState 
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { ToastProvider } from "./lib/toast";
 import { Settings } from "./Settings";
+import { Welcome } from "./Welcome";
 import { SHORTCUTS, matchesShortcut } from "./lib/shortcuts";
+
+function readOnboarded(): boolean {
+  try {
+    return localStorage.getItem("ghovas.onboarded") === "true";
+  } catch {
+    return true;
+  }
+}
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -69,7 +78,23 @@ export function App() {
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!readOnboarded()) {
+      setWelcomeOpen(true);
+    }
+  }, []);
+
+  const handleDismissWelcome = useCallback(() => {
+    try {
+      localStorage.setItem("ghovas.onboarded", "true");
+    } catch {
+      // localStorage unavailable; proceed silently
+    }
+    setWelcomeOpen(false);
+  }, []);
   useWorkspacePersistence(workspace, setWorkspace);
 
   useEffect(() => {
@@ -348,6 +373,7 @@ export function App() {
         </div>
         <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} focusedWindowTitle={focusedWindowTitle} />
         <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
+        {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
         <Settings
           isOpen={settingsOpen}
           onClose={() => setSettingsOpen(false)}
