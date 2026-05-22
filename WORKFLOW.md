@@ -26,7 +26,7 @@ agent:
   max_concurrent_agents: 1
   max_turns: 10
 codex:
-  command: claude-app-server
+  command: ANTHROPIC_MODEL=claude-sonnet-4-6 claude-app-server
   approval_policy: never
   thread_sandbox: workspace-write
   turn_sandbox_policy:
