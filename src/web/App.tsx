@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
-import type { WorkspaceState, LayerLevel, CanvasState } from "../shared/types";
+import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState } from "../shared/types";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -103,18 +103,48 @@ export function App() {
     }));
   }, []);
 
+  const handleUiModeChange = useCallback((level: LayerLevel, mode: LayerUiMode) => {
+    setWorkspace((prev) => ({
+      ...prev,
+      layers: {
+        ...prev.layers,
+        [level]: { ...prev.layers[level], uiMode: mode },
+      },
+    }));
+  }, []);
+
+  const handleVisibilityChange = useCallback((level: LayerLevel, visible: boolean) => {
+    setWorkspace((prev) => ({
+      ...prev,
+      layers: {
+        ...prev.layers,
+        [level]: { ...prev.layers[level], visible },
+      },
+    }));
+  }, []);
+
   const activeCanvas =
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
+    <div
+      style={{
+        display: "grid",
+        gridTemplateRows: "auto 1fr",
+        gridTemplateColumns: "auto 1fr",
+        gridTemplateAreas: '"top top" "left center"',
+        height: "100vh",
+      }}
+    >
       <LayerBar
         workspace={workspace}
         activeIds={activeIds}
         onActiveChange={handleActiveChange}
+        onUiModeChange={handleUiModeChange}
+        onVisibilityChange={handleVisibilityChange}
       />
-      <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
+      <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
         <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} />
       </div>
     </div>
