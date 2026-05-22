@@ -97,7 +97,7 @@ Branch name convention: `issue-{{ issue.identifier | downcase }}`.
 - `Todo` -> queued; immediately transition to `In Progress` before active work.
   - Special case: if a PR is already attached, treat as feedback/rework loop (run full PR feedback sweep, address or explicitly push back, revalidate, return to `Merging`).
 - `In Progress` -> implementation actively underway; on completion, transition directly to `Merging`.
-- `Merging` -> agent runs `gh pr merge <pr> --squash --delete-branch`, confirms merged, then moves the issue to `Done`.
+- `Merging` -> agent runs `gh pr merge <pr> --merge --delete-branch`, confirms merged, then moves the issue to `Done`.
 - `Human Review` -> escape hatch state for blockers per `Blocked-access escape hatch`; the normal flow does not pass through this state.
 - `Rework` -> reviewer requested changes; planning + implementation required.
 - `Done` -> terminal state; no further action required.
@@ -111,7 +111,7 @@ Branch name convention: `issue-{{ issue.identifier | downcase }}`.
    - `Todo` -> immediately move to `In Progress`, then ensure bootstrap workpad comment exists (create if missing), then start execution flow.
      - If PR is already attached, start by reviewing all open PR comments and deciding required changes vs explicit pushback responses.
    - `In Progress` -> continue execution flow from current scratchpad comment.
-   - `Merging` -> run `gh pr merge <pr> --squash --delete-branch`, confirm `MERGED`, then move the issue to `Done`.
+   - `Merging` -> run `gh pr merge <pr> --merge --delete-branch`, confirm `MERGED`, then move the issue to `Done`.
    - `Human Review` -> blocker escape state; do nothing and shut down. A human resolves the blocker and re-routes the issue.
    - `Rework` -> run rework flow.
    - `Done` -> do nothing and shut down.
@@ -247,7 +247,7 @@ Use this only when completion is blocked by missing required tools or missing au
 
 ## Step 3: Merging
 
-1. When the issue is in `Merging`, run `gh pr merge <pr> --squash --delete-branch`. Confirm with `gh pr view <pr> --json state --jq '.state'` returns `MERGED`.
+1. When the issue is in `Merging`, run `gh pr merge <pr> --merge --delete-branch`. Confirm with `gh pr view <pr> --json state --jq '.state'` returns `MERGED`.
 2. After merge is complete, move the issue to `Done` via `mcp__linear__save_issue`.
 3. If a human reroutes the issue to `Rework` (for example after observing the merged result or after rejecting a self-merged change), follow the rework flow.
 
