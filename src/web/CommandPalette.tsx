@@ -3,6 +3,31 @@ import type { KeyboardEvent } from "react";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 
+const LS_KEY = "ghovas.recentCommands";
+const MAX_RECENT = 8;
+
+function loadRecentCommands(): string[] {
+  try {
+    const raw = localStorage.getItem(LS_KEY);
+    if (raw === null) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter((x): x is string => typeof x === "string");
+  } catch {
+    return [];
+  }
+}
+
+function saveRecentCommands(recentIds: string[], id: string): string[] {
+  const next = [id, ...recentIds.filter((x) => x !== id)].slice(0, MAX_RECENT);
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify(next));
+  } catch {
+    // localStorage unavailable — continue without persisting
+  }
+  return next;
+}
+
 export interface Command {
   id: string;
   label: string;
@@ -18,18 +43,32 @@ interface CommandPaletteProps {
 export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProps) {
   const [query, setQuery] = useState("");
   const [highlightIndex, setHighlightIndex] = useState(0);
+  const [recentIds, setRecentIds] = useState<string[]>(() => loadRecentCommands());
 
   useEffect(() => {
     if (isOpen) {
       setQuery("");
       setHighlightIndex(0);
+      setRecentIds(loadRecentCommands());
     }
   }, [isOpen]);
 
   const filtered =
     query === ""
-      ? commands
+      ? [
+          ...recentIds.flatMap((id) => {
+            const cmd = commands.find((c) => c.id === id);
+            return cmd ? [cmd] : [];
+          }),
+          ...commands.filter((c) => !recentIds.includes(c.id)),
+        ]
       : commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()));
+
+  const runCommand = (cmd: Command) => {
+    setRecentIds((prev) => saveRecentCommands(prev, cmd.id));
+    cmd.run();
+    onClose();
+  };
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
@@ -47,8 +86,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
       e.preventDefault();
       const cmd = filtered[highlightIndex];
       if (cmd) {
-        cmd.run();
-        onClose();
+        runCommand(cmd);
       }
     }
   };
@@ -67,10 +105,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
           {filtered.map((cmd, i) => (
             <div
               key={cmd.id}
-              onClick={() => {
-                cmd.run();
-                onClose();
-              }}
+              onClick={() => runCommand(cmd)}
               onMouseEnter={() => setHighlightIndex(i)}
               style={{
                 padding: "6px 10px",
