@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { init, Terminal as GhosttyTerminal, FitAddon } from "ghostty-web";
 import { connectPtySession, type PtyHandle } from "../lib/ptyClient";
+import { useToast } from "../lib/toast";
 
 const wasmReady: Promise<void> = init();
 
@@ -12,6 +13,7 @@ interface TerminalProps {
 export function Terminal({ sessionId, shell }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [overlay, setOverlay] = useState<string | null>(null);
+  const toast = useToast();
 
   useEffect(() => {
     const el = containerRef.current;
@@ -52,8 +54,14 @@ export function Terminal({ sessionId, shell }: TerminalProps) {
           onExit: (code, signal) => {
             const msg = signal ? `exited (signal ${signal})` : `exited (code ${code ?? "?"})`;
             setOverlay(msg);
+            if (signal || (typeof code === "number" && code !== 0)) {
+              toast.show("error", `terminal ${sessionId}: ${msg}`);
+            }
           },
-          onError: (message) => setOverlay(`error: ${message}`),
+          onError: (message) => {
+            setOverlay(`error: ${message}`);
+            toast.show("error", `terminal ${sessionId}: error: ${message}`);
+          },
         });
 
         term.onData((data) => handle?.sendInput(data));
