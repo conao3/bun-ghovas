@@ -333,6 +333,7 @@ export function LayerBar({
   return (
     <>
       <div
+        data-tutorial="layer-bar"
         className={[
           "[grid-area:top] bg-surface shrink-0",
           horizontalLevels.length > 0 ? "border-b border-border" : "",

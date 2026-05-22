@@ -265,6 +265,7 @@ export function Canvas({
 
   return (
     <div
+      data-tutorial="canvas"
       ref={containerRef}
       onMouseDown={handleMouseDown}
       onMouseMove={handleMouseMove}

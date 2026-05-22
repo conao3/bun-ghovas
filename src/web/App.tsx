@@ -15,11 +15,20 @@ import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { ToastProvider } from "./lib/toast";
 import { Settings } from "./Settings";
 import { Welcome } from "./Welcome";
+import { TutorialOverlay } from "./TutorialOverlay";
 import { SHORTCUTS, matchesShortcut } from "./lib/shortcuts";
 
 function readOnboarded(): boolean {
   try {
     return localStorage.getItem("ghovas.onboarded") === "true";
+  } catch {
+    return true;
+  }
+}
+
+function readTutorialSeen(): boolean {
+  try {
+    return localStorage.getItem("ghovas.tutorialSeen") === "true";
   } catch {
     return true;
   }
@@ -112,6 +121,7 @@ export function App() {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [welcomeOpen, setWelcomeOpen] = useState(false);
+  const [tutorialOpen, setTutorialOpen] = useState(false);
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -127,6 +137,9 @@ export function App() {
       // localStorage unavailable; proceed silently
     }
     setWelcomeOpen(false);
+    if (!readTutorialSeen()) {
+      setTutorialOpen(true);
+    }
   }, []);
   useWorkspacePersistence(workspace, setWorkspace);
 
@@ -342,6 +355,11 @@ export function App() {
         }),
     },
     {
+      id: "show-tutorial",
+      label: "Show tutorial",
+      run: () => setTutorialOpen(true),
+    },
+    {
       id: "new-terminal-window",
       label: "New terminal window",
       run: () =>
@@ -430,6 +448,7 @@ export function App() {
           commands={commands}
         />
         {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
+        {tutorialOpen && <TutorialOverlay onDone={() => setTutorialOpen(false)} />}
         <Settings
           isOpen={settingsOpen}
           onClose={() => setSettingsOpen(false)}
