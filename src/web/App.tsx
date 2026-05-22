@@ -7,6 +7,7 @@ import type { Command } from "./CommandPalette";
 import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { ToastProvider } from "./lib/toast";
+import { Settings } from "./Settings";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -66,6 +67,7 @@ export function App() {
   const [workspace, setWorkspace] = useState<WorkspaceState>(INITIAL_WORKSPACE);
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   useWorkspacePersistence(workspace, setWorkspace);
 
   useEffect(() => {
@@ -166,6 +168,11 @@ export function App() {
 
   const commands: Command[] = [
     {
+      id: "open-settings",
+      label: "Open Settings",
+      run: () => setSettingsOpen(true),
+    },
+    {
       id: "new-iframe-window",
       label: "New iframe window",
       run: () =>
@@ -227,6 +234,14 @@ export function App() {
         </div>
         <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
         <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
+        <Settings
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          workspace={workspace}
+          onUiModeChange={handleUiModeChange}
+          onVisibilityChange={handleVisibilityChange}
+          onWorkspaceReplace={setWorkspace}
+        />
       </div>
     </ToastProvider>
   );
