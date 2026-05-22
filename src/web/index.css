@@ -2,15 +2,27 @@
 
 @theme {
   --color-app-bg: #0e0f12;
+  --color-surface-deep: #1a1a1a;
   --color-surface: #1e1e1e;
+  --color-surface-panel: #222222;
+  --color-surface-raised: #242424;
+  --color-surface-overlay: #2a2a2a;
+  --color-surface-active: #2d2d2d;
+  --color-surface-hover: #3a3a3a;
   --color-border-subtle: rgba(255, 255, 255, 0.06);
   --color-border: rgba(255, 255, 255, 0.12);
+  --color-accent: #4a9eff;
   --color-text-primary: #e6e6e3;
   --color-text-muted: #888888;
+  --color-text-inactive: #999999;
   --color-text-muted-light: #cccccc;
+  --color-text-faint: #555555;
+  --color-white: #ffffff;
   --color-status-success: #3aaf5c;
   --color-status-warning: #d6a83f;
   --color-status-error: #c4564f;
+  --color-danger: #c0392b;
+  --color-danger-light: #ff6b6b;
 }
 
 @layer base {
