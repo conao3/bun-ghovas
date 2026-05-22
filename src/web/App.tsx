@@ -217,6 +217,11 @@ export function App() {
       ? (activeCanvas.windows.find((w) => w.id === focusedWindowId)?.title ?? null)
       : null;
 
+  const focusedWindow =
+    focusedWindowId != null
+      ? (activeCanvas.windows.find((w) => w.id === focusedWindowId) ?? null)
+      : null;
+
   const handleFocusWindow = useCallback((id: string) => {
     setFocusedWindowId(id);
   }, []);
@@ -283,6 +288,33 @@ export function App() {
         run: () => handleActiveChange(level as LayerLevel, canvas.id),
       })),
     ),
+    ...(focusedWindow != null
+      ? workspace.layers[0].canvases
+          .filter((c) => c.id !== activeCanvas.id)
+          .map((canvas) => ({
+            id: `move-window-to-${canvas.id}`,
+            label: `Move window to ${canvas.name ?? canvas.id}`,
+            run: () => {
+              const wid = focusedWindow.id;
+              const srcId = activeCanvas.id;
+              setWorkspace((prev) => ({
+                ...prev,
+                layers: {
+                  ...prev.layers,
+                  0: {
+                    ...prev.layers[0],
+                    canvases: prev.layers[0].canvases.map((c) => {
+                      if (c.id === srcId) return { ...c, windows: c.windows.filter((w) => w.id !== wid) };
+                      if (c.id === canvas.id) return { ...c, windows: [...c.windows, focusedWindow] };
+                      return c;
+                    }),
+                  },
+                },
+              }));
+              setFocusedWindowId(null);
+            },
+          }))
+      : []),
   ];
 
   return (
