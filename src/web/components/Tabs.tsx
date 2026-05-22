@@ -12,13 +12,16 @@ import type {
 } from "react-aria-components";
 import type { CSSProperties } from "react";
 
-export function Tabs({ style, ...props }: RACTabsProps) {
+type Orientation = "horizontal" | "vertical";
+
+export function Tabs({ style, orientation = "horizontal", ...props }: RACTabsProps) {
   return (
     <RACTabs
       {...props}
+      orientation={orientation}
       style={{
         display: "flex",
-        flexDirection: "column",
+        flexDirection: orientation === "vertical" ? "row" : "column",
         fontFamily: "monospace",
         fontSize: 13,
         color: "#ccc",
@@ -28,31 +31,49 @@ export function Tabs({ style, ...props }: RACTabsProps) {
   );
 }
 
-export function TabList<T extends object>({ style, ...props }: TabListProps<T>) {
+export function TabList<T extends object>({
+  style,
+  orientation = "horizontal",
+  ...props
+}: TabListProps<T> & { orientation?: Orientation }) {
   return (
     <RACTabList<T>
       {...props}
       style={{
         display: "flex",
-        flexDirection: "row",
+        flexDirection: orientation === "vertical" ? "column" : "row",
         gap: 0,
-        borderBottom: "1px solid rgba(255,255,255,0.12)",
+        ...(orientation === "vertical"
+          ? { borderRight: "1px solid rgba(255,255,255,0.12)" }
+          : { borderBottom: "1px solid rgba(255,255,255,0.12)" }),
         ...(style as CSSProperties),
       }}
     />
   );
 }
 
-export function Tab({ style, ...props }: TabProps) {
+export function Tab({
+  style,
+  orientation = "horizontal",
+  ...props
+}: TabProps & { orientation?: Orientation }) {
   return (
     <RACTab
       {...props}
       style={(renderProps) => ({
         padding: "6px 14px",
         cursor: "pointer",
-        borderBottom: renderProps.isSelected
-          ? "2px solid #4a9eff"
-          : "2px solid transparent",
+        ...(orientation === "vertical"
+          ? {
+              borderRight: renderProps.isSelected
+                ? "2px solid #4a9eff"
+                : "2px solid transparent",
+            }
+          : {
+              borderBottom: renderProps.isSelected
+                ? "2px solid #4a9eff"
+                : "2px solid transparent",
+            }),
         color: renderProps.isSelected ? "#4a9eff" : "#999",
         background: "transparent",
         outline: "none",
