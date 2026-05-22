@@ -1,3 +1,5 @@
+import { Canvas } from "./Canvas";
+
 export function App() {
-  return <div>ghovas</div>;
+  return <Canvas />;
 }
