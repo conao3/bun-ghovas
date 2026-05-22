@@ -53,6 +53,14 @@ src/
 
 Requires Nix flake + direnv (`nix develop` activates the devShell with Bun and node-pty build dependencies).
 
+One-shot startup via [devo](https://github.com/conao3/rust-devo):
+
+```sh
+devo run
+```
+
+Or manually:
+
 ```sh
 bun install
 bun run dev
