@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useEffect } from "react";
 import type { CanvasState, WindowState } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
@@ -50,11 +50,11 @@ interface CanvasProps {
   onCanvasChange: (next: CanvasState) => void;
   onUrlChange: (id: string, url: string) => void;
   onAddWindow: (win: WindowState) => void;
+  focusedWindowId: string | null;
+  onFocusWindow: (id: string) => void;
 }
 
-export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }: CanvasProps) {
-  const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
-
+export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, focusedWindowId, onFocusWindow }: CanvasProps) {
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
 
@@ -62,15 +62,10 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
   const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const handleWindowFocus = useCallback((id: string) => {
-    setFocusedWindowId(id);
-  }, []);
-
   const handleWindowClose = useCallback(
     (id: string) => {
       const prev = stateRef.current;
       onCanvasChange({ ...prev, windows: prev.windows.filter((w) => w.id !== id) });
-      setFocusedWindowId((f) => (f === id ? null : f));
     },
     [onCanvasChange],
   );
@@ -114,9 +109,9 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
               height: src.height,
             };
       onCanvasChange({ ...prev, windows: [...prev.windows, copy] });
-      setFocusedWindowId(copy.id);
+      onFocusWindow(copy.id);
     },
-    [onCanvasChange],
+    [onCanvasChange, onFocusWindow],
   );
 
   const handleWindowMove = useCallback(
@@ -189,9 +184,9 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
         height,
       };
       onAddWindow(win);
-      setFocusedWindowId(win.id);
+      onFocusWindow(win.id);
     },
-    [onAddWindow],
+    [onAddWindow, onFocusWindow],
   );
 
   const handlePanTo = useCallback(
@@ -221,8 +216,8 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
       height,
     };
     onAddWindow(win);
-    setFocusedWindowId(win.id);
-  }, [onAddWindow]);
+    onFocusWindow(win.id);
+  }, [onAddWindow, onFocusWindow]);
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
@@ -280,7 +275,7 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
           panY={canvasState.panY}
           zoom={canvasState.zoom}
           isFocused={focusedWindowId === win.id}
-          onFocus={handleWindowFocus}
+          onFocus={onFocusWindow}
           onClose={handleWindowClose}
           onMove={handleWindowMove}
           onResize={handleWindowResize}

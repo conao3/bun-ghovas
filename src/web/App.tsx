@@ -68,6 +68,7 @@ export function App() {
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
   useWorkspacePersistence(workspace, setWorkspace);
 
   useEffect(() => {
@@ -146,6 +147,15 @@ export function App() {
   const activeCanvas =
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
+
+  const focusedWindowTitle =
+    focusedWindowId != null
+      ? (activeCanvas.windows.find((w) => w.id === focusedWindowId)?.title ?? null)
+      : null;
+
+  const handleFocusWindow = useCallback((id: string) => {
+    setFocusedWindowId(id);
+  }, []);
 
   const handleAddWindow = useCallback(
     (win: WindowState) => {
@@ -230,9 +240,9 @@ export function App() {
           onVisibilityChange={handleVisibilityChange}
         />
         <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
-          <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
+          <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} focusedWindowId={focusedWindowId} onFocusWindow={handleFocusWindow} />
         </div>
-        <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
+        <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} focusedWindowTitle={focusedWindowTitle} />
         <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
         <Settings
           isOpen={settingsOpen}
