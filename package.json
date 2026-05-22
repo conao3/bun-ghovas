@@ -7,7 +7,7 @@
   "private": true,
   "scripts": {
     "dev": "bun run src/server/index.ts",
-    "test": "bun test",
+    "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
   "trustedDependencies": ["node-pty"],
@@ -20,7 +20,8 @@
     "oxfmt": "^0.51.0",
     "oxlint": "^1.66.0",
     "tailwindcss": "^4.3.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.7"
   },
   "dependencies": {
     "ghostty-web": "^0.4.0",

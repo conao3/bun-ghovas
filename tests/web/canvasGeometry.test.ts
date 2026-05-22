@@ -1,4 +1,4 @@
-import { describe, test, expect } from "bun:test";
+import { describe, test, expect } from "vitest";
 import { clampZoom, zoomAtPoint, centeredWindowPosition } from "../../src/web/lib/canvasGeometry";
 
 describe("clampZoom", () => {

@@ -1,4 +1,4 @@
-import { describe, test, expect } from "bun:test";
+import { describe, test, expect } from "vitest";
 import { createRingBuffer } from "../../src/server/ringBuffer.js";
 
 describe("createRingBuffer", () => {

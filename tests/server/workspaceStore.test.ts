@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { describe, it, expect, beforeEach, afterEach } from "bun:test";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
 import { loadWorkspace, saveWorkspace } from "../../src/server/workspaceStore";
 import type { WorkspaceState } from "../../src/shared/types";
 
