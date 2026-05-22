@@ -6,9 +6,10 @@ import { Modal } from "./components/Modal";
 
 interface CreateWindowFabProps {
   onCreateIframeWindow: (url: string) => void;
+  onCreateTerminalWindow: () => void;
 }
 
-export function CreateWindowFab({ onCreateIframeWindow }: CreateWindowFabProps) {
+export function CreateWindowFab({ onCreateIframeWindow, onCreateTerminalWindow }: CreateWindowFabProps) {
   const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [url, setUrl] = useState("");
 
@@ -61,25 +62,17 @@ export function CreateWindowFab({ onCreateIframeWindow }: CreateWindowFabProps) 
               <>
                 <Button
                   variant="ghost"
-                  isDisabled
-                  aria-label="Terminal (coming soon)"
                   style={{
                     width: "100%",
                     justifyContent: "flex-start",
                     padding: "6px 12px",
-                    gap: 8,
+                  }}
+                  onPress={() => {
+                    close();
+                    onCreateTerminalWindow();
                   }}
                 >
                   Terminal
-                  <span
-                    style={{
-                      fontSize: 10,
-                      color: "rgba(255,255,255,0.3)",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    coming soon
-                  </span>
                 </Button>
                 <Button
                   variant="ghost"

@@ -149,6 +149,29 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
     [onAddWindow],
   );
 
+  const handleCreateTerminalWindow = useCallback(() => {
+    const container = containerRef.current;
+    const containerW = container?.clientWidth ?? 800;
+    const containerH = container?.clientHeight ?? 600;
+    const { panX, panY, zoom } = stateRef.current;
+    const width = 560;
+    const height = 360;
+    const x = (containerW / 2 - panX) / zoom - width / 2;
+    const y = (containerH / 2 - panY) / zoom - height / 2;
+    const win: WindowState = {
+      id: crypto.randomUUID(),
+      kind: "terminal",
+      sessionId: crypto.randomUUID(),
+      title: "Terminal",
+      x,
+      y,
+      width,
+      height,
+    };
+    onAddWindow(win);
+    setFocusedWindowId(win.id);
+  }, [onAddWindow]);
+
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
@@ -212,7 +235,7 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }
           onUrlChange={onUrlChange}
         />
       ))}
-      <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} />
+      <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} onCreateTerminalWindow={handleCreateTerminalWindow} />
       <div
         style={{
           position: "absolute",
