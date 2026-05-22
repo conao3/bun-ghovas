@@ -6,6 +6,7 @@ import { CommandPalette } from "./CommandPalette";
 import type { Command } from "./CommandPalette";
 import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
+import { ToastProvider } from "./lib/toast";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -204,27 +205,29 @@ export function App() {
   ];
 
   return (
-    <div
-      style={{
-        display: "grid",
-        gridTemplateRows: "auto 1fr auto",
-        gridTemplateColumns: "auto 1fr",
-        gridTemplateAreas: '"top top" "left center" "bottom bottom"',
-        height: "100vh",
-      }}
-    >
-      <LayerBar
-        workspace={workspace}
-        activeIds={activeIds}
-        onActiveChange={handleActiveChange}
-        onUiModeChange={handleUiModeChange}
-        onVisibilityChange={handleVisibilityChange}
-      />
-      <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
-        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
+    <ToastProvider>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateRows: "auto 1fr auto",
+          gridTemplateColumns: "auto 1fr",
+          gridTemplateAreas: '"top top" "left center" "bottom bottom"',
+          height: "100vh",
+        }}
+      >
+        <LayerBar
+          workspace={workspace}
+          activeIds={activeIds}
+          onActiveChange={handleActiveChange}
+          onUiModeChange={handleUiModeChange}
+          onVisibilityChange={handleVisibilityChange}
+        />
+        <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
+          <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
+        </div>
+        <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
+        <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
       </div>
-      <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
-      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
-    </div>
+    </ToastProvider>
   );
 }
