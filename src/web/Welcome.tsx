@@ -8,23 +8,12 @@ interface WelcomeProps {
 export function Welcome({ onDismiss }: WelcomeProps) {
   return (
     <Modal isOpen={true} onClose={onDismiss}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 16,
-          padding: "12px 8px",
-          textAlign: "center",
-          fontFamily: "monospace",
-          color: "#fff",
-        }}
-      >
-        <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, letterSpacing: 2 }}>ghovas</h1>
-        <p style={{ margin: 0, fontSize: 14, color: "rgba(255,255,255,0.6)" }}>
+      <div className="flex flex-col items-center gap-4 py-3 px-2 text-center font-mono text-white">
+        <h1 className="m-0 text-[28px] font-bold tracking-[2px]">ghovas</h1>
+        <p className="m-0 text-sm text-white/60">
           a browser-native window manager
         </p>
-        <Button variant="primary" onPress={onDismiss} style={{ marginTop: 8, padding: "6px 24px" }}>
+        <Button variant="primary" onPress={onDismiss} className="mt-2 !py-[6px] !px-6">
           Get started
         </Button>
       </div>

@@ -15,13 +15,13 @@ export function LayersPanel(props: {
 }) {
   return (
     <div>
-      <h2 style={{ color: "#ccc", fontFamily: "monospace", marginTop: 0 }}>Layers</h2>
-      <table style={{ borderCollapse: "collapse", width: "100%", fontFamily: "monospace" }}>
+      <h2 className="text-text-muted-light font-mono mt-0">Layers</h2>
+      <table className="border-collapse w-full font-mono">
         <thead>
           <tr>
-            <th style={thStyle}>Layer</th>
-            <th style={thStyle}>UI Mode</th>
-            <th style={thStyle}>Visible</th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">Layer</th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">UI Mode</th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">Visible</th>
           </tr>
         </thead>
         <tbody>
@@ -29,14 +29,14 @@ export function LayersPanel(props: {
             const layer = props.workspace.layers[level];
             return (
               <tr key={level}>
-                <td style={tdStyle}>
-                  <span style={{ color: "#ccc", fontWeight: "bold" }}>L{level}</span>
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
+                  <span className="text-text-muted-light font-bold">L{level}</span>
                 </td>
-                <td style={tdStyle}>
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
                   <select
                     value={layer.uiMode}
                     onChange={(e) => props.onUiModeChange(level, e.target.value as LayerUiMode)}
-                    style={selectStyle}
+                    className="bg-white/8 border border-white/15 rounded text-text-muted-light font-mono text-[12px] py-[2px] px-[6px] cursor-pointer"
                   >
                     {UI_MODE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -45,12 +45,12 @@ export function LayersPanel(props: {
                     ))}
                   </select>
                 </td>
-                <td style={tdStyle}>
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
                   <input
                     type="checkbox"
                     checked={layer.visible}
                     onChange={(e) => props.onVisibilityChange(level, e.target.checked)}
-                    style={{ cursor: "pointer", accentColor: "#888" }}
+                    className="cursor-pointer accent-text-muted"
                   />
                 </td>
               </tr>
@@ -61,30 +61,3 @@ export function LayersPanel(props: {
     </div>
   );
 }
-
-const thStyle: React.CSSProperties = {
-  color: "rgba(255,255,255,0.5)",
-  fontFamily: "monospace",
-  fontSize: 12,
-  fontWeight: "normal",
-  textAlign: "left",
-  padding: "4px 12px 4px 0",
-  borderBottom: "1px solid rgba(255,255,255,0.1)",
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: "6px 12px 6px 0",
-  verticalAlign: "middle",
-  borderBottom: "1px solid rgba(255,255,255,0.06)",
-};
-
-const selectStyle: React.CSSProperties = {
-  background: "rgba(255,255,255,0.08)",
-  border: "1px solid rgba(255,255,255,0.15)",
-  borderRadius: 4,
-  color: "#ccc",
-  fontFamily: "monospace",
-  fontSize: 12,
-  padding: "2px 6px",
-  cursor: "pointer",
-};

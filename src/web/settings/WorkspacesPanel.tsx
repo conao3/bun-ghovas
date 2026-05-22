@@ -46,24 +46,24 @@ export function WorkspacesPanel(props: {
 
   return (
     <div>
-      <h2 style={{ color: "#ccc", fontFamily: "monospace", marginTop: 0 }}>Workspaces</h2>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <h2 className="text-text-muted-light font-mono mt-0">Workspaces</h2>
+      <div className="flex flex-col gap-3">
         <div>
           <Button onPress={handleExport}>Export workspace</Button>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <div className="flex flex-col gap-1">
           <div>
             <Button onPress={handleImportClick}>Import workspace</Button>
             <input
               ref={fileInputRef}
               type="file"
               accept="application/json"
-              style={{ display: "none" }}
+              className="hidden"
               onChange={handleFileChange}
             />
           </div>
           {importError && (
-            <span style={{ color: "#ff6b6b", fontFamily: "monospace", fontSize: 12 }}>
+            <span className="text-danger-light font-mono text-[12px]">
               {importError}
             </span>
           )}

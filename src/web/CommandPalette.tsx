@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import type { KeyboardEvent } from "react";
+import clsx from "clsx";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
@@ -113,47 +114,21 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       {pendingConfirm ? (
-        <div style={{ width: 440 }}>
-          <div
-            style={{
-              color: "#ccc",
-              fontFamily: "monospace",
-              fontSize: 13,
-              marginBottom: 16,
-              lineHeight: 1.5,
-            }}
-          >
+        <div className="w-[440px]">
+          <div className="text-text-muted-light font-mono text-[13px] mb-4 leading-[1.5]">
             {pendingConfirm.confirm}
           </div>
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <div className="flex gap-2 justify-end">
             <button
               onClick={handleCancel}
-              style={{
-                padding: "5px 14px",
-                borderRadius: 3,
-                border: "1px solid rgba(255,255,255,0.2)",
-                background: "transparent",
-                color: "#ccc",
-                fontFamily: "monospace",
-                fontSize: 13,
-                cursor: "pointer",
-              }}
+              className="py-[5px] px-[14px] rounded-[3px] border border-white/20 bg-transparent text-text-muted-light font-mono text-[13px] cursor-pointer"
             >
               Cancel
             </button>
             <button
               autoFocus
               onClick={handleConfirm}
-              style={{
-                padding: "5px 14px",
-                borderRadius: 3,
-                border: "none",
-                background: "#c0392b",
-                color: "#fff",
-                fontFamily: "monospace",
-                fontSize: 13,
-                cursor: "pointer",
-              }}
+              className="py-[5px] px-[14px] rounded-[3px] border-0 bg-danger text-white font-mono text-[13px] cursor-pointer"
             >
               Confirm
             </button>
@@ -166,32 +141,24 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             value={query}
             onChange={handleQueryChange}
             aria-label="コマンド検索"
-            style={{ width: 440 }}
+            className="w-[440px]"
           />
-          <div style={{ marginTop: 8, maxHeight: 320, overflowY: "auto" }}>
+          <div className="mt-2 max-h-[320px] overflow-y-auto">
             {filtered.map((cmd, i) => (
               <div
                 key={cmd.id}
                 onClick={() => runCommand(cmd)}
                 onMouseEnter={() => setHighlightIndex(i)}
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 3,
-                  cursor: "pointer",
-                  background: i === highlightIndex ? "rgba(255,255,255,0.12)" : "transparent",
-                  color: "#ccc",
-                  fontFamily: "monospace",
-                  fontSize: 13,
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
+                className={clsx(
+                  "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
+                  i === highlightIndex ? "bg-white/12" : "bg-transparent",
+                )}
               >
                 <span>{cmd.label}</span>
                 {(() => {
                   const def = SHORTCUTS.find((s) => s.id === cmd.id);
                   return def ? (
-                    <span style={{ color: "rgba(255,255,255,0.4)", marginLeft: 16 }}>
+                    <span className="text-white/40 ml-4">
                       {formatShortcut(def)}
                     </span>
                   ) : null;
@@ -199,14 +166,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
               </div>
             ))}
             {filtered.length === 0 && (
-              <div
-                style={{
-                  padding: "6px 10px",
-                  color: "rgba(255,255,255,0.4)",
-                  fontFamily: "monospace",
-                  fontSize: 13,
-                }}
-              >
+              <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
                 No commands found
               </div>
             )}

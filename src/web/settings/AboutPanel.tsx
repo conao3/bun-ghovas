@@ -10,23 +10,17 @@ export function AboutPanel() {
       .catch(() => setVersion("unknown"));
   }, []);
 
-  const mutedStyle: React.CSSProperties = {
-    color: "rgba(255,255,255,0.5)",
-    fontFamily: "monospace",
-    fontSize: 13,
-  };
-
   return (
     <div>
-      <h2 style={{ color: "#ccc", fontFamily: "monospace", marginTop: 0 }}>ghovas</h2>
-      <p style={mutedStyle}>Version: {version}</p>
-      <ul style={{ ...mutedStyle, paddingLeft: 16, margin: 0 }}>
+      <h2 className="text-text-muted-light font-mono mt-0">ghovas</h2>
+      <p className="text-white/50 font-mono text-[13px]">Version: {version}</p>
+      <ul className="text-white/50 font-mono text-[13px] pl-4 m-0">
         <li>
           <a
             href="https://github.com/conao3/bun-ghovas"
             target="_blank"
             rel="noreferrer"
-            style={{ color: "rgba(255,255,255,0.5)" }}
+            className="text-white/50"
           >
             GitHub
           </a>
@@ -36,7 +30,7 @@ export function AboutPanel() {
             href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md"
             target="_blank"
             rel="noreferrer"
-            style={{ color: "rgba(255,255,255,0.5)" }}
+            className="text-white/50"
           >
             Concept
           </a>
@@ -46,7 +40,7 @@ export function AboutPanel() {
             href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas-design.md"
             target="_blank"
             rel="noreferrer"
-            style={{ color: "rgba(255,255,255,0.5)" }}
+            className="text-white/50"
           >
             Design
           </a>
