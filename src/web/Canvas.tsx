@@ -43,19 +43,16 @@ function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }
   );
 }
 
-export function Canvas() {
-  const [state, setState] = useState<CanvasState>({
-    id: "canvas-0",
-    windows: [
-      { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1" },
-      { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2" },
-      { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser" },
-    ],
-    panX: 0,
-    panY: 0,
-    zoom: 1,
-  });
-  const [focusedWindowId, setFocusedWindowId] = useState<string | null>("w1");
+interface CanvasProps {
+  canvasState: CanvasState;
+  onCanvasChange: (next: CanvasState) => void;
+}
+
+export function Canvas({ canvasState, onCanvasChange }: CanvasProps) {
+  const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
+
+  const stateRef = useRef(canvasState);
+  stateRef.current = canvasState;
 
   const dragging = useRef(false);
   const lastPos = useRef({ x: 0, y: 0 });
@@ -65,26 +62,35 @@ export function Canvas() {
     setFocusedWindowId(id);
   }, []);
 
-  const handleWindowClose = useCallback((id: string) => {
-    setState((prev) => ({ ...prev, windows: prev.windows.filter((w) => w.id !== id) }));
-    setFocusedWindowId((prev) => (prev === id ? null : prev));
-  }, []);
+  const handleWindowClose = useCallback(
+    (id: string) => {
+      const prev = stateRef.current;
+      onCanvasChange({ ...prev, windows: prev.windows.filter((w) => w.id !== id) });
+      setFocusedWindowId((f) => (f === id ? null : f));
+    },
+    [onCanvasChange],
+  );
 
-  const handleWindowMove = useCallback((id: string, x: number, y: number) => {
-    setState((prev) => ({
-      ...prev,
-      windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y } : w)),
-    }));
-  }, []);
+  const handleWindowMove = useCallback(
+    (id: string, x: number, y: number) => {
+      const prev = stateRef.current;
+      onCanvasChange({
+        ...prev,
+        windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y } : w)),
+      });
+    },
+    [onCanvasChange],
+  );
 
   const handleWindowResize = useCallback(
     (id: string, x: number, y: number, width: number, height: number) => {
-      setState((prev) => ({
+      const prev = stateRef.current;
+      onCanvasChange({
         ...prev,
         windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y, width, height } : w)),
-      }));
+      });
     },
-    [],
+    [onCanvasChange],
   );
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -94,35 +100,41 @@ export function Canvas() {
     e.preventDefault();
   }, []);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    if (!dragging.current) return;
-    const dx = e.clientX - lastPos.current.x;
-    const dy = e.clientY - lastPos.current.y;
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    setState((prev) => ({ ...prev, panX: prev.panX + dx, panY: prev.panY + dy }));
-  }, []);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent) => {
+      if (!dragging.current) return;
+      const dx = e.clientX - lastPos.current.x;
+      const dy = e.clientY - lastPos.current.y;
+      lastPos.current = { x: e.clientX, y: e.clientY };
+      const prev = stateRef.current;
+      onCanvasChange({ ...prev, panX: prev.panX + dx, panY: prev.panY + dy });
+    },
+    [onCanvasChange],
+  );
 
   const handleMouseUp = useCallback(() => {
     dragging.current = false;
   }, []);
 
-  const handleWheel = useCallback((e: WheelEvent) => {
-    e.preventDefault();
-    const container = containerRef.current;
-    if (!container) return;
-    const rect = container.getBoundingClientRect();
-    const cursorX = e.clientX - rect.left;
-    const cursorY = e.clientY - rect.top;
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      e.preventDefault();
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const cursorX = e.clientX - rect.left;
+      const cursorY = e.clientY - rect.top;
 
-    setState((prev) => {
+      const prev = stateRef.current;
       const delta = e.deltaY < 0 ? 1.1 : 1 / 1.1;
       const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev.zoom * delta));
       const scale = newZoom / prev.zoom;
       const newPanX = cursorX - scale * (cursorX - prev.panX);
       const newPanY = cursorY - scale * (cursorY - prev.panY);
-      return { ...prev, zoom: newZoom, panX: newPanX, panY: newPanY };
-    });
-  }, []);
+      onCanvasChange({ ...prev, zoom: newZoom, panX: newPanX, panY: newPanY });
+    },
+    [onCanvasChange],
+  );
 
   useEffect(() => {
     const el = containerRef.current;
@@ -131,9 +143,9 @@ export function Canvas() {
     return () => el.removeEventListener("wheel", handleWheel);
   }, [handleWheel]);
 
-  const zoomPct = Math.round(state.zoom * 100);
-  const viewX = Math.round(-state.panX / state.zoom);
-  const viewY = Math.round(-state.panY / state.zoom);
+  const zoomPct = Math.round(canvasState.zoom * 100);
+  const viewX = Math.round(-canvasState.panX / canvasState.zoom);
+  const viewY = Math.round(-canvasState.panY / canvasState.zoom);
 
   return (
     <div
@@ -151,14 +163,14 @@ export function Canvas() {
         userSelect: "none",
       }}
     >
-      <Grid panX={state.panX} panY={state.panY} zoom={state.zoom} />
-      {state.windows.map((win) => (
+      <Grid panX={canvasState.panX} panY={canvasState.panY} zoom={canvasState.zoom} />
+      {canvasState.windows.map((win) => (
         <Window
           key={win.id}
           win={win}
-          panX={state.panX}
-          panY={state.panY}
-          zoom={state.zoom}
+          panX={canvasState.panX}
+          panY={canvasState.panY}
+          zoom={canvasState.zoom}
           isFocused={focusedWindowId === win.id}
           onFocus={handleWindowFocus}
           onClose={handleWindowClose}
