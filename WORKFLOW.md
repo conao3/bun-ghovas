@@ -172,6 +172,32 @@ When a ticket has an attached PR, run this protocol before moving to `Merging`:
 5. Re-run validation after feedback-driven changes and push updates.
 6. Repeat this sweep until there are no outstanding actionable comments.
 
+## CI green confirmation protocol (required)
+
+Before transitioning to `Merging`, confirm CI on the latest pushed commit:
+
+1. List checks with `gh pr checks <pr-number>`.
+2. If any check reports `pending` / `in_progress` / `queued`, wait. `gh pr checks <pr-number> --watch` blocks until every check finishes.
+3. If any check reports `failure` / `cancelled` / `timed_out`, fix the cause with a new commit, push, and restart from step 1.
+4. If `gh pr checks <pr-number>` reports no checks at all (empty list, or exits non-zero with "no checks reported"), the CI workflow most likely landed on `master` after this branch was created. Pull `master` into the branch to bring the workflow file in, then push to trigger CI:
+
+   ```bash
+   git fetch origin master
+   git merge --no-edit origin/master
+   git push origin HEAD
+   ```
+
+   Resolve any merge conflicts and re-push if needed, then restart from step 1.
+5. Inspect the full rollup once everything finishes:
+
+   ```bash
+   gh pr view <pr-number> --json statusCheckRollup \
+     --jq '.statusCheckRollup[] | {name, status, conclusion}'
+   ```
+
+   Every entry must have `status: "COMPLETED"` and `conclusion: "SUCCESS"`. Record any `SKIPPED` / `NEUTRAL` results explicitly in the workpad with a one-line justification before proceeding.
+6. Only when every check on the latest pushed commit is green may the issue transition to `Merging`.
+
 ## Blocked-access escape hatch (required behavior)
 
 Use this only when completion is blocked by missing required tools or missing auth/permissions that cannot be resolved in-session.
@@ -217,7 +243,7 @@ Use this only when completion is blocked by missing required tools or missing au
 11. Before moving to `Merging`, poll PR feedback and checks:
     - Read any PR `Manual QA Plan` comment (when present) and use it to sharpen UI/runtime test coverage for the current change.
     - Run the full PR feedback sweep protocol.
-    - Confirm PR checks have run and are green on the latest pushed commit. If checks are still pending, wait. If checks did not run because the CI workflow was added to `master` after this branch was created, rebase onto `master` and push to trigger them, then wait for green.
+    - Run the CI green confirmation protocol.
     - Confirm every required ticket-provided validation/test-plan item is explicitly marked complete in the workpad.
     - Repeat this check-address-verify loop until no outstanding comments remain and checks are fully passing.
     - Re-open and refresh the workpad before state transition so `Plan`, `Acceptance Criteria`, and `Validation` exactly match completed work.
@@ -252,7 +278,7 @@ Use this only when completion is blocked by missing required tools or missing au
 - Acceptance criteria and required ticket-provided validation items are complete.
 - Validation/tests are green for the latest commit.
 - PR feedback sweep is complete and no actionable comments remain.
-- PR checks have run and are green on the latest pushed commit. If checks are missing because the CI workflow landed on `master` after this branch was created, rebase onto `master` and push to trigger them, then wait for green before transitioning.
+- PR checks on the latest pushed commit are all green per the `CI green confirmation protocol`.
 - Branch is pushed and PR is linked on the issue.
 - Required PR metadata is present (`symphony` label).
 
