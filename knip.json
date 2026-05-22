@@ -3,6 +3,7 @@
   "entry": [
     "src/server/index.ts",
     "src/web/main.tsx",
+    "src/web/lib/theme.ts",
     "tests/**/*.test.ts",
     "scripts/**/*.ts"
   ],
