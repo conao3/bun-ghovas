@@ -1,5 +1,6 @@
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
+import { LayerStripFloating } from "./LayerStripFloating";
 import type { WorkspaceState, LayerLevel, LayerState, LayerUiMode } from "../shared/types";
 
 interface LayerBarProps {
@@ -172,9 +173,18 @@ export function LayerBar({
   );
   const hiddenLevels = allLevels.filter((l) => !workspace.layers[l].visible);
 
+  const floatingLevels = allLevels.filter(
+    (l) => workspace.layers[l].visible && workspace.layers[l].uiMode === "floating",
+  );
+
   const cycleMode = (level: LayerLevel) => {
+    const cur = workspace.layers[level].uiMode;
     const next: LayerUiMode =
-      workspace.layers[level].uiMode === "horizontal-tabs" ? "vertical-tabs" : "horizontal-tabs";
+      cur === "horizontal-tabs"
+        ? "vertical-tabs"
+        : cur === "vertical-tabs"
+          ? "floating"
+          : "horizontal-tabs";
     onUiModeChange(level, next);
   };
 
@@ -247,6 +257,18 @@ export function LayerBar({
           ))}
         </div>
       )}
+      {floatingLevels.map((level, i) => (
+        <LayerStripFloating
+          key={level}
+          level={level}
+          layer={workspace.layers[level]}
+          activeId={activeIds[level]}
+          floatingIndex={i}
+          onSelectionChange={(id) => onActiveChange(level, id)}
+          onUiModeChange={() => cycleMode(level)}
+          onVisibilityChange={() => onVisibilityChange(level, false)}
+        />
+      ))}
     </>
   );
 }
