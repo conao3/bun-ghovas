@@ -1,6 +1,7 @@
 import { createRequire } from "module";
 import path from "path";
 import fs from "fs";
+import { type RingBuffer, createRingBuffer } from "./ringBuffer.js";
 
 const req = createRequire(import.meta.url);
 
@@ -14,7 +15,7 @@ const native = loadNativeModule("pty");
 const ptyNative = native.module;
 const helperPath = path.resolve(native.dir, "spawn-helper");
 
-const SCROLLBACK_CAP = 1024 * 1024;
+const SCROLLBACK_CAP_BYTES = 1024 * 1024;
 
 interface NativePty {
   fork(
@@ -56,8 +57,7 @@ interface Session {
   pid: number;
   ws: WsSend;
   alive: boolean;
-  scrollback: Buffer[];
-  scrollbackSize: number;
+  scrollback: RingBuffer;
 }
 
 function buildEnv(extra: Partial<Record<string, string>> = {}): string[] {
@@ -90,15 +90,6 @@ export function createPtyManager() {
     ws.send(JSON.stringify(msg));
   }
 
-  function appendScrollback(session: Session, chunk: Buffer) {
-    session.scrollback.push(chunk);
-    session.scrollbackSize += chunk.byteLength;
-    while (session.scrollbackSize > SCROLLBACK_CAP && session.scrollback.length > 0) {
-      const dropped = session.scrollback.shift()!;
-      session.scrollbackSize -= dropped.byteLength;
-    }
-  }
-
   function openSession(ws: WsSend, msg: Extract<ClientMessage, { type: "open" }>) {
     const { sessionId, shell, cols, rows } = msg;
 
@@ -106,8 +97,8 @@ export function createPtyManager() {
       const session = sessions.get(sessionId)!;
       session.ws = ws;
       send(ws, { type: "open", sessionId });
-      if (session.scrollback.length > 0) {
-        const data = Buffer.concat(session.scrollback).toString("utf8");
+      if (session.scrollback.byteLength() > 0) {
+        const data = Buffer.concat(session.scrollback.snapshot()).toString("utf8");
         send(ws, { type: "output", sessionId, data });
       }
       return;
@@ -143,13 +134,13 @@ export function createPtyManager() {
         },
       );
 
-      const session: Session = { fd: result.fd, pid: result.pid, ws, alive: true, scrollback: [], scrollbackSize: 0 };
+      const session: Session = { fd: result.fd, pid: result.pid, ws, alive: true, scrollback: createRingBuffer(SCROLLBACK_CAP_BYTES) };
       sessions.set(sessionId, session);
 
       pollRead(session, sessionId, (data) => {
         const s = sessions.get(sessionId);
         if (s) {
-          appendScrollback(s, Buffer.from(data, "utf8"));
+          s.scrollback.append(Buffer.from(data, "utf8"));
           send(s.ws, { type: "output", sessionId, data });
         }
       });
@@ -193,8 +184,7 @@ export function createPtyManager() {
         const s = sessions.get(msg.sessionId);
         if (s) {
           s.alive = false;
-          s.scrollback = [];
-          s.scrollbackSize = 0;
+          s.scrollback.clear();
           try { process.kill(s.pid, "SIGHUP"); } catch {}
           sessions.delete(msg.sessionId);
         }
