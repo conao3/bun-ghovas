@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
 import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
+import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -60,6 +61,7 @@ const INITIAL_ACTIVE: Record<LayerLevel, string> = {
 export function App() {
   const [workspace, setWorkspace] = useState<WorkspaceState>(INITIAL_WORKSPACE);
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
+  useWorkspacePersistence(workspace, setWorkspace);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
     setActiveIds((prev) => {
