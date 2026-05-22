@@ -1,0 +1,16 @@
+{
+  "name": "bun-ghovas",
+  "version": "0.0.0",
+  "description": "Browser-native window manager that arranges terminal windows on an infinite canvas",
+  "type": "module",
+  "license": "Apache-2.0",
+  "private": true,
+  "scripts": {
+    "dev": "bun run src/server/index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "typescript": "^5.9.3"
+  }
+}
