@@ -1,4 +1,6 @@
 import { createPtyManager } from "./pty";
+import { loadWorkspace, saveWorkspace } from "./workspaceStore";
+import type { WorkspaceState } from "../shared/types";
 
 const PORT = Number(process.env.PORT ?? 3000);
 
@@ -23,7 +25,7 @@ console.log("node-pty native module loaded successfully");
 
 const server = Bun.serve({
   port: PORT,
-  fetch(req, server) {
+  async fetch(req, server) {
     const url = new URL(req.url);
     if (url.pathname === "/health") {
       return Response.json({ status: "ok", version, uptimeMs: Date.now() - startedAt });
@@ -41,6 +43,37 @@ const server = Bun.serve({
       return new Response(mainJs, {
         headers: { "content-type": "text/javascript; charset=utf-8" },
       });
+    }
+    if (url.pathname === "/workspace" && req.method === "GET") {
+      const workspace = await loadWorkspace();
+      if (workspace === null) {
+        return Response.json({ error: "no workspace saved" }, { status: 404 });
+      }
+      return Response.json({ workspace });
+    }
+    if (url.pathname === "/workspace" && req.method === "PUT") {
+      let body: { workspace?: WorkspaceState };
+      try {
+        body = await req.json();
+      } catch {
+        return Response.json({ error: "invalid JSON body" }, { status: 400 });
+      }
+      const ws = body.workspace;
+      if (
+        !ws ||
+        !ws.layers ||
+        !("0" in ws.layers) ||
+        !("1" in ws.layers) ||
+        !("2" in ws.layers) ||
+        !("3" in ws.layers)
+      ) {
+        return Response.json(
+          { error: "workspace.layers must have keys 0, 1, 2, 3" },
+          { status: 400 },
+        );
+      }
+      await saveWorkspace(ws);
+      return Response.json({ ok: true });
     }
     return new Response("not found", { status: 404 });
   },

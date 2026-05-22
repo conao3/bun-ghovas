@@ -26,6 +26,18 @@ bun run src/server/index.ts
 bun run scripts/pty-smoke.ts
 ```
 
+### Workspace persistence
+
+```sh
+# Save workspace state
+curl -X PUT -H 'content-type: application/json' \
+  -d '{"workspace":{"layers":{"0":{"canvases":[],"uiMode":"horizontal-tabs","visible":true},"1":{"canvases":[],"uiMode":"horizontal-tabs","visible":true},"2":{"canvases":[],"uiMode":"horizontal-tabs","visible":true},"3":{"canvases":[],"uiMode":"horizontal-tabs","visible":true}}}}' \
+  http://localhost:3000/workspace
+
+# Load workspace state
+curl http://localhost:3000/workspace
+```
+
 ## ライセンス
 
 Apache-2.0

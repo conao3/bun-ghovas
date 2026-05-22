@@ -4,6 +4,7 @@
 /.cache
 /tmp
 /log
+/data
 *.log
 .env
 .env.local
