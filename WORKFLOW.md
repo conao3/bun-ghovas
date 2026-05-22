@@ -95,10 +95,10 @@ Branch name convention: `issue-{{ issue.identifier | downcase }}`.
 
 - `Backlog` -> out of scope for this workflow; do not modify.
 - `Todo` -> queued; immediately transition to `In Progress` before active work.
-  - Special case: if a PR is already attached, treat as feedback/rework loop (run full PR feedback sweep, address or explicitly push back, revalidate, return to `Human Review`).
-- `In Progress` -> implementation actively underway.
-- `Human Review` -> PR is attached and validated; waiting on human approval.
-- `Merging` -> approved by human; merge the PR and move the issue to `Done`.
+  - Special case: if a PR is already attached, treat as feedback/rework loop (run full PR feedback sweep, address or explicitly push back, revalidate, return to `Merging`).
+- `In Progress` -> implementation actively underway; on completion, transition directly to `Merging`.
+- `Merging` -> agent runs `gh pr merge <pr> --squash --delete-branch`, confirms merged, then moves the issue to `Done`.
+- `Human Review` -> escape hatch state for blockers per `Blocked-access escape hatch`; the normal flow does not pass through this state.
 - `Rework` -> reviewer requested changes; planning + implementation required.
 - `Done` -> terminal state; no further action required.
 
@@ -111,8 +111,8 @@ Branch name convention: `issue-{{ issue.identifier | downcase }}`.
    - `Todo` -> immediately move to `In Progress`, then ensure bootstrap workpad comment exists (create if missing), then start execution flow.
      - If PR is already attached, start by reviewing all open PR comments and deciding required changes vs explicit pushback responses.
    - `In Progress` -> continue execution flow from current scratchpad comment.
-   - `Human Review` -> wait and poll for decision/review updates.
    - `Merging` -> run `gh pr merge <pr> --squash --delete-branch`, confirm `MERGED`, then move the issue to `Done`.
+   - `Human Review` -> blocker escape state; do nothing and shut down. A human resolves the blocker and re-routes the issue.
    - `Rework` -> run rework flow.
    - `Done` -> do nothing and shut down.
 4. Check whether a PR already exists for the current branch and whether it is closed.
@@ -158,7 +158,7 @@ Branch name convention: `issue-{{ issue.identifier | downcase }}`.
 
 ## PR feedback sweep protocol (required)
 
-When a ticket has an attached PR, run this protocol before moving to `Human Review`:
+When a ticket has an attached PR, run this protocol before moving to `Merging`:
 
 1. Identify the PR number from issue links/attachments.
 2. Gather feedback from all channels:
@@ -184,7 +184,7 @@ Use this only when completion is blocked by missing required tools or missing au
   - exact human action needed to unblock.
 - Keep the brief concise and action-oriented; do not add extra top-level comments outside the workpad.
 
-## Step 2: Execution phase (Todo -> In Progress -> Human Review)
+## Step 2: Execution phase (Todo -> In Progress -> Merging)
 
 1. Determine current repo state (`branch`, `git status`, `HEAD`) and verify the kickoff sync result is already recorded in the workpad before implementation continues.
 2. If current issue state is `Todo`, move it to `In Progress` via `mcp__linear__save_issue`; otherwise leave the current state unchanged.
@@ -214,28 +214,25 @@ Use this only when completion is blocked by missing required tools or missing au
     - Do not include PR URL in the workpad comment; keep PR linkage on the issue via attachment/link fields.
     - Add a short `### Confusions` section at the bottom when any part of task execution was unclear/confusing, with concise bullets.
     - Do not post any additional completion summary comment.
-11. Before moving to `Human Review`, poll PR feedback and checks:
+11. Before moving to `Merging`, poll PR feedback and checks:
     - Read any PR `Manual QA Plan` comment (when present) and use it to sharpen UI/runtime test coverage for the current change.
     - Run the full PR feedback sweep protocol.
     - Confirm PR checks are passing (green) after the latest changes.
     - Confirm every required ticket-provided validation/test-plan item is explicitly marked complete in the workpad.
     - Repeat this check-address-verify loop until no outstanding comments remain and checks are fully passing.
     - Re-open and refresh the workpad before state transition so `Plan`, `Acceptance Criteria`, and `Validation` exactly match completed work.
-12. Only then move the issue to `Human Review` via `mcp__linear__save_issue`.
+12. Only then move the issue to `Merging` via `mcp__linear__save_issue`.
     - Exception: if blocked by missing required non-GitHub tools/auth per the blocked-access escape hatch, move to `Human Review` with the blocker brief and explicit unblock actions.
 13. For `Todo` tickets that already had a PR attached at kickoff:
     - Ensure all existing PR feedback was reviewed and resolved, including inline review comments (code changes or explicit, justified pushback response).
     - Ensure branch was pushed with any required updates.
-    - Then move to `Human Review`.
+    - Then move to `Merging`.
 
-## Step 3: Human Review and merge handling
+## Step 3: Merging
 
-1. When the issue is in `Human Review`, do not code or change ticket content.
-2. Poll for updates as needed, including GitHub PR review comments from humans and bots.
-3. If review feedback requires changes, move the issue to `Rework` via `mcp__linear__save_issue` and follow the rework flow.
-4. If approved, the human moves the issue to `Merging`.
-5. When the issue is in `Merging`, run `gh pr merge <pr> --squash --delete-branch`. Confirm with `gh pr view <pr> --json state --jq '.state'` returns `MERGED`.
-6. After merge is complete, move the issue to `Done` via `mcp__linear__save_issue`.
+1. When the issue is in `Merging`, run `gh pr merge <pr> --squash --delete-branch`. Confirm with `gh pr view <pr> --json state --jq '.state'` returns `MERGED`.
+2. After merge is complete, move the issue to `Done` via `mcp__linear__save_issue`.
+3. If a human reroutes the issue to `Rework` (for example after observing the merged result or after rejecting a self-merged change), follow the rework flow.
 
 ## Step 4: Rework handling
 
@@ -249,7 +246,7 @@ Use this only when completion is blocked by missing required tools or missing au
    - Create a new bootstrap `## Agent Workpad` comment.
    - Build a fresh plan/checklist and execute end-to-end.
 
-## Completion bar before Human Review
+## Completion bar before Merging
 
 - Step 1/2 checklist is fully complete and accurately reflected in the single workpad comment.
 - Acceptance criteria and required ticket-provided validation items are complete.
@@ -269,8 +266,8 @@ Use this only when completion is blocked by missing required tools or missing au
 - If out-of-scope improvements are found, create a separate `Backlog` issue via `mcp__linear__save_issue` (with `state="Backlog"`, same `project`, `relatedTo=["{{ issue.identifier }}"]`, plus `blockedBy=["{{ issue.identifier }}"]` when applicable) rather than expanding current scope.
 - Never call `gh pr merge` outside the `Merging` flow.
 - Never amend or force-push history that is already on `origin`. Make a new commit for fixes.
-- Do not move to `Human Review` unless the `Completion bar before Human Review` is satisfied.
-- In `Human Review`, do not make changes; wait and poll.
+- Do not move to `Merging` unless the `Completion bar before Merging` is satisfied.
+- `Human Review` is reserved for the blocked-access escape hatch; do not route there from the normal completion flow.
 - If state is terminal (`Done`), do nothing and shut down.
 - Keep issue text concise, specific, and reviewer-oriented.
 - If blocked and no workpad exists yet, add one blocker comment via `mcp__linear__save_comment` describing blocker, impact, and next unblock action.
