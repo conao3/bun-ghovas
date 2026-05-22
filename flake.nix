@@ -25,7 +25,13 @@
         {
           devShells.default = pkgs.mkShell {
             inputsFrom = [ config.treefmt.build.devShell ];
-            packages = [ pkgs.bun ];
+            packages = [
+              pkgs.bun
+              pkgs.awscli2
+              pkgs.gh
+              pkgs.git
+              pkgs.jq
+            ];
           };
 
           treefmt = {
