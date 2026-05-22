@@ -2,7 +2,4 @@ session: bun-ghovas
 
 tasks:
   - id: server
-    cmd: nix develop --command bash -c "bun install && bun run dev"
-  - id: shell
-    cmd: nix develop
-    right_of: server
+    cmd: bun install && portless ghovas bun run dev
