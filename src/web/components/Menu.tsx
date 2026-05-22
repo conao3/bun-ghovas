@@ -26,37 +26,19 @@ export function ContextMenu({
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
       <button
         tabIndex={-1}
-        style={{
-          position: "fixed",
-          width: 0,
-          height: 0,
-          padding: 0,
-          border: 0,
-          outline: 0,
-          background: "transparent",
-          pointerEvents: "none",
-          overflow: "hidden",
-        }}
+        className="fixed size-0 p-0 border-0 outline-none bg-transparent pointer-events-none overflow-hidden"
       />
       <Popover
         triggerRef={triggerRef}
         placement="bottom start"
-        style={{
-          background: "#1e1e1e",
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 4,
-          padding: "4px 0",
-          minWidth: 120,
-          outline: "none",
-          boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
-        }}
+        className="bg-surface border border-white/15 rounded py-1 min-w-[120px] outline-none shadow-[0_4px_16px_color-mix(in_srgb,black_50%,transparent)]"
       >
         <RACMenu
           onAction={(key) => {
             onAction(String(key));
             onOpenChange(false);
           }}
-          style={{ listStyle: "none", margin: 0, padding: 0, outline: "none" }}
+          className="list-none m-0 p-0 outline-none"
         >
           {children}
         </RACMenu>
@@ -65,21 +47,23 @@ export function ContextMenu({
   );
 }
 
-export function MenuItem({ style, ...props }: MenuItemProps) {
+export function MenuItem({ className, ...props }: MenuItemProps) {
+  const base = [
+    "py-1.5 px-3.5 text-[13px] font-mono",
+    "text-text-muted-light bg-transparent cursor-default outline-none select-none",
+    "data-[hovered]:text-white data-[hovered]:bg-surface-hover",
+    "data-[focused]:text-white data-[focused]:bg-surface-hover",
+  ].join(" ");
   return (
     <RACMenuItem
       {...props}
-      style={(renderProps) => ({
-        padding: "6px 14px",
-        fontSize: 13,
-        fontFamily: "monospace",
-        color: renderProps.isHovered || renderProps.isFocused ? "#fff" : "#ccc",
-        background: renderProps.isHovered || renderProps.isFocused ? "#3a3a3a" : "transparent",
-        cursor: "default",
-        outline: "none",
-        userSelect: "none",
-        ...(typeof style === "function" ? style(renderProps) : style),
-      })}
+      className={
+        typeof className === "function"
+          ? (rp) => `${base} ${className(rp)}`
+          : className
+            ? `${base} ${className}`
+            : base
+      }
     />
   );
 }

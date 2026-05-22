@@ -27,12 +27,13 @@ export function Terminal({ sessionId, shell }: TerminalProps) {
       .then(() => {
         if (disposed) return;
 
+        const rootStyle = getComputedStyle(document.documentElement);
         term = new GhosttyTerminal({
           fontSize: 13,
           fontFamily: "monospace",
           theme: {
-            background: "#1e1e1e",
-            foreground: "#cccccc",
+            background: rootStyle.getPropertyValue("--color-surface").trim(),
+            foreground: rootStyle.getPropertyValue("--color-text-muted-light").trim(),
           },
         });
 
@@ -81,26 +82,14 @@ export function Terminal({ sessionId, shell }: TerminalProps) {
 
   return (
     <div
-      style={{ position: "relative", width: "100%", height: "100%" }}
+      className="relative w-full h-full"
       onPointerDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
       onKeyDown={(e) => e.stopPropagation()}
     >
-      <div ref={containerRef} style={{ width: "100%", height: "100%" }} />
+      <div ref={containerRef} className="w-full h-full" />
       {overlay && (
-        <div
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: "4px 8px",
-            background: "rgba(0,0,0,0.75)",
-            color: "#ff6b6b",
-            fontFamily: "monospace",
-            fontSize: 12,
-          }}
-        >
+        <div className="absolute bottom-0 left-0 right-0 py-1 px-2 bg-black/75 text-danger-light font-mono text-[12px]">
           {overlay}
         </div>
       )}

@@ -12,27 +12,10 @@ export function Modal({ isOpen, onClose, children }: ModalProps) {
     <ModalOverlay
       isOpen={isOpen}
       onOpenChange={(open) => !open && onClose()}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0,0,0,0.6)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        zIndex: 1000,
-      }}
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000]"
     >
-      <RACModal
-        style={{
-          background: "#2a2a2a",
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 6,
-          padding: 20,
-          minWidth: 320,
-          outline: "none",
-        }}
-      >
-        <Dialog style={{ outline: "none" }}>{children}</Dialog>
+      <RACModal className="bg-surface-overlay border border-white/15 rounded-md p-5 min-w-[320px] outline-none">
+        <Dialog className="outline-none">{children}</Dialog>
       </RACModal>
     </ModalOverlay>
   );

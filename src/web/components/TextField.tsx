@@ -11,43 +11,22 @@ interface TextFieldProps extends RACTextFieldProps {
   inputStyle?: CSSProperties;
 }
 
-export function TextField({ label, inputStyle, style, ...props }: TextFieldProps) {
+export function TextField({ label, inputStyle, className, ...props }: TextFieldProps) {
   return (
     <RACTextField
       {...props}
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 2,
-        fontFamily: "monospace",
-        fontSize: 12,
-        ...(style as CSSProperties),
-      }}
+      className={
+        className
+          ? `flex flex-col gap-0.5 font-mono text-[12px] ${className as string}`
+          : "flex flex-col gap-0.5 font-mono text-[12px]"
+      }
     >
       {label && (
-        <RACLabel
-          style={{
-            color: "rgba(255,255,255,0.5)",
-            fontSize: 11,
-          }}
-        >
-          {label}
-        </RACLabel>
+        <RACLabel className="text-white/50 text-[11px]">{label}</RACLabel>
       )}
       <RACInput
-        style={{
-          background: "rgba(0,0,0,0.4)",
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 3,
-          color: "#ccc",
-          fontFamily: "monospace",
-          fontSize: 12,
-          padding: "3px 8px",
-          outline: "none",
-          width: "100%",
-          boxSizing: "border-box",
-          ...inputStyle,
-        }}
+        className="bg-black/40 border border-white/15 rounded-[3px] text-text-muted-light font-mono text-[12px] py-[3px] px-2 outline-none w-full"
+        style={inputStyle}
       />
     </RACTextField>
   );
