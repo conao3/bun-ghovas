@@ -9,7 +9,6 @@ import { Modal } from "./components/Modal";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
-const TITLE_BAR_HEIGHT = 32;
 const HANDLE_SIZE = 8;
 const CORNER_SIZE = 12;
 
