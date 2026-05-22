@@ -1,7 +1,7 @@
 ---
 tracker:
   kind: linear
-  project_slug: "bun-ghovas-TODO-FILL-SLUG"
+  project_slug: "bun-ghovas-17a205ff027e"
   active_states:
     - Todo
     - In Progress
