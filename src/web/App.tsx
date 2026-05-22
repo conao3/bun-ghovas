@@ -1,13 +1,23 @@
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
-import type { WorkspaceState, LayerLevel } from "../shared/types";
+import type { WorkspaceState, LayerLevel, CanvasState } from "../shared/types";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
     0: {
       canvases: [
-        { id: "canvas-1", windows: [], panX: 0, panY: 0, zoom: 1 },
+        {
+          id: "canvas-1",
+          windows: [
+            { id: "w1", kind: "terminal", x: 80, y: 60, width: 420, height: 300, title: "Terminal 1" },
+            { id: "w2", kind: "terminal", x: 540, y: 100, width: 400, height: 280, title: "Terminal 2" },
+            { id: "w3", kind: "iframe", x: 180, y: 420, width: 460, height: 320, title: "Browser" },
+          ],
+          panX: 0,
+          panY: 0,
+          zoom: 1,
+        },
         { id: "canvas-2", windows: [], panX: 0, panY: 0, zoom: 1 },
       ],
       uiMode: "horizontal-tabs",
@@ -48,7 +58,7 @@ const INITIAL_ACTIVE: Record<LayerLevel, string> = {
 };
 
 export function App() {
-  const [workspace] = useState<WorkspaceState>(INITIAL_WORKSPACE);
+  const [workspace, setWorkspace] = useState<WorkspaceState>(INITIAL_WORKSPACE);
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
@@ -64,6 +74,23 @@ export function App() {
     });
   };
 
+  const handleCanvasChange = useCallback((next: CanvasState) => {
+    setWorkspace((prev) => ({
+      ...prev,
+      layers: {
+        ...prev.layers,
+        0: {
+          ...prev.layers[0],
+          canvases: prev.layers[0].canvases.map((c) => (c.id === next.id ? next : c)),
+        },
+      },
+    }));
+  }, []);
+
+  const activeCanvas =
+    workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
+    workspace.layers[0].canvases[0]!;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <LayerBar
@@ -72,7 +99,7 @@ export function App() {
         onActiveChange={handleActiveChange}
       />
       <div style={{ flex: 1, position: "relative", overflow: "hidden" }}>
-        <Canvas key={activeIds[1]} />
+        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} />
       </div>
     </div>
   );
