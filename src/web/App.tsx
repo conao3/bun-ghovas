@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
+import { StatusBar } from "./StatusBar";
 import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 
@@ -152,9 +153,9 @@ export function App() {
     <div
       style={{
         display: "grid",
-        gridTemplateRows: "auto 1fr",
+        gridTemplateRows: "auto 1fr auto",
         gridTemplateColumns: "auto 1fr",
-        gridTemplateAreas: '"top top" "left center"',
+        gridTemplateAreas: '"top top" "left center" "bottom bottom"',
         height: "100vh",
       }}
     >
@@ -168,6 +169,7 @@ export function App() {
       <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
         <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
       </div>
+      <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
     </div>
   );
 }
