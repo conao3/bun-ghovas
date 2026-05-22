@@ -21,7 +21,7 @@ hooks:
   after_create: |
     gh repo clone conao3/bun-ghovas . -- --depth 1
 agent:
-  max_concurrent_agents: 1
+  max_concurrent_agents: 10
   max_turns: 10
 codex:
   command: ANTHROPIC_MODEL=claude-sonnet-4-6 claude-app-server
