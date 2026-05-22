@@ -72,15 +72,9 @@ export function LayerStripFloating({
   return (
     <div
       ref={capsuleRef}
+      className="fixed z-[200] flex items-center bg-surface border border-white/[0.18] rounded-full"
       style={{
-        position: "fixed",
-        zIndex: 200,
-        display: "flex",
-        alignItems: "center",
-        background: "#1e1e1e",
-        border: "1px solid rgba(255,255,255,0.18)",
-        borderRadius: 999,
-        boxShadow: "0 4px 16px rgba(0,0,0,0.5)",
+        boxShadow: "0 4px 16px color-mix(in srgb, black 50%, transparent)",
         ...(pos !== null
           ? { left: pos.x, top: pos.y }
           : { bottom: initialBottom, left: "50%", transform: "translateX(-50%)" }),
@@ -88,28 +82,11 @@ export function LayerStripFloating({
     >
       <div
         onMouseDown={handleGripMouseDown}
-        style={{
-          cursor: "grab",
-          padding: "6px 8px 6px 10px",
-          color: "#555",
-          userSelect: "none",
-          fontSize: 14,
-          flexShrink: 0,
-          lineHeight: 1,
-        }}
+        className="cursor-grab py-1.5 pl-2.5 pr-2 text-text-faint select-none text-[14px] shrink-0 leading-none"
       >
         ⠿
       </div>
-      <span
-        style={{
-          color: "#555",
-          fontSize: 11,
-          fontFamily: "monospace",
-          padding: "0 2px",
-          userSelect: "none",
-          flexShrink: 0,
-        }}
-      >
+      <span className="text-text-faint text-[11px] font-mono px-0.5 select-none shrink-0">
         L{level}
       </span>
       <Button

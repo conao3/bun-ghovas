@@ -34,39 +34,26 @@ export function CreateWindowFab({
       <DialogTrigger>
         <Button
           variant="primary"
+          className="absolute bottom-14 right-4 w-9 h-9 leading-none z-10"
           style={{
-            position: "absolute",
-            bottom: 56,
-            right: 16,
-            width: 36,
-            height: 36,
             borderRadius: "50%",
             padding: 0,
             fontSize: 20,
-            lineHeight: 1,
-            zIndex: 10,
           }}
         >
           +
         </Button>
         <Popover
           placement="top end"
-          style={{
-            background: "#2a2a2a",
-            border: "1px solid rgba(255,255,255,0.15)",
-            borderRadius: 6,
-            padding: 4,
-            outline: "none",
-            zIndex: 20,
-          }}
+          className="bg-surface-overlay border border-white/15 rounded-[6px] p-1 outline-none z-20"
         >
-          <Dialog style={{ outline: "none", display: "flex", flexDirection: "column", gap: 2 }}>
+          <Dialog className="outline-none flex flex-col gap-0.5">
             {({ close }) => (
               <>
                 <Button
                   variant="ghost"
+                  className="w-full"
                   style={{
-                    width: "100%",
                     justifyContent: "flex-start",
                     padding: "6px 12px",
                   }}
@@ -79,8 +66,8 @@ export function CreateWindowFab({
                 </Button>
                 <Button
                   variant="ghost"
+                  className="w-full"
                   style={{
-                    width: "100%",
                     justifyContent: "flex-start",
                     padding: "6px 12px",
                   }}
@@ -103,10 +90,10 @@ export function CreateWindowFab({
             e.preventDefault();
             handleOk();
           }}
-          style={{ display: "flex", flexDirection: "column", gap: 16 }}
+          className="flex flex-col gap-4"
         >
           <TextField label="URL" value={url} onChange={setUrl} autoFocus />
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
+          <div className="flex gap-2 justify-end">
             <Button type="button" variant="secondary" onPress={handleCancel}>
               Cancel
             </Button>
