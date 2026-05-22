@@ -10,7 +10,7 @@
     "test": "bun test",
     "typecheck": "tsc --noEmit"
   },
-  "trustedDependencies": ["bun", "node-pty"],
+  "trustedDependencies": ["node-pty"],
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.2.15",
