@@ -27,7 +27,6 @@
             inputsFrom = [ config.treefmt.build.devShell ];
             packages = [
               pkgs.bun
-              pkgs.awscli2
               pkgs.gh
               pkgs.git
               pkgs.jq
