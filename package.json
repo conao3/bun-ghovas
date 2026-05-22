@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "react": "^19.2.6",
+    "react-aria-components": "^1.17.0",
     "react-dom": "^19.2.6"
   }
 }
