@@ -111,7 +111,7 @@ export function Canvas() {
       onMouseUp={handleMouseUp}
       onMouseLeave={handleMouseUp}
       style={{
-        position: "fixed",
+        position: "absolute",
         inset: 0,
         overflow: "hidden",
         cursor: dragging.current ? "grabbing" : "grab",
