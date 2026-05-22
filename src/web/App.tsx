@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
-import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState } from "../shared/types";
+import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -127,6 +127,25 @@ export function App() {
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
 
+  const handleAddWindow = useCallback(
+    (win: WindowState) => {
+      const targetId = activeCanvas.id;
+      setWorkspace((prev) => ({
+        ...prev,
+        layers: {
+          ...prev.layers,
+          0: {
+            ...prev.layers[0],
+            canvases: prev.layers[0].canvases.map((c) =>
+              c.id === targetId ? { ...c, windows: [...c.windows, win] } : c,
+            ),
+          },
+        },
+      }));
+    },
+    [activeCanvas.id],
+  );
+
   return (
     <div
       style={{
@@ -145,7 +164,7 @@ export function App() {
         onVisibilityChange={handleVisibilityChange}
       />
       <div style={{ gridArea: "center", position: "relative", overflow: "hidden" }}>
-        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} />
+        <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
       </div>
     </div>
   );

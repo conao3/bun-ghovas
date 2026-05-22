@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
-import type { CanvasState } from "../shared/types";
+import type { CanvasState, WindowState } from "../shared/types";
 import { Window } from "./Window";
+import { CreateWindowFab } from "./CreateWindowFab";
 
 const GRID_SIZE = 40;
 const MIN_ZOOM = 0.25;
@@ -47,9 +48,10 @@ interface CanvasProps {
   canvasState: CanvasState;
   onCanvasChange: (next: CanvasState) => void;
   onUrlChange: (id: string, url: string) => void;
+  onAddWindow: (win: WindowState) => void;
 }
 
-export function Canvas({ canvasState, onCanvasChange, onUrlChange }: CanvasProps) {
+export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow }: CanvasProps) {
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
 
   const stateRef = useRef(canvasState);
@@ -117,6 +119,36 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange }: CanvasProps
     dragging.current = false;
   }, []);
 
+  const handleCreateIframeWindow = useCallback(
+    (url: string) => {
+      const container = containerRef.current;
+      const containerW = container?.clientWidth ?? 800;
+      const containerH = container?.clientHeight ?? 600;
+      const { panX, panY, zoom } = stateRef.current;
+      const width = 480;
+      const height = 320;
+      const x = (containerW / 2 - panX) / zoom - width / 2;
+      const y = (containerH / 2 - panY) / zoom - height / 2;
+      let title = "Browser";
+      try {
+        title = new URL(url).host;
+      } catch {}
+      const win: WindowState = {
+        id: crypto.randomUUID(),
+        kind: "iframe",
+        url,
+        title,
+        x,
+        y,
+        width,
+        height,
+      };
+      onAddWindow(win);
+      setFocusedWindowId(win.id);
+    },
+    [onAddWindow],
+  );
+
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       e.preventDefault();
@@ -180,6 +212,7 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange }: CanvasProps
           onUrlChange={onUrlChange}
         />
       ))}
+      <CreateWindowFab onCreateIframeWindow={handleCreateIframeWindow} />
       <div
         style={{
           position: "absolute",
