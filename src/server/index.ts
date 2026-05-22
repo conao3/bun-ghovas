@@ -1,5 +1,8 @@
 const PORT = Number(process.env.PORT ?? 3000);
 
+const { version } = await Bun.file(new URL("../../package.json", import.meta.url)).json();
+const startedAt = Date.now();
+
 const indexHtmlPath = new URL("../web/index.html", import.meta.url);
 const indexHtml = await Bun.file(indexHtmlPath).text();
 
@@ -8,7 +11,7 @@ const server = Bun.serve({
   fetch(req, server) {
     const url = new URL(req.url);
     if (url.pathname === "/health") {
-      return Response.json({ status: "ok" });
+      return Response.json({ status: "ok", version, uptimeMs: Date.now() - startedAt });
     }
     if (url.pathname === "/ws") {
       if (server.upgrade(req)) return undefined;
