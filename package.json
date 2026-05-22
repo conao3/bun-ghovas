@@ -9,6 +9,7 @@
     "dev": "bun run src/server/index.ts",
     "typecheck": "tsc --noEmit"
   },
+  "trustedDependencies": ["node-pty"],
   "devDependencies": {
     "@types/bun": "latest",
     "@types/react": "^19.2.15",
@@ -16,6 +17,7 @@
     "typescript": "^5.9.3"
   },
   "dependencies": {
+    "node-pty": "^1",
     "react": "^19.2.6",
     "react-aria-components": "^1.17.0",
     "react-dom": "^19.2.6"
