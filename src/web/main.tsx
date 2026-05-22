@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { App } from "./App";
+import { ToastProvider } from "./lib/toast";
 import { applyTheme, getStoredTheme } from "./lib/theme";
 
 applyTheme(getStoredTheme());
@@ -11,6 +12,8 @@ if (!container) throw new Error("#app element not found");
 
 createRoot(container).render(
   <StrictMode>
-    <App />
+    <ToastProvider>
+      <App />
+    </ToastProvider>
   </StrictMode>,
 );

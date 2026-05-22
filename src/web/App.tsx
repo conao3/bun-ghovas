@@ -12,7 +12,6 @@ import type {
   WindowState,
 } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
-import { ToastProvider } from "./lib/toast";
 import { Settings } from "./Settings";
 import { Welcome } from "./Welcome";
 import { TutorialOverlay } from "./TutorialOverlay";
@@ -413,51 +412,49 @@ export function App() {
   ];
 
   return (
-    <ToastProvider>
-      <div
-        className="grid h-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
-      >
-        <LayerBar
-          workspace={workspace}
-          activeIds={activeIds}
-          onActiveChange={handleActiveChange}
-          onUiModeChange={handleUiModeChange}
-          onVisibilityChange={handleVisibilityChange}
-          onRenameCanvas={handleRenameCanvas}
-          onDuplicateCanvas={handleDuplicateCanvas}
-          onDeleteCanvas={handleDeleteCanvas}
-        />
-        <div className="[grid-area:center] relative overflow-hidden">
-          <Canvas
-            canvasState={activeCanvas}
-            onCanvasChange={handleCanvasChange}
-            onUrlChange={handleUrlChange}
-            onAddWindow={handleAddWindow}
-            focusedWindowId={focusedWindowId}
-            onFocusWindow={handleFocusWindow}
-          />
-        </div>
-        <StatusBar
-          activeIds={activeIds}
-          zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1}
-          focusedWindowTitle={focusedWindowTitle}
-        />
-        <CommandPalette
-          isOpen={paletteOpen}
-          onClose={() => setPaletteOpen(false)}
-          commands={commands}
-        />
-        {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
-        {tutorialOpen && <TutorialOverlay onDone={() => setTutorialOpen(false)} />}
-        <Settings
-          isOpen={settingsOpen}
-          onClose={() => setSettingsOpen(false)}
-          workspace={workspace}
-          onUiModeChange={handleUiModeChange}
-          onVisibilityChange={handleVisibilityChange}
-          onWorkspaceReplace={setWorkspace}
+    <div
+      className="grid h-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
+    >
+      <LayerBar
+        workspace={workspace}
+        activeIds={activeIds}
+        onActiveChange={handleActiveChange}
+        onUiModeChange={handleUiModeChange}
+        onVisibilityChange={handleVisibilityChange}
+        onRenameCanvas={handleRenameCanvas}
+        onDuplicateCanvas={handleDuplicateCanvas}
+        onDeleteCanvas={handleDeleteCanvas}
+      />
+      <div className="[grid-area:center] relative overflow-hidden">
+        <Canvas
+          canvasState={activeCanvas}
+          onCanvasChange={handleCanvasChange}
+          onUrlChange={handleUrlChange}
+          onAddWindow={handleAddWindow}
+          focusedWindowId={focusedWindowId}
+          onFocusWindow={handleFocusWindow}
         />
       </div>
-    </ToastProvider>
+      <StatusBar
+        activeIds={activeIds}
+        zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1}
+        focusedWindowTitle={focusedWindowTitle}
+      />
+      <CommandPalette
+        isOpen={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        commands={commands}
+      />
+      {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
+      {tutorialOpen && <TutorialOverlay onDone={() => setTutorialOpen(false)} />}
+      <Settings
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+        workspace={workspace}
+        onUiModeChange={handleUiModeChange}
+        onVisibilityChange={handleVisibilityChange}
+        onWorkspaceReplace={setWorkspace}
+      />
+    </div>
   );
 }
