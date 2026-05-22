@@ -1,7 +1,9 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
 import { StatusBar } from "./StatusBar";
+import { CommandPalette } from "./CommandPalette";
+import type { Command } from "./CommandPalette";
 import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 
@@ -62,7 +64,19 @@ const INITIAL_ACTIVE: Record<LayerLevel, string> = {
 export function App() {
   const [workspace, setWorkspace] = useState<WorkspaceState>(INITIAL_WORKSPACE);
   const [activeIds, setActiveIds] = useState<Record<LayerLevel, string>>(INITIAL_ACTIVE);
+  const [paletteOpen, setPaletteOpen] = useState(false);
   useWorkspacePersistence(workspace, setWorkspace);
+
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
+        e.preventDefault();
+        setPaletteOpen((open) => !open);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
     setActiveIds((prev) => {
@@ -149,6 +163,46 @@ export function App() {
     [activeCanvas.id],
   );
 
+  const commands: Command[] = [
+    {
+      id: "new-iframe-window",
+      label: "New iframe window",
+      run: () =>
+        handleAddWindow({
+          id: crypto.randomUUID(),
+          kind: "iframe",
+          x: 100,
+          y: 100,
+          width: 480,
+          height: 320,
+          title: "Browser",
+          url: "about:blank",
+        }),
+    },
+    {
+      id: "new-terminal-window",
+      label: "New terminal window",
+      run: () =>
+        handleAddWindow({
+          id: crypto.randomUUID(),
+          kind: "terminal",
+          x: 100,
+          y: 100,
+          width: 560,
+          height: 360,
+          title: "Terminal",
+          sessionId: crypto.randomUUID(),
+        }),
+    },
+    ...[1, 2, 3].flatMap((level) =>
+      workspace.layers[level as LayerLevel].canvases.map((canvas) => ({
+        id: `switch-l${level}-${canvas.id}`,
+        label: `Switch L${level} → ${canvas.id}`,
+        run: () => handleActiveChange(level as LayerLevel, canvas.id),
+      })),
+    ),
+  ];
+
   return (
     <div
       style={{
@@ -170,6 +224,7 @@ export function App() {
         <Canvas canvasState={activeCanvas} onCanvasChange={handleCanvasChange} onUrlChange={handleUrlChange} onAddWindow={handleAddWindow} />
       </div>
       <StatusBar activeIds={activeIds} zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1} />
+      <CommandPalette isOpen={paletteOpen} onClose={() => setPaletteOpen(false)} commands={commands} />
     </div>
   );
 }
