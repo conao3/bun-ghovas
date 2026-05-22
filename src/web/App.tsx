@@ -8,6 +8,7 @@ import type { WorkspaceState, LayerLevel, LayerUiMode, CanvasState, WindowState 
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { ToastProvider } from "./lib/toast";
 import { Settings } from "./Settings";
+import { SHORTCUTS, matchesShortcut } from "./lib/shortcuts";
 
 const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
@@ -73,9 +74,13 @@ export function App() {
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "k") {
-        e.preventDefault();
-        setPaletteOpen((open) => !open);
+      for (const def of SHORTCUTS) {
+        if (matchesShortcut(e, def)) {
+          e.preventDefault();
+          if (def.id === "toggle-command-palette") setPaletteOpen((open) => !open);
+          else if (def.id === "open-settings") setSettingsOpen(true);
+          break;
+        }
       }
     };
     window.addEventListener("keydown", handler);
