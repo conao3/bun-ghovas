@@ -20,8 +20,6 @@ workspace:
 hooks:
   after_create: |
     git clone --depth 1 git@github.com:conao3/bun-ghovas.git .
-    git config user.name "Naoya Yamashita"
-    git config user.email "conao3@gmail.com"
 agent:
   max_concurrent_agents: 1
   max_turns: 10
