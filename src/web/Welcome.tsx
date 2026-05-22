@@ -14,7 +14,7 @@ export function Welcome({ onDismiss }: WelcomeProps) {
           a browser-native window manager
         </p>
         <Button variant="primary" onPress={onDismiss} className="mt-2 !py-[6px] !px-6">
-          Get started
+          始める
         </Button>
       </div>
     </Modal>
