@@ -3,6 +3,7 @@ import type { CanvasState, WindowState } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
 import { Minimap } from "./Minimap";
+import { clampZoom, zoomAtPoint, centeredWindowPosition } from "./lib/canvasGeometry";
 
 const GRID_SIZE = 40;
 const MIN_ZOOM = 0.25;
@@ -165,11 +166,9 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
       const container = containerRef.current;
       const containerW = container?.clientWidth ?? 800;
       const containerH = container?.clientHeight ?? 600;
-      const { panX, panY, zoom } = stateRef.current;
       const width = 480;
       const height = 320;
-      const x = (containerW / 2 - panX) / zoom - width / 2;
-      const y = (containerH / 2 - panY) / zoom - height / 2;
+      const { x, y } = centeredWindowPosition(containerW, containerH, stateRef.current, width, height);
       let title = "Browser";
       try {
         title = new URL(url).host;
@@ -199,8 +198,7 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
 
   const handleZoomPreset = useCallback(
     (preset: number) => {
-      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, preset));
-      onCanvasChange({ ...stateRef.current, zoom: newZoom });
+      onCanvasChange({ ...stateRef.current, zoom: clampZoom(preset, MIN_ZOOM, MAX_ZOOM) });
     },
     [onCanvasChange],
   );
@@ -209,11 +207,9 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
     const container = containerRef.current;
     const containerW = container?.clientWidth ?? 800;
     const containerH = container?.clientHeight ?? 600;
-    const { panX, panY, zoom } = stateRef.current;
     const width = 560;
     const height = 360;
-    const x = (containerW / 2 - panX) / zoom - width / 2;
-    const y = (containerH / 2 - panY) / zoom - height / 2;
+    const { x, y } = centeredWindowPosition(containerW, containerH, stateRef.current, width, height);
     const win: WindowState = {
       id: crypto.randomUUID(),
       kind: "terminal",
@@ -238,12 +234,9 @@ export function Canvas({ canvasState, onCanvasChange, onUrlChange, onAddWindow, 
       const cursorY = e.clientY - rect.top;
 
       const prev = stateRef.current;
-      const delta = e.deltaY < 0 ? 1.1 : 1 / 1.1;
-      const newZoom = Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, prev.zoom * delta));
-      const scale = newZoom / prev.zoom;
-      const newPanX = cursorX - scale * (cursorX - prev.panX);
-      const newPanY = cursorY - scale * (cursorY - prev.panY);
-      onCanvasChange({ ...prev, zoom: newZoom, panX: newPanX, panY: newPanY });
+      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
+      const next = zoomAtPoint(prev, cursorX, cursorY, factor, MIN_ZOOM, MAX_ZOOM);
+      onCanvasChange({ ...prev, ...next });
     },
     [onCanvasChange],
   );
