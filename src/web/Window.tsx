@@ -24,6 +24,16 @@ interface ResizeHandleDef {
   style: CSSProperties;
 }
 
+function handleVisibleClass(dir: ResizeDir): string {
+  if (dir.length === 2) {
+    return "w-full h-full bg-accent rounded-[1px]";
+  }
+  if (dir === "n" || dir === "s") {
+    return "absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-accent/40";
+  }
+  return "absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-accent/40";
+}
+
 const RESIZE_HANDLES: ResizeHandleDef[] = [
   {
     dir: "n",
@@ -433,7 +443,9 @@ export function Window({
             onMouseDown={handleResizeMouseDown(dir)}
             className="absolute z-20"
             style={style}
-          />
+          >
+            {isFocused && <div className={handleVisibleClass(dir)} />}
+          </div>
         ))}
       </div>
     </>
