@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import {
   Tabs as RACTabs,
   TabList as RACTabList,
@@ -14,20 +15,16 @@ import type {
 type Orientation = "horizontal" | "vertical";
 
 export function Tabs({ className, orientation = "horizontal", ...props }: RACTabsProps) {
-  const base = [
+  const base = clsx(
     "flex font-mono text-[13px] text-on-dark-strong",
     orientation === "vertical" ? "flex-row" : "flex-col",
-  ].join(" ");
+  );
   return (
     <RACTabs
       {...props}
       orientation={orientation}
       className={
-        typeof className === "function"
-          ? (rp) => `${base} ${className(rp)}`
-          : className
-            ? `${base} ${className}`
-            : base
+        typeof className === "function" ? (rp) => clsx(base, className(rp)) : clsx(base, className)
       }
     />
   );
@@ -38,21 +35,19 @@ export function TabList<T extends object>({
   orientation = "horizontal",
   ...props
 }: TabListProps<T> & { orientation?: Orientation }) {
-  const base = [
+  const base = clsx(
     "flex",
     orientation === "vertical"
       ? "flex-col border-r border-dark-hairline"
       : "flex-row border-b border-dark-hairline",
-  ].join(" ");
+  );
   return (
     <RACTabList<T>
       {...props}
       className={
         typeof className === "function"
-          ? (rp) => `${base} ${className(rp)}`
-          : className
-            ? `${base} ${className as string}`
-            : base
+          ? (rp) => clsx(base, className(rp))
+          : clsx(base, className as string | undefined)
       }
     />
   );
@@ -63,7 +58,7 @@ export function Tab({
   orientation = "horizontal",
   ...props
 }: TabProps & { orientation?: Orientation }) {
-  const base = [
+  const base = clsx(
     "py-1.5 px-3.5 cursor-pointer bg-transparent outline-none",
     "text-[13px] font-mono text-on-dark-muted font-normal",
     "data-[selected]:text-primary data-[selected]:font-medium",
@@ -71,16 +66,12 @@ export function Tab({
     orientation === "vertical"
       ? "border-r-2 border-r-transparent data-[selected]:border-r-primary"
       : "border-b-2 border-b-transparent data-[selected]:border-b-primary",
-  ].join(" ");
+  );
   return (
     <RACTab
       {...props}
       className={
-        typeof className === "function"
-          ? (rp) => `${base} ${className(rp)}`
-          : className
-            ? `${base} ${className}`
-            : base
+        typeof className === "function" ? (rp) => clsx(base, className(rp)) : clsx(base, className)
       }
     />
   );
@@ -92,11 +83,7 @@ export function TabPanel({ className, ...props }: TabPanelProps) {
     <RACTabPanel
       {...props}
       className={
-        typeof className === "function"
-          ? (rp) => `${base} ${className(rp)}`
-          : className
-            ? `${base} ${className}`
-            : base
+        typeof className === "function" ? (rp) => clsx(base, className(rp)) : clsx(base, className)
       }
     />
   );

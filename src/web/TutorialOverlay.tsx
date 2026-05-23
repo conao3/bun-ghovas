@@ -133,13 +133,22 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
         </div>
         <p className="m-0 text-body text-[13px] font-mono">{step.description}</p>
         <div className="flex justify-between items-center">
-          <Button variant="ghost" onPress={handleBack} isDisabled={stepIndex === 0} className="!text-muted">
+          <Button
+            variant="ghost"
+            onPress={handleBack}
+            isDisabled={stepIndex === 0}
+            className="!text-muted"
+          >
             <span className="inline-flex items-center gap-1.5">
               <ArrowLeft size={14} aria-hidden /> Back
             </span>
           </Button>
           <div className="flex gap-2">
-            <Button variant="secondary" onPress={skip} className="!bg-surface-card !text-body-strong !border-hairline">
+            <Button
+              variant="secondary"
+              onPress={skip}
+              className="!bg-surface-card !text-body-strong !border-hairline"
+            >
               Skip
             </Button>
             <Button variant="primary" onPress={handleNext}>

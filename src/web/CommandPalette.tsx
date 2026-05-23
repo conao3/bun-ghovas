@@ -177,7 +177,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             <button
               autoFocus
               onClick={handleConfirm}
-              className="py-[5px] px-[14px] rounded-[3px] border-0 bg-danger text-white font-mono text-[13px] cursor-pointer"
+              className="py-[5px] px-[14px] rounded-[3px] border-0 bg-error text-white font-mono text-[13px] cursor-pointer"
             >
               Confirm
             </button>

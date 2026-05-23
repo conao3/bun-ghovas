@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import clsx from "clsx";
 import { ArrowLeft, ArrowRight, Copy, Loader2, Minimize2, Pencil, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
@@ -169,9 +170,21 @@ export function Window({
         triggerRef={menuAnchorRef}
         onAction={handleMenuAction}
       >
-        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
-        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
-        <MenuItem id="close"><span className="inline-flex items-center gap-2"><X size={12} aria-hidden /> Close</span></MenuItem>
+        <MenuItem id="rename">
+          <span className="inline-flex items-center gap-2">
+            <Pencil size={12} aria-hidden /> Rename
+          </span>
+        </MenuItem>
+        <MenuItem id="duplicate">
+          <span className="inline-flex items-center gap-2">
+            <Copy size={12} aria-hidden /> Duplicate
+          </span>
+        </MenuItem>
+        <MenuItem id="close">
+          <span className="inline-flex items-center gap-2">
+            <X size={12} aria-hidden /> Close
+          </span>
+        </MenuItem>
       </ContextMenu>
       <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
         <div className="flex flex-col gap-3">
@@ -193,10 +206,10 @@ export function Window({
       </Modal>
       <div
         onMouseDown={handleWindowMouseDown}
-        className={[
+        className={clsx(
           "absolute box-border rounded-[6px] bg-surface-dark flex flex-col overflow-visible",
           isFocused ? "border-[1.5px] border-primary" : "border border-white/15",
-        ].join(" ")}
+        )}
         style={{
           inset: 0,
           zIndex: isFocused ? 100 : 10,
@@ -204,11 +217,11 @@ export function Window({
       >
         <div
           onContextMenu={handleTitleContextMenu}
-          className={[
+          className={clsx(
             "drag-handle h-8 min-h-8 flex items-center gap-2 pr-1 pl-3 cursor-move select-none",
             "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
             isFocused ? "bg-dark-titlebar-focused" : "bg-dark-titlebar",
-          ].join(" ")}
+          )}
         >
           <div className="flex gap-1.5 shrink-0">
             <span className="w-3 h-3 rounded-full bg-error" />

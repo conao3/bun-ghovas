@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import clsx from "clsx";
 import { ArrowLeftRight, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
@@ -121,7 +122,13 @@ function HorizontalStrip({
   onDeleteCanvas: (id: string) => void;
   onNewCanvas: () => void;
 }) {
-  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas, onNewCanvas);
+  const ctx = useTabContextMenu(
+    layer.canvases,
+    onRenameCanvas,
+    onDuplicateCanvas,
+    onDeleteCanvas,
+    onNewCanvas,
+  );
   const shortcutDef = SHORTCUTS.find((s) => s.id === `cycle-l${level}-canvas`);
   const metaHint = shortcutDef ? formatShortcut(shortcutDef) : null;
 
@@ -138,10 +145,26 @@ function HorizontalStrip({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
-        <MenuItem id="new"><span className="inline-flex items-center gap-2"><Plus size={12} aria-hidden /> New canvas</span></MenuItem>
-        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
-        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
-        <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
+        <MenuItem id="new">
+          <span className="inline-flex items-center gap-2">
+            <Plus size={12} aria-hidden /> New canvas
+          </span>
+        </MenuItem>
+        <MenuItem id="rename">
+          <span className="inline-flex items-center gap-2">
+            <Pencil size={12} aria-hidden /> Rename
+          </span>
+        </MenuItem>
+        <MenuItem id="duplicate">
+          <span className="inline-flex items-center gap-2">
+            <Copy size={12} aria-hidden /> Duplicate
+          </span>
+        </MenuItem>
+        <MenuItem id="delete">
+          <span className="inline-flex items-center gap-2">
+            <Trash2 size={12} aria-hidden /> Delete
+          </span>
+        </MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div className="flex flex-col gap-3">
@@ -161,11 +184,11 @@ function HorizontalStrip({
           </div>
         </div>
       </Modal>
-      <div
-        className={["flex items-center", isLast ? "" : "border-b border-dark-hairline"].join(" ")}
-      >
+      <div className={clsx("flex items-center", !isLast && "border-b border-dark-hairline")}>
         {level === 3 && (
-          <span className="font-serif text-on-dark-strong text-[12px] mr-3 pl-1 select-none">ghovas</span>
+          <span className="font-serif text-on-dark-strong text-[12px] mr-3 pl-1 select-none">
+            ghovas
+          </span>
         )}
         <span className="text-on-dark-muted text-[11px] font-mono px-1 min-w-6 select-none">
           L{level}
@@ -186,16 +209,10 @@ function HorizontalStrip({
         >
           <Eye size={14} aria-hidden />
         </Button>
-        <Tabs
-          selectedKey={activeId}
-          onSelectionChange={(key) => onSelectionChange(key as string)}
-        >
+        <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
           <TabList items={layer.canvases}>
             {(canvas) => (
-              <Tab
-                id={canvas.id}
-                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-              >
+              <Tab id={canvas.id} onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}>
                 {canvas.statusHint && (
                   <span
                     className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${dotColorClass(canvas.statusHint)}`}
@@ -252,7 +269,13 @@ function VerticalColumn({
   onDeleteCanvas: (id: string) => void;
   onNewCanvas: () => void;
 }) {
-  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas, onNewCanvas);
+  const ctx = useTabContextMenu(
+    layer.canvases,
+    onRenameCanvas,
+    onDuplicateCanvas,
+    onDeleteCanvas,
+    onNewCanvas,
+  );
 
   return (
     <>
@@ -267,10 +290,26 @@ function VerticalColumn({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
-        <MenuItem id="new"><span className="inline-flex items-center gap-2"><Plus size={12} aria-hidden /> New canvas</span></MenuItem>
-        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
-        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
-        <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
+        <MenuItem id="new">
+          <span className="inline-flex items-center gap-2">
+            <Plus size={12} aria-hidden /> New canvas
+          </span>
+        </MenuItem>
+        <MenuItem id="rename">
+          <span className="inline-flex items-center gap-2">
+            <Pencil size={12} aria-hidden /> Rename
+          </span>
+        </MenuItem>
+        <MenuItem id="duplicate">
+          <span className="inline-flex items-center gap-2">
+            <Copy size={12} aria-hidden /> Duplicate
+          </span>
+        </MenuItem>
+        <MenuItem id="delete">
+          <span className="inline-flex items-center gap-2">
+            <Trash2 size={12} aria-hidden /> Delete
+          </span>
+        </MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div className="flex flex-col gap-3">
@@ -374,10 +413,10 @@ export function LayerBar({
     <>
       <div
         data-tutorial="layer-bar"
-        className={[
+        className={clsx(
           "[grid-area:top] bg-surface-dark shrink-0",
-          horizontalLevels.length > 0 ? "border-b border-dark-hairline" : "",
-        ].join(" ")}
+          horizontalLevels.length > 0 && "border-b border-dark-hairline",
+        )}
       >
         {horizontalLevels.map((level, i) => (
           <HorizontalStrip
@@ -397,10 +436,10 @@ export function LayerBar({
         ))}
       </div>
       <div
-        className={[
+        className={clsx(
           "[grid-area:left] bg-surface-dark flex flex-row",
-          verticalLevels.length > 0 ? "border-r border-dark-hairline" : "",
-        ].join(" ")}
+          verticalLevels.length > 0 && "border-r border-dark-hairline",
+        )}
       >
         {verticalLevels.map((level) => (
           <VerticalColumn
