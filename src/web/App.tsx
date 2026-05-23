@@ -363,6 +363,28 @@ export function App() {
     });
   }, []);
 
+  const handleNewCanvas = useCallback((level: LayerLevel) => {
+    const newId = crypto.randomUUID().slice(0, 8);
+    setWorkspace((prev) => {
+      const newCanvas = {
+        id: newId,
+        viewport: { x: 0, y: 0, zoom: 1 },
+        nodes: [],
+      };
+      return {
+        ...prev,
+        layers: {
+          ...prev.layers,
+          [level]: {
+            ...prev.layers[level],
+            canvases: [...prev.layers[level].canvases, newCanvas],
+          },
+        },
+      };
+    });
+    setActiveIds((prev) => ({ ...prev, [level]: newId }));
+  }, []);
+
   const handleDeleteCanvas = useCallback(
     (level: LayerLevel, canvasId: string) => {
       setWorkspace((prev) => {
@@ -551,6 +573,7 @@ export function App() {
         onRenameCanvas={handleRenameCanvas}
         onDuplicateCanvas={handleDuplicateCanvas}
         onDeleteCanvas={handleDeleteCanvas}
+        onNewCanvas={handleNewCanvas}
       />
       <div className="[grid-area:center] relative overflow-hidden">
         <Canvas

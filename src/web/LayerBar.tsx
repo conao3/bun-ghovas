@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { ArrowLeftRight, Copy, Eye, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeftRight, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import { ContextMenu, MenuItem } from "./components/Menu";
@@ -23,6 +23,7 @@ interface LayerBarProps {
   onRenameCanvas: (level: LayerLevel, canvasId: string, name: string) => void;
   onDuplicateCanvas: (level: LayerLevel, canvasId: string) => void;
   onDeleteCanvas: (level: LayerLevel, canvasId: string) => void;
+  onNewCanvas: (level: LayerLevel) => void;
 }
 
 function useTabContextMenu(
@@ -30,6 +31,7 @@ function useTabContextMenu(
   onRename: (id: string, name: string) => void,
   onDuplicate: (id: string) => void,
   onDelete: (id: string) => void,
+  onNew: () => void,
 ) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
@@ -47,6 +49,10 @@ function useTabContextMenu(
 
   const handleMenuAction = useCallback(
     (key: string) => {
+      if (key === "new") {
+        onNew();
+        return;
+      }
       if (!targetId) return;
       if (key === "rename") {
         const canvas = canvases.find((c) => c.id === targetId);
@@ -58,7 +64,7 @@ function useTabContextMenu(
         onDelete(targetId);
       }
     },
-    [targetId, canvases, onDuplicate, onDelete],
+    [targetId, canvases, onDuplicate, onDelete, onNew],
   );
 
   const handleRenameCommit = useCallback(() => {
@@ -94,6 +100,7 @@ function HorizontalStrip({
   onRenameCanvas,
   onDuplicateCanvas,
   onDeleteCanvas,
+  onNewCanvas,
 }: {
   level: LayerLevel;
   layer: LayerState;
@@ -105,8 +112,9 @@ function HorizontalStrip({
   onRenameCanvas: (id: string, name: string) => void;
   onDuplicateCanvas: (id: string) => void;
   onDeleteCanvas: (id: string) => void;
+  onNewCanvas: () => void;
 }) {
-  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas);
+  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas, onNewCanvas);
 
   return (
     <>
@@ -121,6 +129,7 @@ function HorizontalStrip({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
+        <MenuItem id="new"><span className="inline-flex items-center gap-2"><Plus size={12} aria-hidden /> New canvas</span></MenuItem>
         <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
         <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
         <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
@@ -199,6 +208,7 @@ function VerticalColumn({
   onRenameCanvas,
   onDuplicateCanvas,
   onDeleteCanvas,
+  onNewCanvas,
 }: {
   level: LayerLevel;
   layer: LayerState;
@@ -209,8 +219,9 @@ function VerticalColumn({
   onRenameCanvas: (id: string, name: string) => void;
   onDuplicateCanvas: (id: string) => void;
   onDeleteCanvas: (id: string) => void;
+  onNewCanvas: () => void;
 }) {
-  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas);
+  const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas, onNewCanvas);
 
   return (
     <>
@@ -225,6 +236,7 @@ function VerticalColumn({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
+        <MenuItem id="new"><span className="inline-flex items-center gap-2"><Plus size={12} aria-hidden /> New canvas</span></MenuItem>
         <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
         <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
         <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
@@ -300,6 +312,7 @@ export function LayerBar({
   onRenameCanvas,
   onDuplicateCanvas,
   onDeleteCanvas,
+  onNewCanvas,
 }: LayerBarProps) {
   const allLevels: LayerLevel[] = [3, 2, 1];
 
@@ -348,6 +361,7 @@ export function LayerBar({
             onRenameCanvas={(id, name) => onRenameCanvas(level, id, name)}
             onDuplicateCanvas={(id) => onDuplicateCanvas(level, id)}
             onDeleteCanvas={(id) => onDeleteCanvas(level, id)}
+            onNewCanvas={() => onNewCanvas(level)}
           />
         ))}
       </div>
@@ -369,6 +383,7 @@ export function LayerBar({
             onRenameCanvas={(id, name) => onRenameCanvas(level, id, name)}
             onDuplicateCanvas={(id) => onDuplicateCanvas(level, id)}
             onDeleteCanvas={(id) => onDeleteCanvas(level, id)}
+            onNewCanvas={() => onNewCanvas(level)}
           />
         ))}
       </div>
