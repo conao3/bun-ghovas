@@ -68,9 +68,6 @@ html[data-theme="light"] {
   }
 
   #app {
-    display: flex;
-    align-items: center;
-    justify-content: center;
     height: 100%;
     font-size: 14px;
     letter-spacing: 0.02em;
