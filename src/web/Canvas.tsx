@@ -31,9 +31,9 @@ function WindowNode({ data }: NodeProps) {
   const { win, isFocused, callbacks } = data as unknown as WindowNodeData;
   return (
     <Window
-      win={{ ...win, x: 0, y: 0 }}
-      panX={0}
-      panY={0}
+      win={win}
+      panX={-win.x}
+      panY={-win.y}
       zoom={1}
       isFocused={isFocused}
       onFocus={callbacks.onFocus}
@@ -273,7 +273,7 @@ export function Canvas({
   );
 
   return (
-    <div data-tutorial="canvas" ref={containerRef} className="absolute inset-0">
+    <div data-tutorial="canvas" ref={containerRef} className="absolute inset-0 overflow-hidden bg-surface-deep">
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
