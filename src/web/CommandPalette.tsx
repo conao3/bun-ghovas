@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import type { KeyboardEvent } from "react";
 import clsx from "clsx";
+import { History, AppWindow, Layers, LayoutGrid, Settings, Hash } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
@@ -8,6 +10,14 @@ import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 const LS_KEY = "ghovas.recentCommands";
 const MAX_RECENT = 8;
 const CATEGORY_ORDER = ["Window", "Layer", "Workspace", "Settings"];
+
+const CATEGORY_ICONS: Record<string, LucideIcon> = {
+  Recent: History,
+  Window: AppWindow,
+  Layer: Layers,
+  Workspace: LayoutGrid,
+  Settings: Settings,
+};
 
 function loadRecentCommands(): string[] {
   try {
@@ -216,8 +226,12 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   row.type === "header" ? (
                     <div
                       key={`header-${row.label}`}
-                      className="text-text-faint text-[11px] font-mono px-3 pt-1 pb-0.5"
+                      className="text-text-faint text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
                     >
+                      {(() => {
+                        const Icon = CATEGORY_ICONS[row.label] ?? Hash;
+                        return <Icon size={12} aria-hidden />;
+                      })()}
                       {row.label}
                     </div>
                   ) : (
