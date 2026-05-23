@@ -65,8 +65,8 @@ describe("workspaceStore", () => {
   });
 
   it("throws on malformed JSON", async () => {
-    await fs.mkdir("data", { recursive: true });
-    await fs.writeFile("data/workspace.json", "not json");
+    await fs.mkdir("data/workspaces", { recursive: true });
+    await fs.writeFile("data/workspaces/default.json", "not json");
     await expect(loadWorkspace()).rejects.toThrow();
   });
 });

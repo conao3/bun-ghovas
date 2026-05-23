@@ -8,8 +8,6 @@ import {
   saveNamedWorkspace,
   workspaceExists,
   deleteNamedWorkspace,
-  loadWorkspace,
-  saveWorkspace,
 } from "./workspaceStore";
 import type { WorkspaceState } from "../shared/types";
 

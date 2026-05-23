@@ -16,11 +16,11 @@ function readStartupMode(): "restore-last" | "blank" {
 
 const CURRENT_KEY = "ghovas.workspace-current";
 
-export function getCurrentWorkspaceName(): string {
+function getCurrentWorkspaceName(): string {
   return localStorage.getItem(CURRENT_KEY) ?? "default";
 }
 
-export function setCurrentWorkspaceName(name: string): void {
+function setCurrentWorkspaceName(name: string): void {
   localStorage.setItem(CURRENT_KEY, name);
 }
 
