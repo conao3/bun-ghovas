@@ -3,15 +3,8 @@ import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
 import type { CanvasStateV2, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
+import type { WindowCallbacks } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
-
-interface WindowCallbacks {
-  onFocus: (id: string) => void;
-  onClose: (id: string) => void;
-  onUrlChange: (id: string, url: string) => void;
-  onRename: (id: string, title: string) => void;
-  onDuplicate: (id: string) => void;
-}
 
 interface WindowNodeData {
   win: WorkspaceNode["data"];
