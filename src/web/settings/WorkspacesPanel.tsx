@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { Button } from "../components/Button";
 import type { WorkspaceState } from "../../shared/types";
+import { INITIAL_WORKSPACE } from "../App";
 
 export function WorkspacesPanel(props: {
   workspace: WorkspaceState;
@@ -22,6 +23,12 @@ export function WorkspacesPanel(props: {
 
   function handleImportClick() {
     fileInputRef.current?.click();
+  }
+
+  function handleReset() {
+    if (window.confirm("This resets all layers and windows to the default workspace. Continue?")) {
+      props.onWorkspaceReplace(INITIAL_WORKSPACE);
+    }
   }
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -67,6 +74,9 @@ export function WorkspacesPanel(props: {
               {importError}
             </span>
           )}
+        </div>
+        <div>
+          <Button variant="secondary" onPress={handleReset}>Reset to default</Button>
         </div>
       </div>
     </div>
