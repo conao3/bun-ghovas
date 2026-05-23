@@ -5,11 +5,11 @@ interface StatusBarProps {
   activeIds: Record<LayerLevel, string>;
   zoom: number;
   focusedWindowTitle: string | null;
+  onCycleLayer: (level: LayerLevel) => void;
 }
 
-export function StatusBar({ activeIds, zoom, focusedWindowTitle }: StatusBarProps) {
+export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer }: StatusBarProps) {
   const zoomPct = Math.round(zoom * 100);
-  const layerText = `L3:${activeIds[3]}  L2:${activeIds[2]}  L1:${activeIds[1]}  L0:${activeIds[0]}`;
   const paletteDef = SHORTCUTS.find((s) => s.id === "toggle-command-palette");
   const settingsDef = SHORTCUTS.find((s) => s.id === "open-settings");
 
@@ -18,7 +18,18 @@ export function StatusBar({ activeIds, zoom, focusedWindowTitle }: StatusBarProp
       className="[grid-area:bottom] h-[22px] flex items-center justify-between px-2
         bg-surface border-t border-border text-text-muted text-[11px] font-mono select-none"
     >
-      <span>{layerText}</span>
+      <span className="flex gap-2">
+        {([3, 2, 1, 0] as LayerLevel[]).map((level) => (
+          <button
+            key={level}
+            aria-label={`cycle L${level} canvas`}
+            className="text-text-muted hover:text-text-primary cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
+            onClick={() => onCycleLayer(level)}
+          >
+            L{level}:{activeIds[level]}
+          </button>
+        ))}
+      </span>
       <span>{focusedWindowTitle ?? "—"}</span>
       <span className="flex gap-3 whitespace-nowrap">
         <span>zoom {zoomPct}%</span>

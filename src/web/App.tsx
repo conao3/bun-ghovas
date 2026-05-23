@@ -178,6 +178,19 @@ export function App() {
   }, []);
   useWorkspacePersistence(workspace, setWorkspace);
 
+  const cycleCanvas = useCallback(
+    (level: LayerLevel) => {
+      const layer = workspace.layers[level];
+      if (!layer.visible) return;
+      const canvases = layer.canvases;
+      const currentIdx = canvases.findIndex((c) => c.id === activeIds[level]);
+      const nextIdx = (currentIdx + 1) % canvases.length;
+      const nextCanvasId = canvases[nextIdx]!.id;
+      setActiveIds((prev) => ({ ...prev, [level]: nextCanvasId }));
+    },
+    [workspace.layers, activeIds],
+  );
+
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       for (const def of SHORTCUTS) {
@@ -189,28 +202,18 @@ export function App() {
           e.preventDefault();
           setSettingsOpen(true);
         } else if (def.id === "cycle-l0-canvas") {
-          const layer = workspace.layers[0];
-          if (!layer.visible) break;
-          const canvases = layer.canvases;
-          const currentIdx = canvases.findIndex((c) => c.id === activeIds[0]);
-          const nextIdx = (currentIdx + 1) % canvases.length;
-          const nextCanvasId = canvases[nextIdx]!.id;
+          if (!workspace.layers[0].visible) break;
           e.preventDefault();
-          setActiveIds((prev) => ({ ...prev, 0: nextCanvasId }));
+          cycleCanvas(0);
         } else if (
           def.id === "cycle-l1-canvas" ||
           def.id === "cycle-l2-canvas" ||
           def.id === "cycle-l3-canvas"
         ) {
           const level = def.id === "cycle-l1-canvas" ? 1 : def.id === "cycle-l2-canvas" ? 2 : 3;
-          const layer = workspace.layers[level as LayerLevel];
-          if (!layer.visible) break;
-          const canvases = layer.canvases;
-          const currentIdx = canvases.findIndex((c) => c.id === activeIds[level as LayerLevel]);
-          const nextIdx = (currentIdx + 1) % canvases.length;
-          const nextCanvasId = canvases[nextIdx]!.id;
+          if (!workspace.layers[level as LayerLevel].visible) break;
           e.preventDefault();
-          setActiveIds((prev) => ({ ...prev, [level]: nextCanvasId }));
+          cycleCanvas(level as LayerLevel);
         } else if (def.id === "close-focused-window") {
           if (focusedWindowId == null) break;
           const windowId = focusedWindowId;
@@ -246,7 +249,7 @@ export function App() {
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [workspace.layers, activeIds, focusedWindowId]);
+  }, [workspace.layers, activeIds, focusedWindowId, cycleCanvas]);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
     setActiveIds((prev) => {
@@ -559,6 +562,7 @@ export function App() {
         activeIds={activeIds}
         zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
         focusedWindowTitle={focusedWindowTitle}
+        onCycleLayer={cycleCanvas}
       />
       <CommandPalette
         isOpen={paletteOpen}
