@@ -28,7 +28,7 @@ import {
 import { Settings } from "./Settings";
 import { Welcome } from "./Welcome";
 import { TutorialOverlay } from "./TutorialOverlay";
-import { SHORTCUTS, matchesShortcut } from "./lib/shortcuts";
+import { SHORTCUTS, matchesShortcut, getShortcutBinding } from "./lib/shortcuts";
 
 function readOnboarded(): boolean {
   try {
@@ -201,7 +201,7 @@ export function App() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       for (const def of SHORTCUTS) {
-        if (!matchesShortcut(e, def)) continue;
+        if (!matchesShortcut(e, getShortcutBinding(def.id))) continue;
         if (def.id === "toggle-command-palette") {
           e.preventDefault();
           setPaletteOpen((open) => !open);
