@@ -1,3 +1,4 @@
+import type React from "react";
 import clsx from "clsx";
 import {
   Tabs as RACTabs,
@@ -57,10 +58,12 @@ export function Tab({
   className,
   orientation = "horizontal",
   variant = "default",
+  ref,
   ...props
 }: TabProps & {
   orientation?: Orientation;
   variant?: "default" | "layer" | "layer-l3" | "layer-vertical";
+  ref?: React.Ref<HTMLDivElement>;
 }) {
   let base: string;
   if (variant === "layer" || variant === "layer-l3") {
@@ -94,6 +97,7 @@ export function Tab({
   }
   return (
     <RACTab
+      ref={ref}
       {...props}
       className={
         typeof className === "function" ? (rp) => clsx(base, className(rp)) : clsx(base, className)

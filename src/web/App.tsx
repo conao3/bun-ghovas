@@ -24,6 +24,7 @@ import {
   appendCanvas,
   removeSubtree,
   duplicateSubtree,
+  reorderCanvases,
 } from "./lib/layerTree";
 import { Settings } from "./Settings";
 import { Welcome } from "./Welcome";
@@ -366,6 +367,12 @@ export function App() {
     [activeIds],
   );
 
+  const handleReorderCanvas = useCallback((level: LayerLevel, activeId: string, overId: string) => {
+    setWorkspace((prev) =>
+      applyLayers({ ...prev, ...reorderCanvases(prev, level, activeId, overId) }),
+    );
+  }, []);
+
   const handleDeleteCanvas = useCallback(
     (level: LayerLevel, canvasId: string) => {
       setWorkspace((prev) => applyLayers({ ...prev, ...removeSubtree(prev, level, canvasId) }));
@@ -628,6 +635,7 @@ export function App() {
           onDuplicateCanvas={handleDuplicateCanvas}
           onDeleteCanvas={handleDeleteCanvas}
           onNewCanvas={handleNewCanvas}
+          onReorderCanvas={handleReorderCanvas}
         />
         <div className="[grid-area:center] relative overflow-hidden">
           <Canvas
