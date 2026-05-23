@@ -1,4 +1,6 @@
+import { Layers } from "lucide-react";
 import type { WorkspaceState, LayerLevel, LayerUiMode } from "../../shared/types";
+import { PanelHeader } from "./PanelHeader";
 
 const LAYER_LEVELS: LayerLevel[] = [1, 2, 3];
 
@@ -15,7 +17,7 @@ export function LayersPanel(props: {
 }) {
   return (
     <div>
-      <h2 className="text-text-muted-light font-mono mt-0">Layers</h2>
+      <PanelHeader icon={Layers} title="Layers" />
       <table className="border-collapse w-full font-mono">
         <thead>
           <tr>

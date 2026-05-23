@@ -1,7 +1,9 @@
 import { useRef, useState } from "react";
+import { LayoutGrid } from "lucide-react";
 import { Button } from "../components/Button";
 import type { WorkspaceState } from "../../shared/types";
 import { INITIAL_WORKSPACE } from "../App";
+import { PanelHeader } from "./PanelHeader";
 
 export function WorkspacesPanel(props: {
   workspace: WorkspaceState;
@@ -53,7 +55,7 @@ export function WorkspacesPanel(props: {
 
   return (
     <div>
-      <h2 className="text-text-muted-light font-mono mt-0">Workspaces</h2>
+      <PanelHeader icon={LayoutGrid} title="Workspaces" />
       <div className="flex flex-col gap-3">
         <div>
           <Button onPress={handleExport}>Export workspace</Button>
