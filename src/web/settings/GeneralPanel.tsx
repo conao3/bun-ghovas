@@ -27,8 +27,8 @@ export function GeneralPanel() {
               Reset onboarding
             </Button>
             <p className="text-muted font-mono text-[11px] mt-1">
-              Clears the "onboarded" / "tutorial seen" flags so the welcome screen
-              and the tutorial overlay appear on the next load.
+              Clears the "onboarded" / "tutorial seen" flags so the welcome screen and the tutorial
+              overlay appear on the next load.
             </p>
           </div>
         </div>

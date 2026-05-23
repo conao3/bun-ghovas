@@ -14,6 +14,7 @@ Concept: [`conao3/idea` projects/bun-ghovas.md](https://github.com/conao3/idea/b
 - **`Mod+K` command palette** (`src/web/CommandPalette.tsx`)
 - **Bottom status bar** — active L0/L1/L2/L3 IDs and zoom percentage (`src/web/StatusBar.tsx`)
 - **Workspace persistence** — `GET` / `PUT /workspace`, debounce auto-save, boot load。保存形式は ReactFlow native `viewport` + `nodes`。旧形式からの client-side migration は `src/web/lib/workspaceMigration.ts` (`src/server/workspaceStore.ts`, `src/web/lib/workspaceClient.ts`, `src/web/lib/useWorkspacePersistence.ts`)
+- **Terminal session picker** — attach to an existing PTY or configure a new shell/cwd/env before spawning (`src/web/SessionPicker.tsx`)
 - **Claude design system** — color palette: coral primary (`#cc785c`), cream surfaces (`#faf9f5`), warm dark chrome (`#181715`); typography: Source Serif 4 (headings), Inter (body), JetBrains Mono (code/UI); no custom tokens — all values from the Claude design reference (`src/web/index.css`)
 
 ## Architecture
