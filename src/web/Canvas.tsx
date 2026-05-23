@@ -1,13 +1,13 @@
 import { useRef, useCallback, useMemo } from "react";
 import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
-import type { CanvasStateV2, WorkspaceNode } from "../shared/types";
+import type { CanvasStateV2, WindowState, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
 import type { WindowCallbacks } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
 
 interface WindowNodeData {
-  win: WorkspaceNode["data"];
+  win: WindowState;
   isFocused: boolean;
   callbacks: WindowCallbacks;
 }
