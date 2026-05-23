@@ -1,5 +1,6 @@
 import { Layers } from "lucide-react";
 import type { WorkspaceState, LayerLevel, LayerUiMode } from "../../shared/types";
+import { getActiveL2, getActiveL3 } from "../lib/layerTree";
 import { PanelHeader } from "./PanelHeader";
 
 const LAYER_LEVELS: LayerLevel[] = [1, 2, 3];
@@ -12,9 +13,22 @@ const UI_MODE_OPTIONS: { value: LayerUiMode; label: string }[] = [
 
 export function LayersPanel(props: {
   workspace: WorkspaceState;
+  activeIds: Record<LayerLevel, string>;
   onUiModeChange: (level: LayerLevel, mode: LayerUiMode) => void;
   onVisibilityChange: (level: LayerLevel, visible: boolean) => void;
 }) {
+  const { workspace, activeIds } = props;
+
+  function canvasCount(level: LayerLevel): number {
+    if (level === 3) return workspace.l3.length;
+    if (level === 2) {
+      const l3 = getActiveL3(workspace, activeIds);
+      return workspace.l2.filter((n) => n.parentL3 === l3.id).length;
+    }
+    const l2 = getActiveL2(workspace, activeIds);
+    return workspace.l1.filter((n) => n.parentL2 === l2.id).length;
+  }
+
   return (
     <div>
       <PanelHeader icon={Layers} title="Layers" />
@@ -34,18 +48,19 @@ export function LayersPanel(props: {
         </thead>
         <tbody>
           {LAYER_LEVELS.map((level) => {
-            const layer = props.workspace.layers[level];
+            const config = workspace.layerConfig[level];
+            const count = canvasCount(level);
             return (
               <tr key={level}>
                 <td className="py-[6px] pr-3 pl-0 align-middle border-b border-hairline">
                   <span className="text-ink font-bold">L{level}</span>
                   <span className="ml-2 text-muted text-[11px]">
-                    {layer.canvases.length} {layer.canvases.length === 1 ? "canvas" : "canvases"}
+                    {count} {count === 1 ? "canvas" : "canvases"}
                   </span>
                 </td>
                 <td className="py-[6px] pr-3 pl-0 align-middle border-b border-hairline">
                   <select
-                    value={layer.uiMode}
+                    value={config.uiMode}
                     onChange={(e) => props.onUiModeChange(level, e.target.value as LayerUiMode)}
                     className="bg-surface-soft border border-hairline rounded text-ink font-mono text-[12px] py-[2px] px-[6px] cursor-pointer"
                   >
@@ -59,7 +74,7 @@ export function LayersPanel(props: {
                 <td className="py-[6px] pr-3 pl-0 align-middle border-b border-hairline">
                   <input
                     type="checkbox"
-                    checked={layer.visible}
+                    checked={config.visible}
                     onChange={(e) => props.onVisibilityChange(level, e.target.checked)}
                     className="cursor-pointer accent-text-muted"
                   />
