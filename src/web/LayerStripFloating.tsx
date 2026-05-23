@@ -12,6 +12,7 @@ interface LayerStripFloatingProps {
   onSelectionChange: (id: string) => void;
   onUiModeChange: () => void;
   onVisibilityChange: () => void;
+  onNewCanvas: () => void;
 }
 
 export function LayerStripFloating({
@@ -22,6 +23,7 @@ export function LayerStripFloating({
   onSelectionChange,
   onUiModeChange,
   onVisibilityChange,
+  onNewCanvas,
 }: LayerStripFloatingProps) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; elemX: number; elemY: number } | null>(
@@ -73,9 +75,9 @@ export function LayerStripFloating({
   return (
     <div
       ref={capsuleRef}
-      className="fixed z-[200] flex items-center bg-surface-dark border border-white/[0.18] rounded-full"
+      className="fixed z-[200] flex items-center bg-[rgba(31,30,27,0.92)] backdrop-blur-xl border border-dark-hairline rounded-full"
       style={{
-        boxShadow: "0 4px 16px color-mix(in srgb, black 50%, transparent)",
+        boxShadow: "0 4px 24px color-mix(in srgb, black 60%, transparent)",
         ...(pos !== null
           ? { left: pos.x, top: pos.y }
           : { bottom: initialBottom, left: "50%", transform: "translateX(-50%)" }),
@@ -109,7 +111,7 @@ export function LayerStripFloating({
       <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
         <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
           {(canvas) => (
-            <Tab id={canvas.id}>
+            <Tab id={canvas.id} variant={level === 3 ? "layer-l3" : "layer"}>
               {canvas.statusHint && (
                 <span
                   className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${canvas.statusHint === "ok" ? "bg-success" : canvas.statusHint === "warn" ? "bg-warning" : "bg-error"}`}
@@ -124,6 +126,13 @@ export function LayerStripFloating({
           <TabPanel key={c.id} id={c.id} style={{ padding: 0, height: 0, overflow: "hidden" }} />
         ))}
       </Tabs>
+      <button
+        aria-label="new canvas"
+        onClick={onNewCanvas}
+        className="w-6 h-6 inline-flex items-center justify-center rounded-full text-[14px] text-on-dark-muted hover:bg-white/[0.04] hover:text-on-dark cursor-pointer bg-transparent border-0 shrink-0 mr-1"
+      >
+        +
+      </button>
     </div>
   );
 }

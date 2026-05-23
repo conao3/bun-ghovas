@@ -56,17 +56,42 @@ export function TabList<T extends object>({
 export function Tab({
   className,
   orientation = "horizontal",
+  variant = "default",
   ...props
-}: TabProps & { orientation?: Orientation }) {
-  const base = clsx(
-    "py-1.5 px-3.5 cursor-pointer bg-transparent outline-none",
-    "text-[13px] font-mono text-on-dark-muted font-normal",
-    "data-[selected]:text-primary data-[selected]:font-medium",
-    "data-[disabled]:opacity-40",
-    orientation === "vertical"
-      ? "border-r-2 border-r-transparent data-[selected]:border-r-primary"
-      : "border-b-2 border-b-transparent data-[selected]:border-b-primary",
-  );
+}: TabProps & {
+  orientation?: Orientation;
+  variant?: "default" | "layer" | "layer-l3" | "layer-vertical";
+}) {
+  let base: string;
+  if (variant === "layer" || variant === "layer-l3") {
+    base = clsx(
+      "inline-flex items-center gap-[6px] h-6 px-[10px] cursor-pointer outline-none",
+      "text-[12px] font-sans font-medium text-on-dark-soft rounded-[6px]",
+      "hover:bg-white/[0.04] hover:text-on-dark",
+      "data-[disabled]:opacity-40",
+      variant === "layer"
+        ? "data-[selected]:bg-surface-dark-elevated data-[selected]:text-on-dark data-[selected]:shadow-[inset_0_0_0_1px_var(--color-dark-hairline)]"
+        : "data-[selected]:rounded-none data-[selected]:shadow-[inset_0_-2px_0_0_var(--color-primary)] data-[selected]:text-on-dark",
+    );
+  } else if (variant === "layer-vertical") {
+    base = clsx(
+      "group flex items-center gap-[10px] px-[10px] py-2 rounded-[6px] w-full",
+      "text-[13px] text-on-dark-soft cursor-pointer outline-none",
+      "hover:bg-white/[0.04] hover:text-on-dark",
+      "data-[selected]:bg-surface-dark-elevated data-[selected]:text-on-dark data-[selected]:shadow-[inset_0_0_0_1px_var(--color-dark-hairline)]",
+      "data-[disabled]:opacity-40",
+    );
+  } else {
+    base = clsx(
+      "py-1.5 px-3.5 cursor-pointer bg-transparent outline-none",
+      "text-[13px] font-mono text-on-dark-muted font-normal",
+      "data-[selected]:text-primary data-[selected]:font-medium",
+      "data-[disabled]:opacity-40",
+      orientation === "vertical"
+        ? "border-r-2 border-r-transparent data-[selected]:border-r-primary"
+        : "border-b-2 border-b-transparent data-[selected]:border-b-primary",
+    );
+  }
   return (
     <RACTab
       {...props}

@@ -85,10 +85,22 @@ export function migrateWorkspace(raw: unknown): WorkspaceState {
   const l3: L3Canvas[] = [{ id: defaultL3Id, name: "L3" }];
 
   const layerConfig: WorkspaceState["layerConfig"] = {
-    0: { uiMode: (layers[0]?.uiMode ?? "horizontal-tabs") as LayerUiMode, visible: layers[0]?.visible ?? true } satisfies LayerConfig,
-    1: { uiMode: (layers[1]?.uiMode ?? "horizontal-tabs") as LayerUiMode, visible: layers[1]?.visible ?? true } satisfies LayerConfig,
-    2: { uiMode: (layers[2]?.uiMode ?? "horizontal-tabs") as LayerUiMode, visible: layers[2]?.visible ?? true } satisfies LayerConfig,
-    3: { uiMode: (layers[3]?.uiMode ?? "horizontal-tabs") as LayerUiMode, visible: layers[3]?.visible ?? true } satisfies LayerConfig,
+    0: {
+      uiMode: (layers[0]?.uiMode ?? "horizontal-tabs") as LayerUiMode,
+      visible: layers[0]?.visible ?? true,
+    } satisfies LayerConfig,
+    1: {
+      uiMode: (layers[1]?.uiMode ?? "horizontal-tabs") as LayerUiMode,
+      visible: layers[1]?.visible ?? true,
+    } satisfies LayerConfig,
+    2: {
+      uiMode: (layers[2]?.uiMode ?? "horizontal-tabs") as LayerUiMode,
+      visible: layers[2]?.visible ?? true,
+    } satisfies LayerConfig,
+    3: {
+      uiMode: (layers[3]?.uiMode ?? "horizontal-tabs") as LayerUiMode,
+      visible: layers[3]?.visible ?? true,
+    } satisfies LayerConfig,
   };
 
   const ws = { l3, l2, l1, l0, layerConfig };
