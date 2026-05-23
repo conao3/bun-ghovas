@@ -25,6 +25,7 @@ export function ContextMenu({
   return (
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
       <button
+        aria-hidden="true"
         tabIndex={-1}
         className="fixed size-0 p-0 border-0 outline-none bg-transparent pointer-events-none overflow-hidden"
       />
