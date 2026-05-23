@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from "react";
+import { ArrowLeftRight, Eye } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import { ContextMenu, MenuItem } from "./components/Menu";
@@ -154,16 +155,18 @@ function HorizontalStrip({
         <Button
           variant="ghost"
           onPress={onUiModeChange}
-          style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset" }}
+          aria-label="cycle UI mode"
+          style={{ padding: "2px 4px", minWidth: "unset" }}
         >
-          ⇅
+          <ArrowLeftRight size={14} aria-hidden />
         </Button>
         <Button
           variant="ghost"
           onPress={onVisibilityChange}
-          style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset" }}
+          aria-label="hide layer"
+          style={{ padding: "2px 4px", minWidth: "unset" }}
         >
-          👁
+          <Eye size={14} aria-hidden />
         </Button>
         <Tabs
           selectedKey={activeId}
@@ -264,9 +267,10 @@ function VerticalColumn({
           <Button
             variant="ghost"
             onPress={onVisibilityChange}
-            style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset" }}
+            aria-label="hide layer"
+            style={{ padding: "2px 4px", minWidth: "unset" }}
           >
-            👁
+            <Eye size={14} aria-hidden />
           </Button>
         </div>
         <Tabs
