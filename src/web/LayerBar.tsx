@@ -1,6 +1,22 @@
 import { useState, useRef, useCallback } from "react";
 import clsx from "clsx";
 import { ArrowLeftRight, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  useDndContext,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  horizontalListSortingStrategy,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import { ContextMenu, MenuItem } from "./components/Menu";
@@ -27,12 +43,92 @@ interface LayerBarProps {
   onDuplicateCanvas: (level: LayerLevel, canvasId: string) => void;
   onDeleteCanvas: (level: LayerLevel, canvasId: string) => void;
   onNewCanvas: (level: LayerLevel) => void;
+  onReorderCanvas: (level: LayerLevel, activeId: string, overId: string) => void;
 }
 
 function dotColorClass(hint: "ok" | "warn" | "err"): string {
   if (hint === "ok") return "bg-success";
   if (hint === "warn") return "bg-warning";
   return "bg-error";
+}
+
+function SortableTabItem({
+  canvas,
+  level,
+  onContextMenu,
+}: {
+  canvas: CanvasStateV2;
+  level: LayerLevel;
+  onContextMenu: (e: React.MouseEvent) => void;
+}) {
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: canvas.id,
+  });
+  const { active, over } = useDndContext();
+  const isOver = !isDragging && active !== null && over?.id === canvas.id;
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
+  };
+  return (
+    <Tab
+      id={canvas.id}
+      variant={level === 3 ? "layer-l3" : "layer"}
+      onContextMenu={onContextMenu}
+      ref={setNodeRef}
+      style={style}
+      className={isOver ? "border-l-2 border-primary" : undefined}
+      {...listeners}
+    >
+      {canvas.statusHint && (
+        <span
+          className={`inline-block w-1.5 h-1.5 rounded-full ${dotColorClass(canvas.statusHint)}`}
+          aria-hidden
+        />
+      )}
+      {canvas.name ?? canvas.id}
+    </Tab>
+  );
+}
+
+function SortableVerticalTabItem({
+  canvas,
+  onContextMenu,
+}: {
+  canvas: CanvasStateV2;
+  onContextMenu: (e: React.MouseEvent) => void;
+}) {
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: canvas.id,
+  });
+  const { active, over } = useDndContext();
+  const isOver = !isDragging && active !== null && over?.id === canvas.id;
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
+  };
+  return (
+    <Tab
+      id={canvas.id}
+      variant="layer-vertical"
+      onContextMenu={onContextMenu}
+      ref={setNodeRef}
+      style={style}
+      className={isOver ? "border-t-2 border-primary" : undefined}
+      {...listeners}
+    >
+      <span
+        className="w-[3px] h-[14px] rounded-[2px] shrink-0 bg-transparent group-data-[selected]:bg-primary"
+        aria-hidden
+      />
+      <span className="w-[18px] h-[18px] rounded-[4px] bg-surface-dark-elevated inline-flex items-center justify-center font-mono text-[10px] text-on-dark-soft shrink-0">
+        {(canvas.name ?? canvas.id)[0]?.toUpperCase()}
+      </span>
+      <span className="truncate">{canvas.name ?? canvas.id}</span>
+    </Tab>
+  );
 }
 
 function useTabContextMenu(
@@ -110,6 +206,7 @@ function HorizontalStrip({
   onDuplicateCanvas,
   onDeleteCanvas,
   onNewCanvas,
+  onReorderCanvas,
 }: {
   level: LayerLevel;
   layer: LayerState;
@@ -122,6 +219,7 @@ function HorizontalStrip({
   onDuplicateCanvas: (id: string) => void;
   onDeleteCanvas: (id: string) => void;
   onNewCanvas: () => void;
+  onReorderCanvas: (activeId: string, overId: string) => void;
 }) {
   const ctx = useTabContextMenu(
     layer.canvases,
@@ -132,6 +230,17 @@ function HorizontalStrip({
   );
   const shortcutDef = SHORTCUTS.find((s) => s.id === `cycle-l${level}-canvas`);
   const metaHint = shortcutDef ? formatShortcut(shortcutDef) : null;
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const ids = layer.canvases.map((c) => c.id);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        onReorderCanvas(active.id as string, over.id as string);
+      }
+    },
+    [onReorderCanvas],
+  );
 
   const rowCls = clsx(
     "flex items-center px-4 gap-0.5",
@@ -223,28 +332,32 @@ function HorizontalStrip({
         >
           <Eye size={12} aria-hidden />
         </Button>
-        <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
-          <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
-            {(canvas) => (
-              <Tab
-                id={canvas.id}
-                variant={level === 3 ? "layer-l3" : "layer"}
-                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-              >
-                {canvas.statusHint && (
-                  <span
-                    className={`inline-block w-1.5 h-1.5 rounded-full ${dotColorClass(canvas.statusHint)}`}
-                    aria-hidden
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
+        >
+          <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
+            <Tabs
+              selectedKey={activeId}
+              onSelectionChange={(key) => onSelectionChange(key as string)}
+            >
+              <TabList style={{ borderBottom: "none" }}>
+                {layer.canvases.map((canvas) => (
+                  <SortableTabItem
+                    key={canvas.id}
+                    canvas={canvas}
+                    level={level}
+                    onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
                   />
-                )}
-                {canvas.name ?? canvas.id}
-              </Tab>
-            )}
-          </TabList>
-          {layer.canvases.map((c) => (
-            <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
-          ))}
-        </Tabs>
+                ))}
+              </TabList>
+              {layer.canvases.map((c) => (
+                <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
+              ))}
+            </Tabs>
+          </SortableContext>
+        </DndContext>
         <button
           aria-label="new canvas"
           onClick={onNewCanvas}
@@ -274,6 +387,7 @@ function VerticalColumn({
   onDuplicateCanvas,
   onDeleteCanvas,
   onNewCanvas,
+  onReorderCanvas,
 }: {
   level: LayerLevel;
   layer: LayerState;
@@ -285,6 +399,7 @@ function VerticalColumn({
   onDuplicateCanvas: (id: string) => void;
   onDeleteCanvas: (id: string) => void;
   onNewCanvas: () => void;
+  onReorderCanvas: (activeId: string, overId: string) => void;
 }) {
   const ctx = useTabContextMenu(
     layer.canvases,
@@ -292,6 +407,17 @@ function VerticalColumn({
     onDuplicateCanvas,
     onDeleteCanvas,
     onNewCanvas,
+  );
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const ids = layer.canvases.map((c) => c.id);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        onReorderCanvas(active.id as string, over.id as string);
+      }
+    },
+    [onReorderCanvas],
   );
 
   return (
@@ -374,37 +500,35 @@ function VerticalColumn({
             </Button>
           </div>
         </div>
-        <Tabs
-          selectedKey={activeId}
-          onSelectionChange={(key) => onSelectionChange(key as string)}
-          orientation="vertical"
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleDragEnd}
         >
-          <TabList
-            items={layer.canvases}
-            orientation="vertical"
-            style={{ borderRight: "none", gap: "2px" }}
-          >
-            {(canvas) => (
-              <Tab
-                id={canvas.id}
-                variant="layer-vertical"
-                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+          <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+            <Tabs
+              selectedKey={activeId}
+              onSelectionChange={(key) => onSelectionChange(key as string)}
+              orientation="vertical"
+            >
+              <TabList
+                orientation="vertical"
+                style={{ borderRight: "none", gap: "2px" }}
               >
-                <span
-                  className="w-[3px] h-[14px] rounded-[2px] shrink-0 bg-transparent group-data-[selected]:bg-primary"
-                  aria-hidden
-                />
-                <span className="w-[18px] h-[18px] rounded-[4px] bg-surface-dark-elevated inline-flex items-center justify-center font-mono text-[10px] text-on-dark-soft shrink-0">
-                  {(canvas.name ?? canvas.id)[0]?.toUpperCase()}
-                </span>
-                <span className="truncate">{canvas.name ?? canvas.id}</span>
-              </Tab>
-            )}
-          </TabList>
-          {layer.canvases.map((c) => (
-            <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
-          ))}
-        </Tabs>
+                {layer.canvases.map((canvas) => (
+                  <SortableVerticalTabItem
+                    key={canvas.id}
+                    canvas={canvas}
+                    onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+                  />
+                ))}
+              </TabList>
+              {layer.canvases.map((c) => (
+                <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
+              ))}
+            </Tabs>
+          </SortableContext>
+        </DndContext>
         <div className="mt-auto pt-3 border-t border-dark-hairline-soft">
           <button
             aria-label="new canvas"
@@ -433,6 +557,7 @@ export function LayerBar({
   onDuplicateCanvas,
   onDeleteCanvas,
   onNewCanvas,
+  onReorderCanvas,
 }: LayerBarProps) {
   const allLevels: LayerLevel[] = [3, 2, 1];
 
@@ -487,6 +612,7 @@ export function LayerBar({
             onDuplicateCanvas={(id) => onDuplicateCanvas(level, id)}
             onDeleteCanvas={(id) => onDeleteCanvas(level, id)}
             onNewCanvas={() => onNewCanvas(level)}
+            onReorderCanvas={(activeId, overId) => onReorderCanvas(level, activeId, overId)}
           />
         ))}
       </div>
@@ -509,6 +635,7 @@ export function LayerBar({
             onDuplicateCanvas={(id) => onDuplicateCanvas(level, id)}
             onDeleteCanvas={(id) => onDeleteCanvas(level, id)}
             onNewCanvas={() => onNewCanvas(level)}
+            onReorderCanvas={(activeId, overId) => onReorderCanvas(level, activeId, overId)}
           />
         ))}
       </div>
@@ -537,6 +664,7 @@ export function LayerBar({
           onUiModeChange={() => cycleMode(level)}
           onVisibilityChange={() => onVisibilityChange(level, false)}
           onNewCanvas={() => onNewCanvas(level)}
+          onReorderCanvas={(activeId, overId) => onReorderCanvas(level, activeId, overId)}
         />
       ))}
     </>

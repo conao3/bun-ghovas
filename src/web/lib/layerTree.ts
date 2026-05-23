@@ -216,6 +216,41 @@ export function duplicateSubtree(
   };
 }
 
+export function reorderCanvases(
+  ws: BaseWorkspace,
+  level: LayerLevel,
+  activeId: string,
+  overId: string,
+): BaseWorkspace {
+  if (activeId === overId) return ws;
+  function move<T>(arr: T[], fromIdx: number, toIdx: number): T[] {
+    const next = [...arr];
+    const [item] = next.splice(fromIdx, 1);
+    next.splice(toIdx, 0, item!);
+    return next;
+  }
+  if (level === 3) {
+    const from = ws.l3.findIndex((c) => c.id === activeId);
+    const to = ws.l3.findIndex((c) => c.id === overId);
+    if (from === -1 || to === -1) return ws;
+    return { ...ws, l3: move(ws.l3, from, to) };
+  } else if (level === 2) {
+    const from = ws.l2.findIndex((c) => c.id === activeId);
+    const to = ws.l2.findIndex((c) => c.id === overId);
+    if (from === -1 || to === -1) return ws;
+    return { ...ws, l2: move(ws.l2, from, to) };
+  } else if (level === 1) {
+    const from = ws.l1.findIndex((c) => c.id === activeId);
+    const to = ws.l1.findIndex((c) => c.id === overId);
+    if (from === -1 || to === -1) return ws;
+    return { ...ws, l1: move(ws.l1, from, to) };
+  }
+  const from = ws.l0.findIndex((c) => c.id === activeId);
+  const to = ws.l0.findIndex((c) => c.id === overId);
+  if (from === -1 || to === -1) return ws;
+  return { ...ws, l0: move(ws.l0, from, to) };
+}
+
 export function computeLayers(
   ws: Pick<WorkspaceState, "l0" | "l1" | "l2" | "l3" | "layerConfig">,
 ): WorkspaceState["layers"] {
