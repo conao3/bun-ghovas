@@ -5,14 +5,7 @@ import { Button } from "./components/Button";
 import { UrlComboBox } from "./components/UrlComboBox";
 import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
-
-function normalizeUrl(raw: string): string {
-  const trimmed = raw.trim();
-  if (trimmed === "") return trimmed;
-  if (/^https?:\/\//i.test(trimmed)) return trimmed;
-  if (trimmed.startsWith("//")) return `https:${trimmed}`;
-  return `https://${trimmed}`;
-}
+import { normalizeUrl } from "./lib/normalizeUrl";
 
 interface CreateWindowFabProps {
   onCreateIframeWindow: (url: string) => void;
