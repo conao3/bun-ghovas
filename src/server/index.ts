@@ -1,4 +1,5 @@
 import tailwind from "bun-plugin-tailwind";
+import { watch } from "fs";
 import { createPtyManager } from "./pty";
 import { loadWorkspace, saveWorkspace } from "./workspaceStore";
 import type { WorkspaceState } from "../shared/types";
@@ -11,20 +12,54 @@ const startedAt = Date.now();
 const indexHtmlPath = new URL("../web/index.html", import.meta.url);
 const indexHtml = await Bun.file(indexHtmlPath).text();
 
-const buildResult = await Bun.build({
-  entrypoints: [
-    new URL("../web/main.tsx", import.meta.url).pathname,
-    new URL("../web/index.css", import.meta.url).pathname,
-  ],
-  target: "browser",
-  plugins: [tailwind],
-});
-if (!buildResult.success) {
-  for (const msg of buildResult.logs) console.error(msg);
-  process.exit(1);
+async function buildBundle(): Promise<{ js: string; css: string } | null> {
+  const result = await Bun.build({
+    entrypoints: [
+      new URL("../web/main.tsx", import.meta.url).pathname,
+      new URL("../web/index.css", import.meta.url).pathname,
+    ],
+    target: "browser",
+    plugins: [tailwind],
+  });
+  if (!result.success) {
+    for (const msg of result.logs) console.error("BUILD_FAILED:", msg);
+    return null;
+  }
+  return {
+    js: await result.outputs.find((o) => o.path.endsWith(".js"))!.text(),
+    css: await result.outputs.find((o) => o.path.endsWith(".css"))!.text(),
+  };
 }
-const mainJs = await buildResult.outputs.find((o) => o.path.endsWith(".js"))!.text();
-const mainCss = await buildResult.outputs.find((o) => o.path.endsWith(".css"))!.text();
+
+const initialBuild = await buildBundle();
+if (initialBuild === null) process.exit(1);
+let mainJs = initialBuild.js;
+let mainCss = initialBuild.css;
+
+let rebuildTimer: ReturnType<typeof setTimeout> | null = null;
+
+function scheduleRebuild() {
+  if (rebuildTimer !== null) clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(async () => {
+    rebuildTimer = null;
+    const result = await buildBundle();
+    if (result === null) {
+      console.error("BUILD_FAILED: keeping previous bundle");
+      return;
+    }
+    mainJs = result.js;
+    mainCss = result.css;
+    console.log("bundle rebuilt");
+  }, 100);
+}
+
+for (const dir of [
+  new URL("../web", import.meta.url).pathname,
+  new URL("../shared", import.meta.url).pathname,
+]) {
+  watch(dir, { recursive: true }, scheduleRebuild);
+}
+watch(new URL("../../package.json", import.meta.url).pathname, scheduleRebuild);
 
 const ptyManager = createPtyManager();
 console.log("node-pty native module loaded successfully");
