@@ -7,7 +7,7 @@ import {
 } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import type { CanvasState, WindowState } from "../shared/types";
+import type { CanvasStateV2, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
 
@@ -20,7 +20,7 @@ interface WindowCallbacks {
 }
 
 interface WindowNodeData {
-  win: WindowState;
+  win: WorkspaceNode["data"];
   isFocused: boolean;
   callbacks: WindowCallbacks;
 }
@@ -46,10 +46,10 @@ function WindowNode({ data }: NodeProps) {
 const nodeTypes = { window: WindowNode };
 
 interface CanvasProps {
-  canvasState: CanvasState;
-  onCanvasChange: (next: CanvasState) => void;
+  canvasState: CanvasStateV2;
+  onCanvasChange: (next: CanvasStateV2) => void;
   onUrlChange: (id: string, url: string) => void;
-  onAddWindow: (win: WindowState) => void;
+  onAddWindow: (node: WorkspaceNode) => void;
   focusedWindowId: string | null;
   onFocusWindow: (id: string) => void;
 }
@@ -69,7 +69,7 @@ export function Canvas({
   const handleWindowClose = useCallback(
     (id: string) => {
       const prev = stateRef.current;
-      onCanvasChange({ ...prev, windows: prev.windows.filter((w) => w.id !== id) });
+      onCanvasChange({ ...prev, nodes: prev.nodes.filter((n) => n.id !== id) });
     },
     [onCanvasChange],
   );
@@ -79,7 +79,7 @@ export function Canvas({
       const prev = stateRef.current;
       onCanvasChange({
         ...prev,
-        windows: prev.windows.map((w) => (w.id === id ? { ...w, title } : w)),
+        nodes: prev.nodes.map((n) => (n.id === id ? { ...n, data: { ...n.data, title } } : n)),
       });
     },
     [onCanvasChange],
@@ -88,31 +88,39 @@ export function Canvas({
   const handleWindowDuplicate = useCallback(
     (id: string) => {
       const prev = stateRef.current;
-      const src = prev.windows.find((w) => w.id === id);
+      const src = prev.nodes.find((n) => n.id === id);
       if (!src) return;
-      const copy =
-        src.kind === "terminal"
+      const newId = crypto.randomUUID();
+      const newX = src.position.x + 30;
+      const newY = src.position.y + 30;
+      const copy: WorkspaceNode =
+        src.data.kind === "terminal"
           ? {
-              id: crypto.randomUUID(),
-              kind: "terminal" as const,
-              sessionId: crypto.randomUUID(),
-              title: `${src.title} (copy)`,
-              x: src.x + 30,
-              y: src.y + 30,
-              width: src.width,
-              height: src.height,
+              ...src,
+              id: newId,
+              position: { x: newX, y: newY },
+              data: {
+                ...src.data,
+                id: newId,
+                x: newX,
+                y: newY,
+                sessionId: crypto.randomUUID(),
+                title: `${src.data.title} (copy)`,
+              },
             }
           : {
-              id: crypto.randomUUID(),
-              kind: "iframe" as const,
-              url: src.url,
-              title: `${src.title} (copy)`,
-              x: src.x + 30,
-              y: src.y + 30,
-              width: src.width,
-              height: src.height,
+              ...src,
+              id: newId,
+              position: { x: newX, y: newY },
+              data: {
+                ...src.data,
+                id: newId,
+                x: newX,
+                y: newY,
+                title: `${src.data.title} (copy)`,
+              },
             };
-      onCanvasChange({ ...prev, windows: [...prev.windows, copy] });
+      onCanvasChange({ ...prev, nodes: [...prev.nodes, copy] });
       onFocusWindow(copy.id);
     },
     [onCanvasChange, onFocusWindow],
@@ -121,23 +129,31 @@ export function Canvas({
   const handleNodesChange = useCallback(
     (changes: NodeChange[]) => {
       const prev = stateRef.current;
-      let windows = prev.windows;
+      let nodes = prev.nodes;
       let changed = false;
 
       for (const change of changes) {
         if (change.type === "position" && change.position) {
           const { x, y } = change.position;
-          windows = windows.map((w) => (w.id === change.id ? { ...w, x, y } : w));
+          nodes = nodes.map((n) =>
+            n.id === change.id
+              ? { ...n, position: { x, y }, data: { ...n.data, x, y } }
+              : n,
+          );
           changed = true;
         } else if (change.type === "dimensions" && change.dimensions) {
           const { width, height } = change.dimensions;
-          windows = windows.map((w) => (w.id === change.id ? { ...w, width, height } : w));
+          nodes = nodes.map((n) =>
+            n.id === change.id
+              ? { ...n, width, height, data: { ...n.data, width, height } }
+              : n,
+          );
           changed = true;
         }
       }
 
       if (changed) {
-        onCanvasChange({ ...prev, windows });
+        onCanvasChange({ ...prev, nodes });
       }
     },
     [onCanvasChange],
@@ -147,9 +163,7 @@ export function Canvas({
     (viewport: Viewport) => {
       onCanvasChange({
         ...stateRef.current,
-        panX: viewport.x,
-        panY: viewport.y,
-        zoom: viewport.zoom,
+        viewport: { x: viewport.x, y: viewport.y, zoom: viewport.zoom },
       });
     },
     [onCanvasChange],
@@ -161,25 +175,24 @@ export function Canvas({
       const containerH = containerRef.current?.clientHeight ?? 600;
       const width = 480;
       const height = 320;
-      const { panX, panY, zoom } = stateRef.current;
-      const x = (containerW / 2 - panX) / zoom - width / 2;
-      const y = (containerH / 2 - panY) / zoom - height / 2;
+      const { viewport } = stateRef.current;
+      const x = (containerW / 2 - viewport.x) / viewport.zoom - width / 2;
+      const y = (containerH / 2 - viewport.y) / viewport.zoom - height / 2;
       let title = "Browser";
       try {
         title = new URL(url).host;
       } catch {}
-      const win: WindowState = {
-        id: crypto.randomUUID(),
-        kind: "iframe",
-        url,
-        title,
-        x,
-        y,
+      const id = crypto.randomUUID();
+      const node: WorkspaceNode = {
+        id,
+        type: "window",
+        position: { x, y },
         width,
         height,
+        data: { id, kind: "iframe", url, title, x, y, width, height },
       };
-      onAddWindow(win);
-      onFocusWindow(win.id);
+      onAddWindow(node);
+      onFocusWindow(id);
     },
     [onAddWindow, onFocusWindow],
   );
@@ -189,21 +202,20 @@ export function Canvas({
     const containerH = containerRef.current?.clientHeight ?? 600;
     const width = 560;
     const height = 360;
-    const { panX, panY, zoom } = stateRef.current;
-    const x = (containerW / 2 - panX) / zoom - width / 2;
-    const y = (containerH / 2 - panY) / zoom - height / 2;
-    const win: WindowState = {
-      id: crypto.randomUUID(),
-      kind: "terminal",
-      sessionId: crypto.randomUUID(),
-      title: "Terminal",
-      x,
-      y,
+    const { viewport } = stateRef.current;
+    const x = (containerW / 2 - viewport.x) / viewport.zoom - width / 2;
+    const y = (containerH / 2 - viewport.y) / viewport.zoom - height / 2;
+    const id = crypto.randomUUID();
+    const node: WorkspaceNode = {
+      id,
+      type: "window",
+      position: { x, y },
       width,
       height,
+      data: { id, kind: "terminal", sessionId: crypto.randomUUID(), title: "Terminal", x, y, width, height },
     };
-    onAddWindow(win);
-    onFocusWindow(win.id);
+    onAddWindow(node);
+    onFocusWindow(id);
   }, [onAddWindow, onFocusWindow]);
 
   const callbacks = useMemo(
@@ -225,21 +237,21 @@ export function Canvas({
 
   const nodes = useMemo(
     () =>
-      canvasState.windows.map((win) => ({
-        id: win.id,
+      canvasState.nodes.map((node) => ({
+        id: node.id,
         type: "window" as const,
-        position: { x: win.x, y: win.y },
-        width: win.width,
-        height: win.height,
-        zIndex: focusedWindowId === win.id ? 100 : 1,
+        position: node.position,
+        width: node.width,
+        height: node.height,
+        zIndex: focusedWindowId === node.id ? 100 : 1,
         data: {
-          win,
-          isFocused: focusedWindowId === win.id,
+          win: node.data,
+          isFocused: focusedWindowId === node.id,
           callbacks,
         },
         dragHandle: ".drag-handle",
       })),
-    [canvasState.windows, focusedWindowId, callbacks],
+    [canvasState.nodes, focusedWindowId, callbacks],
   );
 
   return (
@@ -250,7 +262,7 @@ export function Canvas({
         edges={[]}
         onNodesChange={handleNodesChange}
         onViewportChange={handleViewportChange}
-        defaultViewport={{ x: canvasState.panX, y: canvasState.panY, zoom: canvasState.zoom }}
+        defaultViewport={{ x: canvasState.viewport.x, y: canvasState.viewport.y, zoom: canvasState.viewport.zoom }}
         minZoom={0.25}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
