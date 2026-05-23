@@ -39,11 +39,42 @@ let mainCss = initialBuild.css;
 const sseClients = new Set<WritableStreamDefaultWriter<Uint8Array>>();
 
 let rebuildTimer: ReturnType<typeof setTimeout> | null = null;
+let installTimer: ReturnType<typeof setTimeout> | null = null;
 
 function scheduleRebuild() {
   if (rebuildTimer !== null) clearTimeout(rebuildTimer);
   rebuildTimer = setTimeout(async () => {
     rebuildTimer = null;
+    const result = await buildBundle();
+    if (result === null) {
+      console.error("BUILD_FAILED: keeping previous bundle");
+      return;
+    }
+    mainJs = result.js;
+    mainCss = result.css;
+    console.log("bundle rebuilt");
+    const msg = new TextEncoder().encode("data: rebuild\n\n");
+    for (const writer of sseClients) {
+      writer.write(msg).catch(() => {
+        sseClients.delete(writer);
+      });
+    }
+  }, 100);
+}
+
+function scheduleInstallAndRebuild() {
+  if (rebuildTimer !== null) clearTimeout(rebuildTimer);
+  rebuildTimer = null;
+  if (installTimer !== null) clearTimeout(installTimer);
+  installTimer = setTimeout(async () => {
+    installTimer = null;
+    console.log("package.json changed: running bun install...");
+    const proc = Bun.spawn(["bun", "install"], { stdout: "inherit", stderr: "inherit" });
+    const exitCode = await proc.exited;
+    if (exitCode !== 0) {
+      console.error(`BUILD_FAILED: bun install exit ${exitCode}`);
+      return;
+    }
     const result = await buildBundle();
     if (result === null) {
       console.error("BUILD_FAILED: keeping previous bundle");
@@ -67,7 +98,7 @@ for (const dir of [
 ]) {
   watch(dir, { recursive: true }, scheduleRebuild);
 }
-watch(new URL("../../package.json", import.meta.url).pathname, scheduleRebuild);
+watch(new URL("../../package.json", import.meta.url).pathname, scheduleInstallAndRebuild);
 
 const ptyManager = createPtyManager();
 console.log("node-pty native module loaded successfully");
