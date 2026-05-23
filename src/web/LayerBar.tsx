@@ -8,6 +8,7 @@ import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 import { LayerStripFloating } from "./LayerStripFloating";
 import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
+import { getChildrenAt } from "./lib/layerTree";
 import type {
   WorkspaceState,
   LayerLevel,
@@ -417,6 +418,11 @@ export function LayerBar({
     onUiModeChange(level, next);
   };
 
+  const treeLayer = (level: LayerLevel): LayerState => ({
+    ...workspace.layers[level],
+    canvases: getChildrenAt(workspace, level, activeIds) as CanvasStateV2[],
+  });
+
   return (
     <>
       <div
@@ -430,7 +436,7 @@ export function LayerBar({
           <HorizontalStrip
             key={level}
             level={level}
-            layer={workspace.layers[level]}
+            layer={treeLayer(level)}
             activeId={activeIds[level]}
             isLast={i === horizontalLevels.length - 1}
             onSelectionChange={(id) => onActiveChange(level, id)}
@@ -453,7 +459,7 @@ export function LayerBar({
           <VerticalColumn
             key={level}
             level={level}
-            layer={workspace.layers[level]}
+            layer={treeLayer(level)}
             activeId={activeIds[level]}
             onSelectionChange={(id) => onActiveChange(level, id)}
             onUiModeChange={() => cycleMode(level)}
@@ -483,7 +489,7 @@ export function LayerBar({
         <LayerStripFloating
           key={level}
           level={level}
-          layer={workspace.layers[level]}
+          layer={treeLayer(level)}
           activeId={activeIds[level]}
           floatingIndex={i}
           onSelectionChange={(id) => onActiveChange(level, id)}
