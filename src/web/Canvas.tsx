@@ -118,13 +118,13 @@ export function Canvas({
       let changed = false;
 
       for (const change of changes) {
-        if (change.type === "position" && change.position) {
+        if (change.type === "position" && change.position && change.dragging === false) {
           const { x, y } = change.position;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, position: { x, y }, data: { ...n.data, x, y } } : n,
           );
           changed = true;
-        } else if (change.type === "dimensions" && change.dimensions) {
+        } else if (change.type === "dimensions" && change.dimensions && change.resizing === false) {
           const { width, height } = change.dimensions;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, width, height, data: { ...n.data, width, height } } : n,
