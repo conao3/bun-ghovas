@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import { TerminalSessionCtx } from "./SessionPicker";
 import type { TerminalSessionCtxValue } from "./SessionPicker";
 import { Canvas } from "./Canvas";
@@ -422,9 +422,7 @@ export function App() {
 
   const activeCanvas = getActiveL0(workspace, activeIds);
 
-  const resetViewport = useCallback(() => {
-    handleCanvasChange({ ...activeCanvas, viewport: { x: 0, y: 0, zoom: 1 } });
-  }, [activeCanvas, handleCanvasChange]);
+  const setZoomRef = useRef<((zoom: number) => void) | null>(null);
 
   const focusedWindowTitle =
     focusedWindowId != null
@@ -639,6 +637,7 @@ export function App() {
             onAddWindow={handleAddWindow}
             focusedWindowId={focusedWindowId}
             onFocusWindow={handleFocusWindow}
+            setZoomRef={setZoomRef}
           />
         </div>
         <StatusBar
@@ -648,7 +647,7 @@ export function App() {
           zoom={activeCanvas.viewport.zoom}
           focusedWindowTitle={focusedWindowTitle}
           onCycleLayer={cycleCanvas}
-          onResetZoom={resetViewport}
+          onSetZoom={(z) => { setZoomRef.current?.(z); }}
         />
         <CommandPalette
           isOpen={paletteOpen}

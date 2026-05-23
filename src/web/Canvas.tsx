@@ -1,11 +1,37 @@
 import { useRef, useCallback, useMemo } from "react";
+import type { RefObject } from "react";
 import { Plus } from "lucide-react";
-import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
+import { ReactFlow, Background, Controls, MiniMap, useReactFlow } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
 import type { L0Canvas, WindowState, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
 import type { WindowCallbacks } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
+
+function ZoomController({
+  setZoomRef,
+  containerRef,
+}: {
+  setZoomRef: RefObject<((zoom: number) => void) | null>;
+  containerRef: RefObject<HTMLDivElement | null>;
+}) {
+  const { setViewport, getViewport } = useReactFlow();
+  const zoomFn = useCallback(
+    (newZoom: number) => {
+      const cw = containerRef.current?.clientWidth ?? 800;
+      const ch = containerRef.current?.clientHeight ?? 600;
+      const cx = cw / 2;
+      const cy = ch / 2;
+      const { x, y, zoom } = getViewport();
+      const newX = cx + (x - cx) * (newZoom / zoom);
+      const newY = cy + (y - cy) * (newZoom / zoom);
+      setViewport({ x: newX, y: newY, zoom: newZoom }, { duration: 200 });
+    },
+    [setViewport, getViewport, containerRef],
+  );
+  setZoomRef.current = zoomFn;
+  return null;
+}
 
 interface WindowNodeData {
   win: WindowState;
@@ -37,6 +63,7 @@ interface CanvasProps {
   onAddWindow: (node: WorkspaceNode) => void;
   focusedWindowId: string | null;
   onFocusWindow: (id: string) => void;
+  setZoomRef?: RefObject<((zoom: number) => void) | null>;
 }
 
 export function Canvas({
@@ -46,6 +73,7 @@ export function Canvas({
   onAddWindow,
   focusedWindowId,
   onFocusWindow,
+  setZoomRef,
 }: CanvasProps) {
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
@@ -282,6 +310,7 @@ export function Canvas({
       >
         <Background />
         <Controls />
+        {setZoomRef && <ZoomController setZoomRef={setZoomRef} containerRef={containerRef} />}
         <MiniMap
           nodeColor={() => "var(--color-primary)"}
           maskColor="var(--color-surface-dark-elevated)"
