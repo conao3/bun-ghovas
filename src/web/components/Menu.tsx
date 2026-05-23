@@ -3,6 +3,7 @@ import {
   MenuItem as RACMenuItem,
   MenuTrigger,
   Popover,
+  Pressable,
 } from "react-aria-components";
 import type { MenuItemProps } from "react-aria-components";
 import type { RefObject, ReactNode } from "react";
@@ -24,11 +25,13 @@ export function ContextMenu({
 }: ContextMenuProps) {
   return (
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
-      <button
-        aria-hidden="true"
-        tabIndex={-1}
-        className="fixed size-0 p-0 border-0 outline-none bg-transparent pointer-events-none overflow-hidden"
-      />
+      <Pressable>
+        <button
+          aria-hidden="true"
+          tabIndex={-1}
+          className="fixed size-0 p-0 border-0 outline-none bg-transparent pointer-events-none overflow-hidden"
+        />
+      </Pressable>
       <Popover
         triggerRef={triggerRef}
         placement="bottom start"
