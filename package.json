@@ -24,6 +24,7 @@
     "vitest": "^4.1.7"
   },
   "dependencies": {
+    "@xyflow/react": "^12.10.2",
     "clsx": "^2.1.1",
     "ghostty-web": "^0.4.0",
     "lucide-react": "^1.16.0",

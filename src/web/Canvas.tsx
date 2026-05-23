@@ -1,43 +1,53 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback, useMemo } from "react";
+import {
+  ReactFlow,
+  Background,
+  Controls,
+  MiniMap,
+} from "@xyflow/react";
+import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import type { CanvasState, WindowState } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
-import { Minimap } from "./Minimap";
-import { clampZoom, zoomAtPoint, centeredWindowPosition } from "./lib/canvasGeometry";
 
-const GRID_SIZE = 40;
-const MIN_ZOOM = 0.25;
-const MAX_ZOOM = 2;
-const ZOOM_PRESETS = [0.25, 0.5, 1, 2] as const;
+interface WindowCallbacks {
+  onFocus: (id: string) => void;
+  onClose: (id: string) => void;
+  onMove: (id: string, x: number, y: number) => void;
+  onResize: (id: string, x: number, y: number, width: number, height: number) => void;
+  onUrlChange: (id: string, url: string) => void;
+  onRename: (id: string, title: string) => void;
+  onDuplicate: (id: string) => void;
+}
 
-function Grid({ panX, panY, zoom }: { panX: number; panY: number; zoom: number }) {
-  const scaledGrid = GRID_SIZE * zoom;
-  const offsetX = ((panX % scaledGrid) + scaledGrid) % scaledGrid;
-  const offsetY = ((panY % scaledGrid) + scaledGrid) % scaledGrid;
+interface WindowNodeData {
+  win: WindowState;
+  isFocused: boolean;
+  callbacks: WindowCallbacks;
+}
 
+function WindowNode({ data }: NodeProps) {
+  const { win, isFocused, callbacks } = data as unknown as WindowNodeData;
   return (
-    <svg className="absolute inset-0 w-full h-full pointer-events-none">
-      <defs>
-        <pattern
-          id="grid"
-          width={scaledGrid}
-          height={scaledGrid}
-          x={offsetX}
-          y={offsetY}
-          patternUnits="userSpaceOnUse"
-        >
-          <path
-            d={`M ${scaledGrid} 0 L 0 0 0 ${scaledGrid}`}
-            fill="none"
-            stroke="var(--color-border)"
-            strokeWidth="0.5"
-          />
-        </pattern>
-      </defs>
-      <rect width="100%" height="100%" fill="url(#grid)" />
-    </svg>
+    <Window
+      win={{ ...win, x: 0, y: 0 }}
+      panX={0}
+      panY={0}
+      zoom={1}
+      isFocused={isFocused}
+      onFocus={callbacks.onFocus}
+      onClose={callbacks.onClose}
+      onMove={callbacks.onMove}
+      onResize={callbacks.onResize}
+      onUrlChange={callbacks.onUrlChange}
+      onRename={callbacks.onRename}
+      onDuplicate={callbacks.onDuplicate}
+    />
   );
 }
+
+const nodeTypes = { window: WindowNode };
 
 interface CanvasProps {
   canvasState: CanvasState;
@@ -58,9 +68,6 @@ export function Canvas({
 }: CanvasProps) {
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
-
-  const dragging = useRef(false);
-  const lastPos = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleWindowClose = useCallback(
@@ -137,43 +144,52 @@ export function Canvas({
     [onCanvasChange],
   );
 
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if (e.button !== 0) return;
-    dragging.current = true;
-    lastPos.current = { x: e.clientX, y: e.clientY };
-    e.preventDefault();
-  }, []);
-
-  const handleMouseMove = useCallback(
-    (e: React.MouseEvent) => {
-      if (!dragging.current) return;
-      const dx = e.clientX - lastPos.current.x;
-      const dy = e.clientY - lastPos.current.y;
-      lastPos.current = { x: e.clientX, y: e.clientY };
+  const handleNodesChange = useCallback(
+    (changes: NodeChange[]) => {
       const prev = stateRef.current;
-      onCanvasChange({ ...prev, panX: prev.panX + dx, panY: prev.panY + dy });
+      let windows = prev.windows;
+      let changed = false;
+
+      for (const change of changes) {
+        if (change.type === "position" && change.position) {
+          const { x, y } = change.position;
+          windows = windows.map((w) => (w.id === change.id ? { ...w, x, y } : w));
+          changed = true;
+        } else if (change.type === "dimensions" && change.dimensions) {
+          const { width, height } = change.dimensions;
+          windows = windows.map((w) => (w.id === change.id ? { ...w, width, height } : w));
+          changed = true;
+        }
+      }
+
+      if (changed) {
+        onCanvasChange({ ...prev, windows });
+      }
     },
     [onCanvasChange],
   );
 
-  const handleMouseUp = useCallback(() => {
-    dragging.current = false;
-  }, []);
+  const handleViewportChange = useCallback(
+    (viewport: Viewport) => {
+      onCanvasChange({
+        ...stateRef.current,
+        panX: viewport.x,
+        panY: viewport.y,
+        zoom: viewport.zoom,
+      });
+    },
+    [onCanvasChange],
+  );
 
   const handleCreateIframeWindow = useCallback(
     (url: string) => {
-      const container = containerRef.current;
-      const containerW = container?.clientWidth ?? 800;
-      const containerH = container?.clientHeight ?? 600;
+      const containerW = containerRef.current?.clientWidth ?? 800;
+      const containerH = containerRef.current?.clientHeight ?? 600;
       const width = 480;
       const height = 320;
-      const { x, y } = centeredWindowPosition(
-        containerW,
-        containerH,
-        stateRef.current,
-        width,
-        height,
-      );
+      const { panX, panY, zoom } = stateRef.current;
+      const x = (containerW / 2 - panX) / zoom - width / 2;
+      const y = (containerH / 2 - panY) / zoom - height / 2;
       let title = "Browser";
       try {
         title = new URL(url).host;
@@ -194,33 +210,14 @@ export function Canvas({
     [onAddWindow, onFocusWindow],
   );
 
-  const handlePanTo = useCallback(
-    (newPanX: number, newPanY: number) => {
-      onCanvasChange({ ...stateRef.current, panX: newPanX, panY: newPanY });
-    },
-    [onCanvasChange],
-  );
-
-  const handleZoomPreset = useCallback(
-    (preset: number) => {
-      onCanvasChange({ ...stateRef.current, zoom: clampZoom(preset, MIN_ZOOM, MAX_ZOOM) });
-    },
-    [onCanvasChange],
-  );
-
   const handleCreateTerminalWindow = useCallback(() => {
-    const container = containerRef.current;
-    const containerW = container?.clientWidth ?? 800;
-    const containerH = container?.clientHeight ?? 600;
+    const containerW = containerRef.current?.clientWidth ?? 800;
+    const containerH = containerRef.current?.clientHeight ?? 600;
     const width = 560;
     const height = 360;
-    const { x, y } = centeredWindowPosition(
-      containerW,
-      containerH,
-      stateRef.current,
-      width,
-      height,
-    );
+    const { panX, panY, zoom } = stateRef.current;
+    const x = (containerW / 2 - panX) / zoom - width / 2;
+    const y = (containerH / 2 - panY) / zoom - height / 2;
     const win: WindowState = {
       id: crypto.randomUUID(),
       kind: "terminal",
@@ -235,103 +232,67 @@ export function Canvas({
     onFocusWindow(win.id);
   }, [onAddWindow, onFocusWindow]);
 
-  const handleWheel = useCallback(
-    (e: WheelEvent) => {
-      e.preventDefault();
-      const container = containerRef.current;
-      if (!container) return;
-      const rect = container.getBoundingClientRect();
-      const cursorX = e.clientX - rect.left;
-      const cursorY = e.clientY - rect.top;
-
-      const prev = stateRef.current;
-      const factor = e.deltaY < 0 ? 1.1 : 1 / 1.1;
-      const next = zoomAtPoint(prev, cursorX, cursorY, factor, MIN_ZOOM, MAX_ZOOM);
-      onCanvasChange({ ...prev, ...next });
-    },
-    [onCanvasChange],
+  const callbacks = useMemo(
+    () => ({
+      onFocus: onFocusWindow,
+      onClose: handleWindowClose,
+      onMove: handleWindowMove,
+      onResize: handleWindowResize,
+      onUrlChange,
+      onRename: handleWindowRename,
+      onDuplicate: handleWindowDuplicate,
+    }),
+    [
+      onFocusWindow,
+      handleWindowClose,
+      handleWindowMove,
+      handleWindowResize,
+      onUrlChange,
+      handleWindowRename,
+      handleWindowDuplicate,
+    ],
   );
 
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    el.addEventListener("wheel", handleWheel, { passive: false });
-    return () => el.removeEventListener("wheel", handleWheel);
-  }, [handleWheel]);
-
-  const zoomPct = Math.round(canvasState.zoom * 100);
-  const viewX = Math.round(-canvasState.panX / canvasState.zoom);
-  const viewY = Math.round(-canvasState.panY / canvasState.zoom);
+  const nodes = useMemo(
+    () =>
+      canvasState.windows.map((win) => ({
+        id: win.id,
+        type: "window" as const,
+        position: { x: win.x, y: win.y },
+        width: win.width,
+        height: win.height,
+        zIndex: focusedWindowId === win.id ? 100 : 1,
+        data: {
+          win,
+          isFocused: focusedWindowId === win.id,
+          callbacks,
+        },
+        dragHandle: ".drag-handle",
+      })),
+    [canvasState.windows, focusedWindowId, callbacks],
+  );
 
   return (
-    <div
-      data-tutorial="canvas"
-      ref={containerRef}
-      onMouseDown={handleMouseDown}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleMouseUp}
-      onMouseLeave={handleMouseUp}
-      className="absolute inset-0 overflow-hidden bg-surface-deep select-none"
-      style={{ cursor: dragging.current ? "grabbing" : "grab" }}
-    >
-      <Grid panX={canvasState.panX} panY={canvasState.panY} zoom={canvasState.zoom} />
-      {canvasState.windows.map((win) => (
-        <Window
-          key={win.id}
-          win={win}
-          panX={canvasState.panX}
-          panY={canvasState.panY}
-          zoom={canvasState.zoom}
-          isFocused={focusedWindowId === win.id}
-          onFocus={onFocusWindow}
-          onClose={handleWindowClose}
-          onMove={handleWindowMove}
-          onResize={handleWindowResize}
-          onUrlChange={onUrlChange}
-          onRename={handleWindowRename}
-          onDuplicate={handleWindowDuplicate}
-        />
-      ))}
+    <div data-tutorial="canvas" ref={containerRef} className="absolute inset-0">
+      <ReactFlow
+        nodes={nodes}
+        nodeTypes={nodeTypes}
+        edges={[]}
+        onNodesChange={handleNodesChange}
+        onViewportChange={handleViewportChange}
+        defaultViewport={{ x: canvasState.panX, y: canvasState.panY, zoom: canvasState.zoom }}
+        minZoom={0.25}
+        maxZoom={2}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Background />
+        <Controls />
+        <MiniMap />
+      </ReactFlow>
       <CreateWindowFab
         onCreateIframeWindow={handleCreateIframeWindow}
         onCreateTerminalWindow={handleCreateTerminalWindow}
       />
-      <div
-        onMouseDown={(e) => e.stopPropagation()}
-        className="absolute bottom-3 left-3 flex bg-black/60 rounded overflow-hidden z-[5]"
-      >
-        {ZOOM_PRESETS.map((preset) => {
-          const pct = Math.round(preset * 100);
-          const isActive = zoomPct === pct;
-          return (
-            <button
-              key={pct}
-              onClick={() => handleZoomPreset(preset)}
-              className={[
-                "border-0 border-r border-solid border-white/10 font-mono text-[12px] px-2 py-1 cursor-pointer leading-[1.6]",
-                isActive ? "bg-accent/35 text-white" : "bg-transparent text-text-muted-light",
-              ].join(" ")}
-            >
-              {pct}%
-            </button>
-          );
-        })}
-      </div>
-      <Minimap
-        windows={canvasState.windows}
-        panX={canvasState.panX}
-        panY={canvasState.panY}
-        zoom={canvasState.zoom}
-        containerWidth={containerRef.current?.clientWidth ?? 0}
-        containerHeight={containerRef.current?.clientHeight ?? 0}
-        onPanTo={handlePanTo}
-      />
-      <div className="absolute bottom-3 right-3 bg-black/60 text-text-muted-light font-mono text-[12px] py-1 px-2 rounded pointer-events-none leading-[1.6]">
-        <div>{zoomPct}%</div>
-        <div>
-          {viewX}, {viewY}
-        </div>
-      </div>
     </div>
   );
 }
