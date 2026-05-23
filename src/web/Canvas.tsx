@@ -121,6 +121,8 @@ export function Canvas({
         if (change.type === "position" && change.position) {
           if (change.dragging === true) continue;
           const { x, y } = change.position;
+          const node = nodes.find((n) => n.id === change.id);
+          if (node && node.position.x === x && node.position.y === y) continue;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, position: { x, y }, data: { ...n.data, x, y } } : n,
           );
@@ -128,6 +130,8 @@ export function Canvas({
         } else if (change.type === "dimensions" && change.dimensions) {
           if (change.resizing === true) continue;
           const { width, height } = change.dimensions;
+          const node = nodes.find((n) => n.id === change.id);
+          if (node && node.width === width && node.height === height) continue;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, width, height, data: { ...n.data, width, height } } : n,
           );
@@ -144,6 +148,8 @@ export function Canvas({
 
   const handleViewportChange = useCallback(
     (viewport: Viewport) => {
+      const prev = stateRef.current.viewport;
+      if (prev.x === viewport.x && prev.y === viewport.y && prev.zoom === viewport.zoom) return;
       onCanvasChange({
         ...stateRef.current,
         viewport: { x: viewport.x, y: viewport.y, zoom: viewport.zoom },
