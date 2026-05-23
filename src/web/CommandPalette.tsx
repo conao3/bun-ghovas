@@ -161,7 +161,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Command palette">
       {pendingConfirm ? (
         <div className="w-[440px]">
           <div className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">

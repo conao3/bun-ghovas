@@ -52,7 +52,7 @@ export function CreateWindowFab({
           placement="top end"
           className="bg-surface-dark-elevated border border-white/15 rounded-[6px] p-1 outline-none z-20"
         >
-          <Dialog className="outline-none flex flex-col gap-0.5">
+          <Dialog aria-label="New window" className="outline-none flex flex-col gap-0.5">
             {({ close }) => (
               <>
                 <Button
@@ -89,7 +89,7 @@ export function CreateWindowFab({
         </Popover>
       </DialogTrigger>
 
-      <Modal isOpen={urlModalOpen} onClose={handleCancel}>
+      <Modal isOpen={urlModalOpen} onClose={handleCancel} ariaLabel="New iframe window">
         <form
           onSubmit={(e) => {
             e.preventDefault();

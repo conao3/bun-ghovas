@@ -51,7 +51,7 @@ export function Settings({
   const [selected, setSelected] = useState<NavEntry>("General");
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Settings">
       <div className="bg-canvas rounded-md -m-5 p-5 flex gap-0 min-w-[560px] min-h-[360px]">
         <nav className="w-[140px] bg-surface-soft border-r border-hairline pr-3 mr-3">
           {NAV_ENTRIES.map((entry) => {

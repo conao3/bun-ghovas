@@ -186,7 +186,7 @@ export function Window({
           </span>
         </MenuItem>
       </ContextMenu>
-      <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
+      <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)} ariaLabel="Rename window">
         <div className="flex flex-col gap-3">
           <TextField
             value={renameValue}
