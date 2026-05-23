@@ -248,9 +248,16 @@ export function App() {
         next[2] = l2children[0]?.id ?? prev[2];
         const l1children = workspace.l1.filter((c) => c.parentL2 === next[2]);
         next[1] = l1children[0]?.id ?? prev[1];
+        const l0children = workspace.l0.filter((c) => c.parentL1 === next[1]);
+        next[0] = l0children[0]?.id ?? prev[0];
       } else if (level === 2) {
         const l1children = workspace.l1.filter((c) => c.parentL2 === id);
         next[1] = l1children[0]?.id ?? prev[1];
+        const l0children = workspace.l0.filter((c) => c.parentL1 === next[1]);
+        next[0] = l0children[0]?.id ?? prev[0];
+      } else if (level === 1) {
+        const l0children = workspace.l0.filter((c) => c.parentL1 === id);
+        next[0] = l0children[0]?.id ?? prev[0];
       }
       return next;
     });
@@ -310,6 +317,19 @@ export function App() {
   const handleDuplicateCanvas = useCallback((level: LayerLevel, canvasId: string) => {
     setWorkspace((prev) => {
       const newId = crypto.randomUUID();
+      const cloneNodes = (nodes: WorkspaceNode[]) =>
+        nodes.map((n) => {
+          const newNId = crypto.randomUUID();
+          return {
+            ...n,
+            id: newNId,
+            data: {
+              ...n.data,
+              id: newNId,
+              ...(n.data.kind === "terminal" ? { sessionId: crypto.randomUUID() } : {}),
+            },
+          };
+        });
       if (level === 0) {
         const idx = prev.l0.findIndex((c) => c.id === canvasId);
         if (idx === -1) return prev;
@@ -318,18 +338,7 @@ export function App() {
           ...orig,
           id: newId,
           name: (orig.name ?? orig.id) + " copy",
-          nodes: orig.nodes.map((n) => {
-            const newNId = crypto.randomUUID();
-            return {
-              ...n,
-              id: newNId,
-              data: {
-                ...n.data,
-                id: newNId,
-                ...(n.data.kind === "terminal" ? { sessionId: crypto.randomUUID() } : {}),
-              },
-            };
-          }),
+          nodes: cloneNodes(orig.nodes),
         };
         const next = [...prev.l0];
         next.splice(idx + 1, 0, clone);
@@ -339,25 +348,63 @@ export function App() {
         if (idx === -1) return prev;
         const orig = prev.l1[idx]!;
         const clone: L1Canvas = { ...orig, id: newId, name: (orig.name ?? orig.id) + " copy" };
-        const next = [...prev.l1];
-        next.splice(idx + 1, 0, clone);
-        return applyLayers({ ...prev, l1: next });
+        const nextL1 = [...prev.l1];
+        nextL1.splice(idx + 1, 0, clone);
+        const clonedL0 = prev.l0
+          .filter((c) => c.parentL1 === canvasId)
+          .map((c) => ({ ...c, id: crypto.randomUUID(), parentL1: newId, nodes: cloneNodes(c.nodes) }));
+        return applyLayers({ ...prev, l1: nextL1, l0: [...prev.l0, ...clonedL0] });
       } else if (level === 2) {
         const idx = prev.l2.findIndex((c) => c.id === canvasId);
         if (idx === -1) return prev;
         const orig = prev.l2[idx]!;
         const clone: L2Canvas = { ...orig, id: newId, name: (orig.name ?? orig.id) + " copy" };
-        const next = [...prev.l2];
-        next.splice(idx + 1, 0, clone);
-        return applyLayers({ ...prev, l2: next });
+        const nextL2 = [...prev.l2];
+        nextL2.splice(idx + 1, 0, clone);
+        const childL1 = prev.l1.filter((c) => c.parentL2 === canvasId);
+        const l1IdMap = new Map(childL1.map((c) => [c.id, crypto.randomUUID()]));
+        const clonedL1 = childL1.map((c) => ({ ...c, id: l1IdMap.get(c.id)!, parentL2: newId }));
+        const clonedL0 = prev.l0
+          .filter((c) => l1IdMap.has(c.parentL1))
+          .map((c) => ({
+            ...c,
+            id: crypto.randomUUID(),
+            parentL1: l1IdMap.get(c.parentL1)!,
+            nodes: cloneNodes(c.nodes),
+          }));
+        return applyLayers({ ...prev, l2: nextL2, l1: [...prev.l1, ...clonedL1], l0: [...prev.l0, ...clonedL0] });
       } else {
         const idx = prev.l3.findIndex((c) => c.id === canvasId);
         if (idx === -1) return prev;
         const orig = prev.l3[idx]!;
         const clone: L3Canvas = { ...orig, id: newId, name: (orig.name ?? orig.id) + " copy" };
-        const next = [...prev.l3];
-        next.splice(idx + 1, 0, clone);
-        return applyLayers({ ...prev, l3: next });
+        const nextL3 = [...prev.l3];
+        nextL3.splice(idx + 1, 0, clone);
+        const childL2 = prev.l2.filter((c) => c.parentL3 === canvasId);
+        const l2IdMap = new Map(childL2.map((c) => [c.id, crypto.randomUUID()]));
+        const clonedL2 = childL2.map((c) => ({ ...c, id: l2IdMap.get(c.id)!, parentL3: newId }));
+        const childL1 = prev.l1.filter((c) => l2IdMap.has(c.parentL2));
+        const l1IdMap = new Map(childL1.map((c) => [c.id, crypto.randomUUID()]));
+        const clonedL1 = childL1.map((c) => ({
+          ...c,
+          id: l1IdMap.get(c.id)!,
+          parentL2: l2IdMap.get(c.parentL2)!,
+        }));
+        const clonedL0 = prev.l0
+          .filter((c) => l1IdMap.has(c.parentL1))
+          .map((c) => ({
+            ...c,
+            id: crypto.randomUUID(),
+            parentL1: l1IdMap.get(c.parentL1)!,
+            nodes: cloneNodes(c.nodes),
+          }));
+        return applyLayers({
+          ...prev,
+          l3: nextL3,
+          l2: [...prev.l2, ...clonedL2],
+          l1: [...prev.l1, ...clonedL1],
+          l0: [...prev.l0, ...clonedL0],
+        });
       }
     });
   }, []);
@@ -394,31 +441,77 @@ export function App() {
     (level: LayerLevel, canvasId: string) => {
       setWorkspace((prev) => {
         if (level === 0) {
-          if (prev.l0.length <= 1) return prev;
+          const target = prev.l0.find((c) => c.id === canvasId);
+          if (!target) return prev;
+          if (prev.l0.filter((c) => c.parentL1 === target.parentL1).length <= 1) return prev;
           return applyLayers({ ...prev, l0: prev.l0.filter((c) => c.id !== canvasId) });
         } else if (level === 1) {
-          if (prev.l1.length <= 1) return prev;
-          return applyLayers({ ...prev, l1: prev.l1.filter((c) => c.id !== canvasId) });
+          const target = prev.l1.find((c) => c.id === canvasId);
+          if (!target) return prev;
+          if (prev.l1.filter((c) => c.parentL2 === target.parentL2).length <= 1) return prev;
+          const newL1 = prev.l1.filter((c) => c.id !== canvasId);
+          const newL0 = prev.l0.filter((c) => c.parentL1 !== canvasId);
+          return applyLayers({ ...prev, l1: newL1, l0: newL0 });
         } else if (level === 2) {
-          if (prev.l2.length <= 1) return prev;
-          return applyLayers({ ...prev, l2: prev.l2.filter((c) => c.id !== canvasId) });
+          const target = prev.l2.find((c) => c.id === canvasId);
+          if (!target) return prev;
+          if (prev.l2.filter((c) => c.parentL3 === target.parentL3).length <= 1) return prev;
+          const newL2 = prev.l2.filter((c) => c.id !== canvasId);
+          const deletedL1Ids = new Set(prev.l1.filter((c) => c.parentL2 === canvasId).map((c) => c.id));
+          const newL1 = prev.l1.filter((c) => c.parentL2 !== canvasId);
+          const newL0 = prev.l0.filter((c) => !deletedL1Ids.has(c.parentL1));
+          return applyLayers({ ...prev, l2: newL2, l1: newL1, l0: newL0 });
         } else {
           if (prev.l3.length <= 1) return prev;
-          return applyLayers({ ...prev, l3: prev.l3.filter((c) => c.id !== canvasId) });
+          const newL3 = prev.l3.filter((c) => c.id !== canvasId);
+          const deletedL2Ids = new Set(prev.l2.filter((c) => c.parentL3 === canvasId).map((c) => c.id));
+          const newL2 = prev.l2.filter((c) => c.parentL3 !== canvasId);
+          const deletedL1Ids = new Set(prev.l1.filter((c) => deletedL2Ids.has(c.parentL2)).map((c) => c.id));
+          const newL1 = prev.l1.filter((c) => !deletedL2Ids.has(c.parentL2));
+          const newL0 = prev.l0.filter((c) => !deletedL1Ids.has(c.parentL1));
+          return applyLayers({ ...prev, l3: newL3, l2: newL2, l1: newL1, l0: newL0 });
         }
       });
       setActiveIds((prev) => {
         if (prev[level] !== canvasId) return prev;
-        const canvases =
-          level === 0
-            ? workspace.l0
-            : level === 1
-              ? workspace.l1
-              : level === 2
-                ? workspace.l2
-                : workspace.l3;
-        const sibling = canvases.find((c) => c.id !== canvasId);
-        return sibling ? { ...prev, [level]: sibling.id } : prev;
+        let siblingId: string | undefined;
+        if (level === 0) {
+          const target = workspace.l0.find((c) => c.id === canvasId);
+          siblingId = workspace.l0.find((c) => c.parentL1 === target?.parentL1 && c.id !== canvasId)?.id;
+        } else if (level === 1) {
+          const target = workspace.l1.find((c) => c.id === canvasId);
+          siblingId = workspace.l1.find((c) => c.parentL2 === target?.parentL2 && c.id !== canvasId)?.id;
+        } else if (level === 2) {
+          const target = workspace.l2.find((c) => c.id === canvasId);
+          siblingId = workspace.l2.find((c) => c.parentL3 === target?.parentL3 && c.id !== canvasId)?.id;
+        } else {
+          siblingId = workspace.l3.find((c) => c.id !== canvasId)?.id;
+        }
+        if (!siblingId) return prev;
+        const next = { ...prev, [level]: siblingId };
+        if (level === 3) {
+          const firstL2 = workspace.l2.find((c) => c.parentL3 === siblingId);
+          if (firstL2) {
+            next[2] = firstL2.id;
+            const firstL1 = workspace.l1.find((c) => c.parentL2 === firstL2.id);
+            if (firstL1) {
+              next[1] = firstL1.id;
+              const firstL0 = workspace.l0.find((c) => c.parentL1 === firstL1.id);
+              if (firstL0) next[0] = firstL0.id;
+            }
+          }
+        } else if (level === 2) {
+          const firstL1 = workspace.l1.find((c) => c.parentL2 === siblingId);
+          if (firstL1) {
+            next[1] = firstL1.id;
+            const firstL0 = workspace.l0.find((c) => c.parentL1 === firstL1.id);
+            if (firstL0) next[0] = firstL0.id;
+          }
+        } else if (level === 1) {
+          const firstL0 = workspace.l0.find((c) => c.parentL1 === siblingId);
+          if (firstL0) next[0] = firstL0.id;
+        }
+        return next;
       });
     },
     [workspace],
