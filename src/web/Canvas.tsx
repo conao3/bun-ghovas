@@ -119,12 +119,14 @@ export function Canvas({
 
       for (const change of changes) {
         if (change.type === "position" && change.position) {
+          if (change.dragging === true) continue;
           const { x, y } = change.position;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, position: { x, y }, data: { ...n.data, x, y } } : n,
           );
           changed = true;
         } else if (change.type === "dimensions" && change.dimensions) {
+          if (change.resizing === true) continue;
           const { width, height } = change.dimensions;
           nodes = nodes.map((n) =>
             n.id === change.id ? { ...n, width, height, data: { ...n.data, width, height } } : n,
