@@ -35,6 +35,7 @@ interface SettingsProps {
   isOpen: boolean;
   onClose: () => void;
   workspace: WorkspaceState;
+  activeIds: Record<LayerLevel, string>;
   onUiModeChange: (level: LayerLevel, mode: LayerUiMode) => void;
   onVisibilityChange: (level: LayerLevel, visible: boolean) => void;
   onWorkspaceReplace: (next: WorkspaceState) => void;
@@ -44,6 +45,7 @@ export function Settings({
   isOpen,
   onClose,
   workspace,
+  activeIds,
   onUiModeChange,
   onVisibilityChange,
   onWorkspaceReplace,
@@ -76,6 +78,7 @@ export function Settings({
           {selected === "Layers" && (
             <LayersPanel
               workspace={workspace}
+              activeIds={activeIds}
               onUiModeChange={onUiModeChange}
               onVisibilityChange={onVisibilityChange}
             />

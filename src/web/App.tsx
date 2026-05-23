@@ -654,36 +654,64 @@ export function App() {
         });
       },
     },
-    ...[1, 2, 3].flatMap((level) =>
-      workspace.layers[level as LayerLevel].canvases.map((canvas) => ({
-        id: `switch-l${level}-${canvas.id}`,
-        label: `Switch L${level} → ${canvas.name ?? canvas.id}`,
+    ...workspace.l3.map((canvas) => ({
+      id: `switch-l3-${canvas.id}`,
+      label: `Switch L3 → ${canvas.name ?? canvas.id}`,
+      category: "Layer",
+      run: () => handleActiveChange(3, canvas.id),
+    })),
+    ...workspace.l2.map((canvas) => {
+      const parentL3 = workspace.l3.find((l) => l.id === canvas.parentL3);
+      const l3Name = parentL3?.name ?? parentL3?.id ?? canvas.parentL3;
+      return {
+        id: `switch-l2-${canvas.id}`,
+        label: `Switch L2 → ${canvas.name ?? canvas.id} (under ${l3Name})`,
         category: "Layer",
-        run: () => handleActiveChange(level as LayerLevel, canvas.id),
-      })),
-    ),
+        run: () => handleActiveChange(2, canvas.id),
+      };
+    }),
+    ...workspace.l1.map((canvas) => {
+      const parentL2 = workspace.l2.find((l) => l.id === canvas.parentL2);
+      const parentL3 = workspace.l3.find((l) => l.id === parentL2?.parentL3);
+      const l3Name = parentL3?.name ?? parentL3?.id ?? "";
+      const l2Name = parentL2?.name ?? parentL2?.id ?? canvas.parentL2;
+      return {
+        id: `switch-l1-${canvas.id}`,
+        label: `Switch L1 → ${canvas.name ?? canvas.id} (under ${l3Name} › ${l2Name})`,
+        category: "Layer",
+        run: () => handleActiveChange(1, canvas.id),
+      };
+    }),
     ...(focusedNode != null
       ? workspace.l0
           .filter((c) => c.id !== activeCanvas.id)
-          .map((canvas) => ({
-            id: `move-window-to-${canvas.id}`,
-            label: `Move window to ${canvas.name ?? canvas.id}`,
-            category: "Window",
-            run: () => {
-              const nid = focusedNode.id;
-              const srcId = activeCanvas.id;
-              setWorkspace((prev) => {
-                const newL0 = prev.l0.map((c) => {
-                  if (c.id === srcId)
-                    return { ...c, nodes: c.nodes.filter((n) => n.id !== nid) };
-                  if (c.id === canvas.id) return { ...c, nodes: [...c.nodes, focusedNode] };
-                  return c;
+          .map((canvas) => {
+            const parentL1 = workspace.l1.find((l) => l.id === canvas.parentL1);
+            const parentL2 = workspace.l2.find((l) => l.id === parentL1?.parentL2);
+            const parentL3 = workspace.l3.find((l) => l.id === parentL2?.parentL3);
+            const l3Name = parentL3?.name ?? parentL3?.id ?? "";
+            const l2Name = parentL2?.name ?? parentL2?.id ?? "";
+            const l1Name = parentL1?.name ?? parentL1?.id ?? canvas.parentL1;
+            return {
+              id: `move-window-to-${canvas.id}`,
+              label: `Move window to ${canvas.name ?? canvas.id} (under ${l3Name} › ${l2Name} › ${l1Name})`,
+              category: "Window",
+              run: () => {
+                const nid = focusedNode.id;
+                const srcId = activeCanvas.id;
+                setWorkspace((prev) => {
+                  const newL0 = prev.l0.map((c) => {
+                    if (c.id === srcId)
+                      return { ...c, nodes: c.nodes.filter((n) => n.id !== nid) };
+                    if (c.id === canvas.id) return { ...c, nodes: [...c.nodes, focusedNode] };
+                    return c;
+                  });
+                  return applyLayers({ ...prev, l0: newL0 });
                 });
-                return applyLayers({ ...prev, l0: newL0 });
-              });
-              setFocusedWindowId(null);
-            },
-          }))
+                setFocusedWindowId(null);
+              },
+            };
+          })
       : []),
   ];
 
@@ -712,6 +740,7 @@ export function App() {
           />
         </div>
         <StatusBar
+          workspace={workspace}
           activeIds={activeIds}
           activeCanvasWindowCount={activeCanvas.nodes.length}
           zoom={activeCanvas.viewport.zoom}
@@ -730,6 +759,7 @@ export function App() {
           isOpen={settingsOpen}
           onClose={() => setSettingsOpen(false)}
           workspace={workspace}
+          activeIds={activeIds}
           onUiModeChange={handleUiModeChange}
           onVisibilityChange={handleVisibilityChange}
           onWorkspaceReplace={setWorkspace}
