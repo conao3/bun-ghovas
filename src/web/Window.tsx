@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
+import { ArrowLeft, ArrowRight, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
@@ -42,7 +42,12 @@ export function Window({
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [iframeState, setIframeState] = useState<IframeLoadState>("idle");
+  const [urlNav, setUrlNav] = useState<{ history: string[]; index: number }>({
+    history: [win.url ?? ""],
+    index: 0,
+  });
   const menuAnchorRef = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -65,10 +70,44 @@ export function Window({
     (e: React.FormEvent) => {
       e.preventDefault();
       recordVisit(urlInput);
+      setUrlNav((prev) => {
+        const base = prev.history.slice(0, prev.index + 1).concat(urlInput);
+        const trimmed = base.length > 50 ? base.slice(base.length - 50) : base;
+        return { history: trimmed, index: trimmed.length - 1 };
+      });
       onUrlChange(win.id, urlInput);
     },
     [win.id, urlInput, onUrlChange],
   );
+
+  const handleBack = useCallback(() => {
+    setUrlNav((prev) => {
+      if (prev.index <= 0) return prev;
+      const nextIndex = prev.index - 1;
+      const url = prev.history[nextIndex];
+      onUrlChange(win.id, url);
+      setUrlInput(url);
+      return { ...prev, index: nextIndex };
+    });
+  }, [win.id, onUrlChange]);
+
+  const handleForward = useCallback(() => {
+    setUrlNav((prev) => {
+      if (prev.index >= prev.history.length - 1) return prev;
+      const nextIndex = prev.index + 1;
+      const url = prev.history[nextIndex];
+      onUrlChange(win.id, url);
+      setUrlInput(url);
+      return { ...prev, index: nextIndex };
+    });
+  }, [win.id, onUrlChange]);
+
+  const handleReload = useCallback(() => {
+    if (iframeRef.current) {
+      iframeRef.current.src = iframeRef.current.src;
+      setIframeState("loading");
+    }
+  }, []);
 
   const handleWindowMouseDown = useCallback(
     (e: React.MouseEvent) => {
@@ -192,8 +231,36 @@ export function Window({
             <form
               onSubmit={handleUrlSubmit}
               onMouseDown={(e) => e.stopPropagation()}
-              className="px-2 py-1 shrink-0"
+              className="px-2 py-1 shrink-0 flex items-center gap-1"
             >
+              <Button
+                variant="ghost"
+                aria-label="back"
+                isDisabled={urlNav.index <= 0}
+                onPress={handleBack}
+                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+                className="data-[disabled]:cursor-not-allowed"
+              >
+                <ArrowLeft size={14} aria-hidden />
+              </Button>
+              <Button
+                variant="ghost"
+                aria-label="forward"
+                isDisabled={urlNav.index >= urlNav.history.length - 1}
+                onPress={handleForward}
+                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+                className="data-[disabled]:cursor-not-allowed"
+              >
+                <ArrowRight size={14} aria-hidden />
+              </Button>
+              <Button
+                variant="ghost"
+                aria-label="reload"
+                onPress={handleReload}
+                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+              >
+                <RotateCw size={14} aria-hidden />
+              </Button>
               <UrlComboBox
                 value={urlInput}
                 onChange={setUrlInput}
@@ -212,6 +279,7 @@ export function Window({
                 }}
               >
                 <iframe
+                  ref={iframeRef}
                   src={win.url ?? "about:blank"}
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                   onLoad={handleIframeLoad}
