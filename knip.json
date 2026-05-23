@@ -2,6 +2,8 @@
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "entry": [
     "src/web/main.tsx",
+    "src/native/main.ts",
+    "electrobun.config.ts",
     "tests/**/*.test.ts",
     "scripts/**/*.ts"
   ],
@@ -11,6 +13,7 @@
     "scripts/**/*.ts"
   ],
   "ignoreDependencies": [
+    "@types/three",
     "node-pty",
     "oxlint",
     "oxfmt"
