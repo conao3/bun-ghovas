@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { Button } from "./components/Button";
 
 interface TutorialStep {
@@ -133,14 +134,24 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
         <p className="m-0 text-text-muted-light text-[13px] font-mono">{step.description}</p>
         <div className="flex justify-between items-center">
           <Button variant="ghost" onPress={handleBack} isDisabled={stepIndex === 0}>
-            Back
+            <span className="inline-flex items-center gap-1.5">
+              <ArrowLeft size={14} aria-hidden /> Back
+            </span>
           </Button>
           <div className="flex gap-2">
             <Button variant="secondary" onPress={skip}>
               Skip
             </Button>
             <Button variant="primary" onPress={handleNext}>
-              {isLast ? "Done" : "Next"}
+              {isLast ? (
+                <span className="inline-flex items-center gap-1.5">
+                  <Check size={14} aria-hidden /> Done
+                </span>
+              ) : (
+                <span className="inline-flex items-center gap-1.5">
+                  Next <ArrowRight size={14} aria-hidden />
+                </span>
+              )}
             </Button>
           </div>
         </div>
