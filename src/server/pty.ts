@@ -15,8 +15,6 @@ const native = loadNativeModule("pty");
 const ptyNative = native.module;
 const helperPath = path.resolve(native.dir, "spawn-helper");
 
-const SCROLLBACK_CAP_BYTES = 1024 * 1024;
-
 interface NativePty {
   fork(
     file: string,
@@ -35,7 +33,7 @@ interface NativePty {
 }
 
 export type ClientMessage =
-  | { type: "open"; sessionId: string; shell?: string; cols: number; rows: number }
+  | { type: "open"; sessionId: string; shell?: string; cwd?: string; scrollbackMiB?: number; cols: number; rows: number }
   | { type: "input"; sessionId: string; data: string }
   | { type: "resize"; sessionId: string; cols: number; rows: number }
   | { type: "close"; sessionId: string };
@@ -95,7 +93,7 @@ export function createPtyManager() {
   }
 
   function openSession(ws: WsSend, msg: Extract<ClientMessage, { type: "open" }>) {
-    const { sessionId, shell, cols, rows } = msg;
+    const { sessionId, shell, cwd, scrollbackMiB, cols, rows } = msg;
 
     if (sessions.has(sessionId)) {
       const session = sessions.get(sessionId)!;
@@ -109,13 +107,15 @@ export function createPtyManager() {
     }
 
     const shellPath = shell ?? process.env.SHELL ?? "/bin/sh";
+    const cwdPath = cwd && cwd.length > 0 ? cwd : process.cwd();
+    const scrollbackBytes = Math.max(1, Math.floor((scrollbackMiB ?? 1) * 1024 * 1024));
 
     try {
       const result = ptyNative.fork(
         shellPath,
         [],
         buildEnv({ TERM: "xterm-256color" }),
-        process.cwd(),
+        cwdPath,
         cols,
         rows,
         -1,
@@ -145,7 +145,7 @@ export function createPtyManager() {
         pid: result.pid,
         ws,
         alive: true,
-        scrollback: createRingBuffer(SCROLLBACK_CAP_BYTES),
+        scrollback: createRingBuffer(scrollbackBytes),
       };
       sessions.set(sessionId, session);
 

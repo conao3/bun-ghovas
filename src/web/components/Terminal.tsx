@@ -8,9 +8,11 @@ const wasmReady: Promise<void> = init();
 interface TerminalProps {
   sessionId: string;
   shell?: string;
+  cwd?: string;
+  scrollbackMiB?: number;
 }
 
-export function Terminal({ sessionId, shell }: TerminalProps) {
+export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [overlay, setOverlay] = useState<string | null>(null);
   const toast = useToast();
@@ -51,6 +53,8 @@ export function Terminal({ sessionId, shell }: TerminalProps) {
           cols,
           rows,
           shell,
+          cwd,
+          scrollbackMiB,
           onOutput: (data) => term?.write(data),
           onExit: (code, signal) => {
             const msg = signal ? `exited (signal ${signal})` : `exited (code ${code ?? "?"})`;
@@ -78,7 +82,7 @@ export function Terminal({ sessionId, shell }: TerminalProps) {
       handle?.close();
       term?.dispose();
     };
-  }, [sessionId, shell]);
+  }, [sessionId, shell, cwd, scrollbackMiB]);
 
   return (
     <div
