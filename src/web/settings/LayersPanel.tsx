@@ -19,9 +19,15 @@ export function LayersPanel(props: {
       <table className="border-collapse w-full font-mono">
         <thead>
           <tr>
-            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">Layer</th>
-            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">UI Mode</th>
-            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">Visible</th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">
+              Layer
+            </th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">
+              UI Mode
+            </th>
+            <th className="text-white/50 font-mono text-[12px] font-normal text-left pt-1 pr-3 pb-1 pl-0 border-b border-white/10">
+              Visible
+            </th>
           </tr>
         </thead>
         <tbody>

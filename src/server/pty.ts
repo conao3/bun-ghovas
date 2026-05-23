@@ -33,7 +33,15 @@ interface NativePty {
 }
 
 export type ClientMessage =
-  | { type: "open"; sessionId: string; shell?: string; cwd?: string; scrollbackMiB?: number; cols: number; rows: number }
+  | {
+      type: "open";
+      sessionId: string;
+      shell?: string;
+      cwd?: string;
+      scrollbackMiB?: number;
+      cols: number;
+      rows: number;
+    }
   | { type: "input"; sessionId: string; data: string }
   | { type: "resize"; sessionId: string; cols: number; rows: number }
   | { type: "close"; sessionId: string };

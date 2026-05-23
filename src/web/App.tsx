@@ -197,7 +197,11 @@ export function App() {
           const nextCanvasId = canvases[nextIdx]!.id;
           e.preventDefault();
           setActiveIds((prev) => ({ ...prev, 0: nextCanvasId }));
-        } else if (def.id === "cycle-l1-canvas" || def.id === "cycle-l2-canvas" || def.id === "cycle-l3-canvas") {
+        } else if (
+          def.id === "cycle-l1-canvas" ||
+          def.id === "cycle-l2-canvas" ||
+          def.id === "cycle-l3-canvas"
+        ) {
           const level = def.id === "cycle-l1-canvas" ? 1 : def.id === "cycle-l2-canvas" ? 2 : 3;
           const layer = workspace.layers[level as LayerLevel];
           if (!layer.visible) break;
@@ -218,7 +222,9 @@ export function App() {
               0: {
                 ...prev.layers[0],
                 canvases: prev.layers[0].canvases.map((c) =>
-                  c.id === activeIds[0] ? { ...c, nodes: c.nodes.filter((n) => n.id !== windowId) } : c,
+                  c.id === activeIds[0]
+                    ? { ...c, nodes: c.nodes.filter((n) => n.id !== windowId) }
+                    : c,
                 ),
               },
             },
@@ -230,7 +236,8 @@ export function App() {
           const nodes = canvas.nodes;
           const currentIdx = nodes.findIndex((n) => n.id === focusedWindowId);
           const delta = def.id === "cycle-next-window" ? 1 : -1;
-          const nextIdx = currentIdx === -1 ? 0 : (currentIdx + delta + nodes.length) % nodes.length;
+          const nextIdx =
+            currentIdx === -1 ? 0 : (currentIdx + delta + nodes.length) % nodes.length;
           e.preventDefault();
           setFocusedWindowId(nodes[nextIdx]!.id);
         }
@@ -443,7 +450,16 @@ export function App() {
           position: { x: 100, y: 100 },
           width: 480,
           height: 320,
-          data: { id, kind: "iframe", x: 100, y: 100, width: 480, height: 320, title: "Browser", url: "about:blank" },
+          data: {
+            id,
+            kind: "iframe",
+            x: 100,
+            y: 100,
+            width: 480,
+            height: 320,
+            title: "Browser",
+            url: "about:blank",
+          },
         });
       },
     },
@@ -465,7 +481,16 @@ export function App() {
           position: { x: 100, y: 100 },
           width: 560,
           height: 360,
-          data: { id, kind: "terminal", x: 100, y: 100, width: 560, height: 360, title: "Terminal", sessionId: crypto.randomUUID() },
+          data: {
+            id,
+            kind: "terminal",
+            x: 100,
+            y: 100,
+            width: 560,
+            height: 360,
+            title: "Terminal",
+            sessionId: crypto.randomUUID(),
+          },
         });
       },
     },
@@ -496,8 +521,7 @@ export function App() {
                     canvases: prev.layers[0].canvases.map((c) => {
                       if (c.id === srcId)
                         return { ...c, nodes: c.nodes.filter((n) => n.id !== nid) };
-                      if (c.id === canvas.id)
-                        return { ...c, nodes: [...c.nodes, focusedNode] };
+                      if (c.id === canvas.id) return { ...c, nodes: [...c.nodes, focusedNode] };
                       return c;
                     }),
                   },
@@ -510,9 +534,7 @@ export function App() {
   ];
 
   return (
-    <div
-      className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
-    >
+    <div className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']">
       <LayerBar
         workspace={workspace}
         activeIds={activeIds}

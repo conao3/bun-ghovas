@@ -70,13 +70,13 @@ export function WorkspacesPanel(props: {
             />
           </div>
           {importError && (
-            <span className="text-danger-light font-mono text-[12px]">
-              {importError}
-            </span>
+            <span className="text-danger-light font-mono text-[12px]">{importError}</span>
           )}
         </div>
         <div>
-          <Button variant="secondary" onPress={handleReset}>Reset to default</Button>
+          <Button variant="secondary" onPress={handleReset}>
+            Reset to default
+          </Button>
         </div>
       </div>
     </div>

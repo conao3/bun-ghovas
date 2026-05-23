@@ -35,7 +35,10 @@ describe("loadHistory", () => {
   });
 
   test("returns stored URLs", () => {
-    store.set("ghovas.iframe-url-history", JSON.stringify(["https://example.com", "https://foo.dev"]));
+    store.set(
+      "ghovas.iframe-url-history",
+      JSON.stringify(["https://example.com", "https://foo.dev"]),
+    );
     expect(loadHistory()).toEqual(["https://example.com", "https://foo.dev"]);
   });
 });

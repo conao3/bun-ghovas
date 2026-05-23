@@ -30,9 +30,7 @@ export function UrlComboBox({
   ...rest
 }: UrlComboBoxProps) {
   const [items, setItems] = useState<HistoryItem[]>([]);
-  const filtered = items.filter((item) =>
-    item.id.toLowerCase().includes(value.toLowerCase()),
-  );
+  const filtered = items.filter((item) => item.id.toLowerCase().includes(value.toLowerCase()));
 
   return (
     <RACComboBox<HistoryItem>

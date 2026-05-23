@@ -32,8 +32,6 @@ export interface CanvasStateV2 {
   nodes: WorkspaceNode[];
 }
 
-export type CanvasState = CanvasStateV2;
-
 export interface LayerState {
   canvases: CanvasStateV2[];
   uiMode: LayerUiMode;
