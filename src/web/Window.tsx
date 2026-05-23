@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { CSSProperties } from "react";
 import { X } from "lucide-react";
+import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
 import { TextField } from "./components/TextField";
@@ -11,117 +11,11 @@ import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
 import { loadBackendSettings } from "./lib/backendSettings";
 
-const MIN_WIDTH = 160;
-const MIN_HEIGHT = 80;
-const HANDLE_SIZE = 8;
-const CORNER_SIZE = 12;
-
-type ResizeDir = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
-
-interface ResizeHandleDef {
-  dir: ResizeDir;
-  style: CSSProperties;
-}
-
-function handleVisibleClass(dir: ResizeDir): string {
-  if (dir.length === 2) {
-    return "w-full h-full bg-accent rounded-[1px]";
-  }
-  if (dir === "n" || dir === "s") {
-    return "absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-accent/40";
-  }
-  return "absolute inset-y-0 left-1/2 -translate-x-1/2 w-px bg-accent/40";
-}
-
-const RESIZE_HANDLES: ResizeHandleDef[] = [
-  {
-    dir: "n",
-    style: {
-      top: -HANDLE_SIZE / 2,
-      left: CORNER_SIZE,
-      right: CORNER_SIZE,
-      height: HANDLE_SIZE,
-      cursor: "ns-resize",
-    },
-  },
-  {
-    dir: "s",
-    style: {
-      bottom: -HANDLE_SIZE / 2,
-      left: CORNER_SIZE,
-      right: CORNER_SIZE,
-      height: HANDLE_SIZE,
-      cursor: "ns-resize",
-    },
-  },
-  {
-    dir: "e",
-    style: {
-      top: CORNER_SIZE,
-      right: -HANDLE_SIZE / 2,
-      bottom: CORNER_SIZE,
-      width: HANDLE_SIZE,
-      cursor: "ew-resize",
-    },
-  },
-  {
-    dir: "w",
-    style: {
-      top: CORNER_SIZE,
-      left: -HANDLE_SIZE / 2,
-      bottom: CORNER_SIZE,
-      width: HANDLE_SIZE,
-      cursor: "ew-resize",
-    },
-  },
-  {
-    dir: "ne",
-    style: {
-      top: -HANDLE_SIZE / 2,
-      right: -HANDLE_SIZE / 2,
-      width: CORNER_SIZE,
-      height: CORNER_SIZE,
-      cursor: "nesw-resize",
-    },
-  },
-  {
-    dir: "nw",
-    style: {
-      top: -HANDLE_SIZE / 2,
-      left: -HANDLE_SIZE / 2,
-      width: CORNER_SIZE,
-      height: CORNER_SIZE,
-      cursor: "nwse-resize",
-    },
-  },
-  {
-    dir: "se",
-    style: {
-      bottom: -HANDLE_SIZE / 2,
-      right: -HANDLE_SIZE / 2,
-      width: CORNER_SIZE,
-      height: CORNER_SIZE,
-      cursor: "nwse-resize",
-    },
-  },
-  {
-    dir: "sw",
-    style: {
-      bottom: -HANDLE_SIZE / 2,
-      left: -HANDLE_SIZE / 2,
-      width: CORNER_SIZE,
-      height: CORNER_SIZE,
-      cursor: "nesw-resize",
-    },
-  },
-];
 
 interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
-  onMove: (id: string, x: number, y: number) => void;
-  onResize: (id: string, x: number, y: number, width: number, height: number) => void;
   onUrlChange: (id: string, url: string) => void;
   onRename: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
@@ -143,8 +37,6 @@ export function Window({
   isFocused,
   onFocus,
   onClose,
-  onMove,
-  onResize,
   onUrlChange,
   onRename,
   onDuplicate,
@@ -196,33 +88,6 @@ export function Window({
     [win.id, onFocus],
   );
 
-  const handleTitleMouseDown = useCallback(
-    (e: React.MouseEvent) => {
-      if (e.button !== 0) return;
-      e.stopPropagation();
-      onFocus(win.id);
-
-      const startClient = { x: e.clientX, y: e.clientY };
-      const startWin = { x: win.x, y: win.y };
-      const capturedZoom = zoom;
-
-      const handleMove = (ev: MouseEvent) => {
-        const dx = (ev.clientX - startClient.x) / capturedZoom;
-        const dy = (ev.clientY - startClient.y) / capturedZoom;
-        onMove(win.id, startWin.x + dx, startWin.y + dy);
-      };
-
-      const handleUp = () => {
-        window.removeEventListener("mousemove", handleMove);
-        window.removeEventListener("mouseup", handleUp);
-      };
-
-      window.addEventListener("mousemove", handleMove);
-      window.addEventListener("mouseup", handleUp);
-    },
-    [win.id, win.x, win.y, zoom, onFocus, onMove],
-  );
-
   const handleTitleContextMenu = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
@@ -254,49 +119,6 @@ export function Window({
       setRenameOpen(false);
     }
   }, [win.id, renameValue, onRename]);
-
-  const handleResizeMouseDown = useCallback(
-    (dir: ResizeDir) => (e: React.MouseEvent) => {
-      if (e.button !== 0) return;
-      e.stopPropagation();
-      onFocus(win.id);
-
-      const startClient = { x: e.clientX, y: e.clientY };
-      const startWin = { x: win.x, y: win.y, width: win.width, height: win.height };
-      const capturedZoom = zoom;
-
-      const handleMove = (ev: MouseEvent) => {
-        const dx = (ev.clientX - startClient.x) / capturedZoom;
-        const dy = (ev.clientY - startClient.y) / capturedZoom;
-
-        let { x, y, width, height } = startWin;
-
-        if (dir.includes("e")) width = Math.max(MIN_WIDTH, width + dx);
-        if (dir.includes("s")) height = Math.max(MIN_HEIGHT, height + dy);
-        if (dir.includes("w")) {
-          const newWidth = Math.max(MIN_WIDTH, width - dx);
-          x = x + (width - newWidth);
-          width = newWidth;
-        }
-        if (dir.includes("n")) {
-          const newHeight = Math.max(MIN_HEIGHT, height - dy);
-          y = y + (height - newHeight);
-          height = newHeight;
-        }
-
-        onResize(win.id, x, y, width, height);
-      };
-
-      const handleUp = () => {
-        window.removeEventListener("mousemove", handleMove);
-        window.removeEventListener("mouseup", handleUp);
-      };
-
-      window.addEventListener("mousemove", handleMove);
-      window.addEventListener("mouseup", handleUp);
-    },
-    [win.id, win.x, win.y, win.width, win.height, zoom, onFocus, onResize],
-  );
 
   const backendSettings = loadBackendSettings();
 
@@ -350,10 +172,9 @@ export function Window({
         }}
       >
         <div
-          onMouseDown={handleTitleMouseDown}
           onContextMenu={handleTitleContextMenu}
           className={[
-            "h-8 min-h-8 flex items-center justify-between pr-1 pl-3 cursor-move select-none",
+            "drag-handle h-8 min-h-8 flex items-center justify-between pr-1 pl-3 cursor-move select-none",
             "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
             isFocused ? "bg-surface-active" : "bg-surface-panel",
           ].join(" ")}
@@ -437,16 +258,7 @@ export function Window({
           </div>
         )}
 
-        {RESIZE_HANDLES.map(({ dir, style }) => (
-          <div
-            key={dir}
-            onMouseDown={handleResizeMouseDown(dir)}
-            className="absolute z-20"
-            style={style}
-          >
-            {isFocused && <div className={handleVisibleClass(dir)} />}
-          </div>
-        ))}
+        <NodeResizer isVisible={isFocused} minWidth={120} minHeight={60} lineClassName="!border-accent" handleClassName="!bg-accent" />
       </div>
     </>
   );

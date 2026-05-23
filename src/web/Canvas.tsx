@@ -14,8 +14,6 @@ import { CreateWindowFab } from "./CreateWindowFab";
 interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
-  onMove: (id: string, x: number, y: number) => void;
-  onResize: (id: string, x: number, y: number, width: number, height: number) => void;
   onUrlChange: (id: string, url: string) => void;
   onRename: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
@@ -38,8 +36,6 @@ function WindowNode({ data }: NodeProps) {
       isFocused={isFocused}
       onFocus={callbacks.onFocus}
       onClose={callbacks.onClose}
-      onMove={callbacks.onMove}
-      onResize={callbacks.onResize}
       onUrlChange={callbacks.onUrlChange}
       onRename={callbacks.onRename}
       onDuplicate={callbacks.onDuplicate}
@@ -120,28 +116,6 @@ export function Canvas({
       onFocusWindow(copy.id);
     },
     [onCanvasChange, onFocusWindow],
-  );
-
-  const handleWindowMove = useCallback(
-    (id: string, x: number, y: number) => {
-      const prev = stateRef.current;
-      onCanvasChange({
-        ...prev,
-        windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y } : w)),
-      });
-    },
-    [onCanvasChange],
-  );
-
-  const handleWindowResize = useCallback(
-    (id: string, x: number, y: number, width: number, height: number) => {
-      const prev = stateRef.current;
-      onCanvasChange({
-        ...prev,
-        windows: prev.windows.map((w) => (w.id === id ? { ...w, x, y, width, height } : w)),
-      });
-    },
-    [onCanvasChange],
   );
 
   const handleNodesChange = useCallback(
@@ -236,8 +210,6 @@ export function Canvas({
     () => ({
       onFocus: onFocusWindow,
       onClose: handleWindowClose,
-      onMove: handleWindowMove,
-      onResize: handleWindowResize,
       onUrlChange,
       onRename: handleWindowRename,
       onDuplicate: handleWindowDuplicate,
@@ -245,8 +217,6 @@ export function Canvas({
     [
       onFocusWindow,
       handleWindowClose,
-      handleWindowMove,
-      handleWindowResize,
       onUrlChange,
       handleWindowRename,
       handleWindowDuplicate,
