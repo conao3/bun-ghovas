@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
@@ -111,7 +111,7 @@ export function Window({
   }, [win.id, renameValue, onRename]);
 
   const flowZoom = useFlowZoom();
-  const backendSettings = loadBackendSettings();
+  const backendSettings = useMemo(() => loadBackendSettings(), []);
 
   return (
     <>
