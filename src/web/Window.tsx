@@ -14,7 +14,7 @@ import { useFlowZoom } from "./lib/useFlowZoom";
 
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
-interface WindowCallbacks {
+export interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
   onUrlChange: (id: string, url: string) => void;
