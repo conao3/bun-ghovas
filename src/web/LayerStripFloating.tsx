@@ -108,7 +108,17 @@ export function LayerStripFloating({
       </Button>
       <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
         <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
-          {(canvas) => <Tab id={canvas.id}>{canvas.name ?? canvas.id}</Tab>}
+          {(canvas) => (
+            <Tab id={canvas.id}>
+              {canvas.statusHint && (
+                <span
+                  className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${canvas.statusHint === "ok" ? "bg-success" : canvas.statusHint === "warn" ? "bg-warning" : "bg-error"}`}
+                  aria-hidden
+                />
+              )}
+              {canvas.name ?? canvas.id}
+            </Tab>
+          )}
         </TabList>
         {layer.canvases.map((c) => (
           <TabPanel key={c.id} id={c.id} style={{ padding: 0, height: 0, overflow: "hidden" }} />

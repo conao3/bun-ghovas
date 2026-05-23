@@ -6,6 +6,7 @@ import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
 import { TextField } from "./components/TextField";
 import { LayerStripFloating } from "./LayerStripFloating";
+import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 import type {
   WorkspaceState,
   LayerLevel,
@@ -24,6 +25,12 @@ interface LayerBarProps {
   onDuplicateCanvas: (level: LayerLevel, canvasId: string) => void;
   onDeleteCanvas: (level: LayerLevel, canvasId: string) => void;
   onNewCanvas: (level: LayerLevel) => void;
+}
+
+function dotColorClass(hint: "ok" | "warn" | "err"): string {
+  if (hint === "ok") return "bg-success";
+  if (hint === "warn") return "bg-warning";
+  return "bg-error";
 }
 
 function useTabContextMenu(
@@ -115,6 +122,8 @@ function HorizontalStrip({
   onNewCanvas: () => void;
 }) {
   const ctx = useTabContextMenu(layer.canvases, onRenameCanvas, onDuplicateCanvas, onDeleteCanvas, onNewCanvas);
+  const shortcutDef = SHORTCUTS.find((s) => s.id === `cycle-l${level}-canvas`);
+  const metaHint = shortcutDef ? formatShortcut(shortcutDef) : null;
 
   return (
     <>
@@ -155,6 +164,9 @@ function HorizontalStrip({
       <div
         className={["flex items-center", isLast ? "" : "border-b border-dark-hairline"].join(" ")}
       >
+        {level === 3 && (
+          <span className="font-serif text-on-dark-strong text-[12px] mr-3 pl-1 select-none">ghovas</span>
+        )}
         <span className="text-on-dark-muted text-[11px] font-mono px-1 min-w-6 select-none">
           L{level}
         </span>
@@ -177,7 +189,6 @@ function HorizontalStrip({
         <Tabs
           selectedKey={activeId}
           onSelectionChange={(key) => onSelectionChange(key as string)}
-          className="flex-1"
         >
           <TabList items={layer.canvases}>
             {(canvas) => (
@@ -185,6 +196,12 @@ function HorizontalStrip({
                 id={canvas.id}
                 onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
               >
+                {canvas.statusHint && (
+                  <span
+                    className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${dotColorClass(canvas.statusHint)}`}
+                    aria-hidden
+                  />
+                )}
                 {canvas.name ?? canvas.id}
               </Tab>
             )}
@@ -193,6 +210,20 @@ function HorizontalStrip({
             <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
           ))}
         </Tabs>
+        <Button
+          variant="ghost"
+          aria-label="new canvas"
+          onPress={onNewCanvas}
+          style={{ padding: "2px 8px", minWidth: "unset" }}
+        >
+          <Plus size={12} aria-hidden />
+        </Button>
+        <span className="flex-1" />
+        {metaHint && (
+          <span className="text-on-dark-muted text-[10px] font-mono px-2 select-none">
+            {metaHint}
+          </span>
+        )}
       </div>
     </>
   );

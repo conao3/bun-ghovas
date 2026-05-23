@@ -28,6 +28,7 @@ export interface WorkspaceNode {
 export interface CanvasStateV2 {
   id: string;
   name?: string;
+  statusHint?: "ok" | "warn" | "err";
   viewport: { x: number; y: number; zoom: number };
   nodes: WorkspaceNode[];
 }
