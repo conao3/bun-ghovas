@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
+import { X } from "lucide-react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
 import { TextField } from "./components/TextField";
@@ -354,16 +355,15 @@ export function Window({
             <Button
               variant="ghost"
               onPress={() => onClose(win.id)}
+              aria-label="close window"
               style={{
                 padding: "0 4px",
-                fontSize: 16,
-                lineHeight: 1,
                 color: "var(--color-text-muted)",
                 minWidth: 24,
                 height: 24,
               }}
             >
-              ×
+              <X size={14} aria-hidden />
             </Button>
           </div>
         </div>

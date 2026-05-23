@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Plus } from "lucide-react";
 import { DialogTrigger, Popover, Dialog } from "react-aria-components";
 import { Button } from "./components/Button";
 import { UrlComboBox } from "./components/UrlComboBox";
@@ -37,14 +38,14 @@ export function CreateWindowFab({
         <Button
           data-tutorial="create-window"
           variant="primary"
+          aria-label="create window"
           className="absolute bottom-[152px] right-4 w-9 h-9 leading-none z-10"
           style={{
             borderRadius: "50%",
             padding: 0,
-            fontSize: 20,
           }}
         >
-          +
+          <Plus size={20} aria-hidden />
         </Button>
         <Popover
           placement="top end"

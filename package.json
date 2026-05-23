@@ -26,6 +26,7 @@
   "dependencies": {
     "clsx": "^2.1.1",
     "ghostty-web": "^0.4.0",
+    "lucide-react": "^1.16.0",
     "node-pty": "^1",
     "react": "^19.2.6",
     "react-aria-components": "^1.17.0",

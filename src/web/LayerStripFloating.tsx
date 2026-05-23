@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from "react";
+import { Eye } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import type { LayerLevel, LayerState } from "../shared/types";
@@ -99,9 +100,10 @@ export function LayerStripFloating({
       <Button
         variant="ghost"
         onPress={onVisibilityChange}
-        style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset", flexShrink: 0 }}
+        aria-label="hide layer"
+        style={{ padding: "2px 4px", minWidth: "unset", flexShrink: 0 }}
       >
-        👁
+        <Eye size={14} aria-hidden />
       </Button>
       <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
         <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
