@@ -3,7 +3,6 @@ import { init, Terminal as GhosttyTerminal, FitAddon } from "ghostty-web";
 import { connectPtySession, type PtyHandle } from "../lib/ptyClient";
 import { useToast } from "../lib/toast";
 import { Button } from "./Button";
-import { isGlobalShortcut } from "../lib/shortcuts";
 
 const wasmReady: Promise<void> = init();
 
@@ -99,7 +98,6 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: Terminal
       onPointerDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
       onKeyDown={(e) => {
-        if (isGlobalShortcut(e.nativeEvent)) return;
         e.stopPropagation();
       }}
     >

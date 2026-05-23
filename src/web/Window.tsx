@@ -14,7 +14,6 @@ import { recordVisit } from "./lib/iframeUrlHistory";
 import { loadBackendSettings } from "./lib/backendSettings";
 import { useFlowZoom } from "./lib/useFlowZoom";
 import { normalizeUrl } from "./lib/normalizeUrl";
-import { isGlobalShortcut } from "./lib/shortcuts";
 
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
@@ -371,7 +370,6 @@ export function Window({
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}
             onKeyDown={(e) => {
-              if (isGlobalShortcut(e.nativeEvent)) return;
               e.stopPropagation();
             }}
           >

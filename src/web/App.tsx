@@ -203,6 +203,7 @@ export function App() {
     const handler = (e: KeyboardEvent) => {
       for (const def of SHORTCUTS) {
         if (!matchesShortcut(e, getShortcutBinding(def.id))) continue;
+        e.stopPropagation();
         if (def.id === "toggle-command-palette") {
           e.preventDefault();
           setPaletteOpen((open) => !open);
@@ -247,8 +248,8 @@ export function App() {
         break;
       }
     };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
+    window.addEventListener("keydown", handler, { capture: true });
+    return () => window.removeEventListener("keydown", handler, { capture: true });
   }, [workspace, activeIds, focusedWindowId, cycleCanvas]);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
