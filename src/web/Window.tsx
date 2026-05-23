@@ -299,6 +299,19 @@ export function Window({
                 {(iframeState === "failed" || iframeState === "likely-blocked") && (
                   <div className="absolute bottom-0 left-0 right-0 bg-surface/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
                     <span>This page may not allow embedding.</span>
+                    <button
+                      type="button"
+                      aria-label="retry"
+                      className="inline-flex items-center gap-1 text-accent hover:text-text-primary bg-transparent border-0 p-0 cursor-pointer"
+                      onClick={() => {
+                        setIframeState("loading");
+                        if (iframeRef.current) {
+                          iframeRef.current.src = iframeRef.current.src;
+                        }
+                      }}
+                    >
+                      <RotateCw size={12} aria-hidden /> Retry
+                    </button>
                     <a
                       href={win.url}
                       target="_blank"
