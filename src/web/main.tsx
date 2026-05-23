@@ -7,6 +7,9 @@ import { applyTheme, getStoredTheme } from "./lib/theme";
 
 applyTheme(getStoredTheme());
 
+const devEvents = new EventSource("/dev-events");
+devEvents.onmessage = () => location.reload();
+
 const container = document.getElementById("app");
 if (!container) throw new Error("#app element not found");
 

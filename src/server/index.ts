@@ -36,6 +36,8 @@ if (initialBuild === null) process.exit(1);
 let mainJs = initialBuild.js;
 let mainCss = initialBuild.css;
 
+const sseClients = new Set<WritableStreamDefaultWriter<Uint8Array>>();
+
 let rebuildTimer: ReturnType<typeof setTimeout> | null = null;
 
 function scheduleRebuild() {
@@ -50,6 +52,12 @@ function scheduleRebuild() {
     mainJs = result.js;
     mainCss = result.css;
     console.log("bundle rebuilt");
+    const msg = new TextEncoder().encode("data: rebuild\n\n");
+    for (const writer of sseClients) {
+      writer.write(msg).catch(() => {
+        sseClients.delete(writer);
+      });
+    }
   }, 100);
 }
 
@@ -68,6 +76,22 @@ const server = Bun.serve({
   port: PORT,
   async fetch(req, server) {
     const url = new URL(req.url);
+    if (url.pathname === "/dev-events") {
+      const { readable, writable } = new TransformStream<Uint8Array, Uint8Array>();
+      const writer = writable.getWriter();
+      sseClients.add(writer);
+      req.signal.addEventListener("abort", () => {
+        sseClients.delete(writer);
+        writer.close().catch(() => {});
+      });
+      return new Response(readable, {
+        headers: {
+          "content-type": "text/event-stream",
+          "cache-control": "no-cache",
+          connection: "keep-alive",
+        },
+      });
+    }
     if (url.pathname === "/health") {
       return Response.json({ status: "ok", version, uptimeMs: Date.now() - startedAt });
     }
