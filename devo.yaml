@@ -1,5 +1,5 @@
-session: bun-ghovas
+session: bun-ghovas${SLUG:+-$SLUG}
 
 tasks:
   - id: server
-    cmd: bun install && portless ghovas bun run dev
+    cmd: bun install && portless ${SLUG:+$SLUG.}ghovas bun run dev
