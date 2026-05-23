@@ -4,20 +4,26 @@ import { DialogTrigger, Popover, Dialog } from "react-aria-components";
 import { Button } from "./components/Button";
 import { UrlComboBox } from "./components/UrlComboBox";
 import { Modal } from "./components/Modal";
+import { SessionPicker } from "./SessionPicker";
 import { recordVisit } from "./lib/iframeUrlHistory";
 import { normalizeUrl } from "./lib/normalizeUrl";
 
 interface CreateWindowFabProps {
   onCreateIframeWindow: (url: string) => void;
-  onCreateTerminalWindow: () => void;
+  onCreateTerminalWindow: (sessionId?: string) => void;
+  windowTitles?: Map<string, string>;
 }
 
 export function CreateWindowFab({
   onCreateIframeWindow,
   onCreateTerminalWindow,
+  windowTitles = new Map(),
 }: CreateWindowFabProps) {
   const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [url, setUrl] = useState("");
+  const [sessionPickerOpen, setSessionPickerOpen] = useState(false);
+  const [newSessionFormOpen, setNewSessionFormOpen] = useState(false);
+  void newSessionFormOpen;
 
   const handleOk = () => {
     const normalized = normalizeUrl(url);
@@ -64,7 +70,7 @@ export function CreateWindowFab({
                   }}
                   onPress={() => {
                     close();
-                    onCreateTerminalWindow();
+                    setSessionPickerOpen(true);
                   }}
                 >
                   Terminal
@@ -108,6 +114,13 @@ export function CreateWindowFab({
           </div>
         </form>
       </Modal>
+      <SessionPicker
+        isOpen={sessionPickerOpen}
+        onClose={() => setSessionPickerOpen(false)}
+        onAttach={(id) => onCreateTerminalWindow(id)}
+        onCreateNew={() => setNewSessionFormOpen(true)}
+        windowTitles={windowTitles}
+      />
     </>
   );
 }

@@ -180,35 +180,48 @@ export function Canvas({
     [onAddWindow, onFocusWindow],
   );
 
-  const handleCreateTerminalWindow = useCallback(() => {
-    const containerW = containerRef.current?.clientWidth ?? 800;
-    const containerH = containerRef.current?.clientHeight ?? 600;
-    const width = 560;
-    const height = 360;
-    const { viewport } = stateRef.current;
-    const x = (containerW / 2 - viewport.x) / viewport.zoom - width / 2;
-    const y = (containerH / 2 - viewport.y) / viewport.zoom - height / 2;
-    const id = crypto.randomUUID();
-    const node: WorkspaceNode = {
-      id,
-      type: "window",
-      position: { x, y },
-      width,
-      height,
-      data: {
+  const handleCreateTerminalWindow = useCallback(
+    (sessionId?: string) => {
+      const containerW = containerRef.current?.clientWidth ?? 800;
+      const containerH = containerRef.current?.clientHeight ?? 600;
+      const width = 560;
+      const height = 360;
+      const { viewport } = stateRef.current;
+      const x = (containerW / 2 - viewport.x) / viewport.zoom - width / 2;
+      const y = (containerH / 2 - viewport.y) / viewport.zoom - height / 2;
+      const id = crypto.randomUUID();
+      const node: WorkspaceNode = {
         id,
-        kind: "terminal",
-        sessionId: crypto.randomUUID(),
-        title: "Terminal",
-        x,
-        y,
+        type: "window",
+        position: { x, y },
         width,
         height,
-      },
-    };
-    onAddWindow(node);
-    onFocusWindow(id);
-  }, [onAddWindow, onFocusWindow]);
+        data: {
+          id,
+          kind: "terminal",
+          sessionId: sessionId ?? crypto.randomUUID().slice(0, 8),
+          title: "Terminal",
+          x,
+          y,
+          width,
+          height,
+        },
+      };
+      onAddWindow(node);
+      onFocusWindow(id);
+    },
+    [onAddWindow, onFocusWindow],
+  );
+
+  const windowTitles = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const node of canvasState.nodes) {
+      if (node.data.kind === "terminal" && node.data.sessionId != null) {
+        map.set(node.data.sessionId, node.data.title);
+      }
+    }
+    return map;
+  }, [canvasState.nodes]);
 
   const callbacks = useMemo(
     () => ({
@@ -287,6 +300,7 @@ export function Canvas({
       <CreateWindowFab
         onCreateIframeWindow={handleCreateIframeWindow}
         onCreateTerminalWindow={handleCreateTerminalWindow}
+        windowTitles={windowTitles}
       />
     </div>
   );
