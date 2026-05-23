@@ -24,6 +24,12 @@ const KIND_ICONS: Record<ToastKind, LucideIcon> = {
   error: XCircle,
 };
 
+const KIND_ROLE: Record<ToastKind, "status" | "alert"> = {
+  success: "status",
+  warning: "alert",
+  error: "alert",
+};
+
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -43,12 +49,19 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <div className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none">
+      <div
+        role="region"
+        aria-label="Notifications"
+        aria-live="polite"
+        aria-atomic="false"
+        className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none"
+      >
         {toasts.map((toast) => {
           const Icon = KIND_ICONS[toast.kind];
           return (
             <div
               key={toast.id}
+              role={KIND_ROLE[toast.kind]}
               onClick={() => dismiss(toast.id)}
               className={clsx(
                 "w-[280px] text-white py-2 px-3 rounded shadow-[0_2px_8px_var(--tw-shadow-color)] shadow-black/40 text-[12px] cursor-pointer pointer-events-auto",
@@ -57,7 +70,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             >
               <span className="inline-flex items-start gap-2">
                 <Icon size={14} className="shrink-0 mt-0.5" aria-hidden />
-                <span>{toast.message}</span>
+                <span>
+                  <span className="sr-only">{toast.kind}: </span>
+                  {toast.message}
+                </span>
               </span>
             </div>
           );
