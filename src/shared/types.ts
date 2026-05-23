@@ -1,3 +1,9 @@
+export interface SessionMeta {
+  id: string;
+  alive: boolean;
+  createdAt: number;
+}
+
 type WindowKind = "terminal" | "iframe";
 
 export interface WindowState {

@@ -2,6 +2,7 @@ import { createRequire } from "module";
 import path from "path";
 import fs from "fs";
 import { type RingBuffer, createRingBuffer } from "./ringBuffer.js";
+import type { SessionMeta } from "../shared/types.js";
 
 const req = createRequire(import.meta.url);
 
@@ -64,6 +65,7 @@ interface Session {
   ws: WsSend;
   alive: boolean;
   scrollback: RingBuffer;
+  createdAt: number;
 }
 
 function buildEnv(extra: Partial<Record<string, string>> = {}): string[] {
@@ -154,6 +156,7 @@ export function createPtyManager() {
         ws,
         alive: true,
         scrollback: createRingBuffer(scrollbackBytes),
+        createdAt: Date.now(),
       };
       sessions.set(sessionId, session);
 
@@ -227,5 +230,13 @@ export function createPtyManager() {
     }
   }
 
-  return { handleMessage, cleanup };
+  function listSessions(): SessionMeta[] {
+    return Array.from(sessions.entries()).map(([id, s]) => ({
+      id,
+      alive: s.alive,
+      createdAt: s.createdAt,
+    }));
+  }
+
+  return { handleMessage, cleanup, listSessions };
 }

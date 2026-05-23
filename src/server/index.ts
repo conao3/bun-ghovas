@@ -127,6 +127,9 @@ const server = Bun.serve({
     if (url.pathname === "/health") {
       return Response.json({ status: "ok", version, uptimeMs: Date.now() - startedAt });
     }
+    if (url.pathname === "/sessions" && req.method === "GET") {
+      return Response.json({ sessions: ptyManager.listSessions() });
+    }
     if (url.pathname === "/ws") {
       if (server.upgrade(req)) return undefined;
       return new Response("upgrade failed", { status: 400 });
