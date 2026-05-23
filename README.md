@@ -55,6 +55,18 @@ src/
         └── workspaceMigration.ts      # Client-side workspace format migration
 ```
 
+## Native (electrobun) — experimental
+
+macOS only. Wraps the web app in an Electrobun native window.
+
+```sh
+bun run dist:native:run
+```
+
+`dist:native:run` builds and launches the native window. `dist:native` produces distributable artifacts in `dist-native/` without opening the window.
+
+> Note: electrobun targets macOS. The native window does not run on Linux or Windows (PoC scope).
+
 ## Development
 
 Requires Nix flake + direnv (`nix develop` activates the devShell with Bun and node-pty build dependencies).

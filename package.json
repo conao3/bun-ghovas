@@ -7,6 +7,8 @@
   "private": true,
   "scripts": {
     "dev": "bun run src/server/index.ts",
+    "dist:native": "bunx electrobun build",
+    "dist:native:run": "bunx electrobun dev",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
@@ -15,7 +17,9 @@
     "@types/bun": "latest",
     "@types/react": "^19.2.15",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.184.1",
     "bun-plugin-tailwind": "^0.1.2",
+    "electrobun": "^1.18.1",
     "knip": "^6.14.2",
     "oxfmt": "^0.51.0",
     "oxlint": "^1.66.0",
