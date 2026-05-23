@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { TerminalSessionCtx } from "./SessionPicker";
 import clsx from "clsx";
 import { ArrowLeft, ArrowRight, Copy, Loader2, Minimize2, Pencil, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
@@ -156,6 +157,9 @@ export function Window({
 
   const flowZoom = useFlowZoom();
   const backendSettings = useMemo(() => loadBackendSettings(), []);
+  const terminalCtx = useContext(TerminalSessionCtx);
+  const sessionOpts =
+    win.sessionId != null ? terminalCtx?.sessionOptsMap.get(win.sessionId) : undefined;
 
   return (
     <>
@@ -378,10 +382,10 @@ export function Window({
               {win.sessionId ? (
                 <Terminal
                   sessionId={win.sessionId}
-                  shell={backendSettings.shell || undefined}
-                  cwd={backendSettings.cwd || undefined}
+                  shell={sessionOpts?.shell ?? (backendSettings.shell || undefined)}
+                  cwd={sessionOpts?.cwd ?? (backendSettings.cwd || undefined)}
                   scrollbackMiB={backendSettings.scrollbackMiB}
-                  env={undefined}
+                  env={sessionOpts?.env}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
