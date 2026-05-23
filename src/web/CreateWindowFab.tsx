@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { DialogTrigger, Popover, Dialog } from "react-aria-components";
 import { Button } from "./components/Button";
-import { TextField } from "./components/TextField";
+import { UrlComboBox } from "./components/UrlComboBox";
 import { Modal } from "./components/Modal";
+import { recordVisit } from "./lib/iframeUrlHistory";
 
 interface CreateWindowFabProps {
   onCreateIframeWindow: (url: string) => void;
@@ -19,6 +20,7 @@ export function CreateWindowFab({
   const handleOk = () => {
     const trimmed = url.trim();
     if (!trimmed) return;
+    recordVisit(trimmed);
     onCreateIframeWindow(trimmed);
     setUrlModalOpen(false);
     setUrl("");
@@ -93,7 +95,7 @@ export function CreateWindowFab({
           }}
           className="flex flex-col gap-4"
         >
-          <TextField label="URL" value={url} onChange={setUrl} autoFocus />
+          <UrlComboBox label="URL" value={url} onChange={setUrl} autoFocus />
           <div className="flex gap-2 justify-end">
             <Button type="button" variant="secondary" onPress={handleCancel}>
               Cancel
