@@ -10,6 +10,7 @@ import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
 import { loadBackendSettings } from "./lib/backendSettings";
+import { useFlowZoom } from "./lib/useFlowZoom";
 
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
@@ -120,6 +121,7 @@ export function Window({
     }
   }, [win.id, renameValue, onRename]);
 
+  const flowZoom = useFlowZoom();
   const backendSettings = loadBackendSettings();
 
   return (
@@ -213,27 +215,37 @@ export function Window({
                 inputStyle={{ width: "100%" }}
               />
             </form>
-            <div className="flex-1 relative">
-              <iframe
-                src={win.url ?? "about:blank"}
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                onLoad={handleIframeLoad}
-                onError={handleIframeError}
-                className="absolute inset-0 border-0 w-full h-full"
-              />
-              {(iframeState === "failed" || iframeState === "likely-blocked") && (
-                <div className="absolute bottom-0 left-0 right-0 bg-surface/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
-                  <span>This page may not allow embedding.</span>
-                  <a
-                    href={win.url}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-accent no-underline"
-                  >
-                    Open in new tab
-                  </a>
-                </div>
-              )}
+            <div className="flex-1 overflow-hidden relative">
+              <div
+                style={{
+                  transform: `scale(${1 / flowZoom})`,
+                  transformOrigin: "top left",
+                  width: `${100 * flowZoom}%`,
+                  height: `${100 * flowZoom}%`,
+                  position: "relative",
+                }}
+              >
+                <iframe
+                  src={win.url ?? "about:blank"}
+                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                  onLoad={handleIframeLoad}
+                  onError={handleIframeError}
+                  className="absolute inset-0 border-0 w-full h-full"
+                />
+                {(iframeState === "failed" || iframeState === "likely-blocked") && (
+                  <div className="absolute bottom-0 left-0 right-0 bg-surface/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
+                    <span>This page may not allow embedding.</span>
+                    <a
+                      href={win.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-accent no-underline"
+                    >
+                      Open in new tab
+                    </a>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         ) : (
@@ -243,18 +255,27 @@ export function Window({
             onWheel={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
           >
-            {win.sessionId ? (
-              <Terminal
-                sessionId={win.sessionId}
-                shell={backendSettings.shell || undefined}
-                cwd={backendSettings.cwd || undefined}
-                scrollbackMiB={backendSettings.scrollbackMiB}
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
-                no session bound
-              </div>
-            )}
+            <div
+              style={{
+                transform: `scale(${1 / flowZoom})`,
+                transformOrigin: "top left",
+                width: `${100 * flowZoom}%`,
+                height: `${100 * flowZoom}%`,
+              }}
+            >
+              {win.sessionId ? (
+                <Terminal
+                  sessionId={win.sessionId}
+                  shell={backendSettings.shell || undefined}
+                  cwd={backendSettings.cwd || undefined}
+                  scrollbackMiB={backendSettings.scrollbackMiB}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
+                  no session bound
+                </div>
+              )}
+            </div>
           </div>
         )}
 
