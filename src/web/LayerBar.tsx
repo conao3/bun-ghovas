@@ -133,6 +133,15 @@ function HorizontalStrip({
   const shortcutDef = SHORTCUTS.find((s) => s.id === `cycle-l${level}-canvas`);
   const metaHint = shortcutDef ? formatShortcut(shortcutDef) : null;
 
+  const rowCls = clsx(
+    "flex items-center px-4 gap-0.5",
+    level === 3 && "h-9 bg-surface-dark",
+    level === 2 && "h-8 bg-surface-dark-soft",
+    level === 1 && "h-8 bg-dark-canvas",
+    !isLast && level === 1 && "border-b border-dark-hairline",
+    !isLast && level !== 1 && "border-b border-dark-hairline-soft",
+  );
+
   return (
     <>
       <div
@@ -189,38 +198,42 @@ function HorizontalStrip({
           </div>
         </div>
       </Modal>
-      <div className={clsx("flex items-center", !isLast && "border-b border-dark-hairline")}>
+      <div className={rowCls}>
         {level === 3 && (
-          <span className="font-serif text-on-dark-strong text-[12px] mr-3 pl-1 select-none">
+          <span className="font-serif text-on-dark-strong text-[12px] mr-2 select-none shrink-0">
             ghovas
           </span>
         )}
-        <span className="text-on-dark-muted text-[11px] font-mono px-1 min-w-6 select-none">
+        <span className="text-on-dark-muted text-[10px] font-mono tracking-[0.08em] uppercase mr-3 select-none shrink-0">
           L{level}
         </span>
         <Button
           variant="ghost"
           onPress={onUiModeChange}
           aria-label="cycle UI mode"
-          style={{ padding: "2px 4px", minWidth: "unset" }}
+          style={{ padding: "2px 4px", minWidth: "unset", flexShrink: 0 }}
         >
-          <ArrowLeftRight size={14} aria-hidden />
+          <ArrowLeftRight size={12} aria-hidden />
         </Button>
         <Button
           variant="ghost"
           onPress={onVisibilityChange}
           aria-label="hide layer"
-          style={{ padding: "2px 4px", minWidth: "unset" }}
+          style={{ padding: "2px 4px", minWidth: "unset", flexShrink: 0 }}
         >
-          <Eye size={14} aria-hidden />
+          <Eye size={12} aria-hidden />
         </Button>
         <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
-          <TabList items={layer.canvases}>
+          <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
             {(canvas) => (
-              <Tab id={canvas.id} onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}>
+              <Tab
+                id={canvas.id}
+                variant={level === 3 ? "layer-l3" : "layer"}
+                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+              >
                 {canvas.statusHint && (
                   <span
-                    className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${dotColorClass(canvas.statusHint)}`}
+                    className={`inline-block w-1.5 h-1.5 rounded-full ${dotColorClass(canvas.statusHint)}`}
                     aria-hidden
                   />
                 )}
@@ -232,17 +245,16 @@ function HorizontalStrip({
             <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
           ))}
         </Tabs>
-        <Button
-          variant="ghost"
+        <button
           aria-label="new canvas"
-          onPress={onNewCanvas}
-          style={{ padding: "2px 8px", minWidth: "unset" }}
+          onClick={onNewCanvas}
+          className="w-6 h-6 inline-flex items-center justify-center rounded-[6px] text-[14px] text-on-dark-muted hover:bg-white/[0.04] hover:text-on-dark cursor-pointer bg-transparent border-0 shrink-0"
         >
-          <Plus size={12} aria-hidden />
-        </Button>
+          +
+        </button>
         <span className="flex-1" />
         {metaHint && (
-          <span className="text-on-dark-muted text-[10px] font-mono px-2 select-none">
+          <span className="text-on-dark-muted text-[11px] font-mono px-2 select-none shrink-0">
             {metaHint}
           </span>
         )}
@@ -338,38 +350,54 @@ function VerticalColumn({
           </div>
         </div>
       </Modal>
-      <div className="flex flex-col border-r border-dark-hairline py-1">
-        <div className="flex flex-col items-center gap-0.5 px-0.5 pb-1">
-          <span className="text-on-dark-muted text-[11px] font-mono select-none">L{level}</span>
-          <Button
-            variant="ghost"
-            onPress={onUiModeChange}
-            style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset" }}
-          >
-            ⇄
-          </Button>
-          <Button
-            variant="ghost"
-            onPress={onVisibilityChange}
-            aria-label="hide layer"
-            style={{ padding: "2px 4px", minWidth: "unset" }}
-          >
-            <Eye size={14} aria-hidden />
-          </Button>
+      <div className="w-[196px] flex flex-col border-r border-dark-hairline py-4 px-2 gap-0.5 bg-surface-dark">
+        <div className="flex items-center justify-between px-2 pb-3 mb-2 border-b border-dark-hairline-soft">
+          <span className="text-on-dark-muted text-[10px] font-mono tracking-[0.08em] uppercase select-none">
+            L{level}
+          </span>
+          <div className="flex gap-1">
+            <Button
+              variant="ghost"
+              onPress={onUiModeChange}
+              aria-label="cycle UI mode"
+              style={{ padding: "2px 4px", minWidth: "unset" }}
+            >
+              <ArrowLeftRight size={12} aria-hidden />
+            </Button>
+            <Button
+              variant="ghost"
+              onPress={onVisibilityChange}
+              aria-label="hide layer"
+              style={{ padding: "2px 4px", minWidth: "unset" }}
+            >
+              <Eye size={12} aria-hidden />
+            </Button>
+          </div>
         </div>
         <Tabs
           selectedKey={activeId}
           onSelectionChange={(key) => onSelectionChange(key as string)}
           orientation="vertical"
         >
-          <TabList items={layer.canvases} orientation="vertical">
+          <TabList
+            items={layer.canvases}
+            orientation="vertical"
+            style={{ borderRight: "none", gap: "2px" }}
+          >
             {(canvas) => (
               <Tab
                 id={canvas.id}
-                orientation="vertical"
+                variant="layer-vertical"
                 onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
               >
-                {canvas.name ?? canvas.id}
+                <span
+                  className="w-[3px] h-[14px] rounded-[2px] shrink-0 bg-transparent group-data-[selected]:bg-primary"
+                  aria-hidden
+                />
+                <span className="w-[18px] h-[18px] rounded-[4px] bg-surface-dark-elevated inline-flex items-center justify-center font-mono text-[10px] text-on-dark-soft shrink-0">
+                  {(canvas.name ?? canvas.id)[0]?.toUpperCase()}
+                </span>
+                <span className="truncate">{canvas.name ?? canvas.id}</span>
               </Tab>
             )}
           </TabList>
@@ -377,6 +405,19 @@ function VerticalColumn({
             <TabPanel key={c.id} id={c.id} style={{ padding: 0 }} />
           ))}
         </Tabs>
+        <div className="mt-auto pt-3 border-t border-dark-hairline-soft">
+          <button
+            aria-label="new canvas"
+            onClick={onNewCanvas}
+            className="flex items-center gap-[10px] px-[10px] py-2 rounded-[6px] w-full text-[13px] text-on-dark-soft hover:bg-white/[0.04] hover:text-on-dark cursor-pointer bg-transparent border-0"
+          >
+            <span className="w-[3px] h-[14px] rounded-[2px] shrink-0 bg-transparent" aria-hidden />
+            <span className="w-[18px] h-[18px] rounded-[4px] bg-surface-dark-elevated inline-flex items-center justify-center font-mono text-[10px] text-on-dark-soft shrink-0">
+              +
+            </span>
+            <span>New canvas</span>
+          </button>
+        </div>
       </div>
     </>
   );
@@ -495,6 +536,7 @@ export function LayerBar({
           onSelectionChange={(id) => onActiveChange(level, id)}
           onUiModeChange={() => cycleMode(level)}
           onVisibilityChange={() => onVisibilityChange(level, false)}
+          onNewCanvas={() => onNewCanvas(level)}
         />
       ))}
     </>
