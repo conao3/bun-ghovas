@@ -3,9 +3,6 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import { App } from "./App";
 import { ToastProvider } from "./lib/toast";
-import { applyTheme, getStoredTheme } from "./lib/theme";
-
-applyTheme(getStoredTheme());
 
 const devEvents = new EventSource("/dev-events");
 devEvents.onmessage = () => location.reload();
