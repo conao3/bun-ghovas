@@ -8,6 +8,7 @@ import type {
   L3Canvas,
   LayerConfig,
 } from "../../shared/types";
+import { computeLayers } from "./layerTree";
 
 type LegacyWindow = {
   id: string;
@@ -61,7 +62,9 @@ export function migrateWorkspace(raw: unknown): WorkspaceState {
   const obj = raw as Record<string, unknown>;
 
   if ("l0" in obj && "l1" in obj && "l2" in obj && "l3" in obj && "layerConfig" in obj) {
-    return obj as unknown as WorkspaceState;
+    const ws = obj as unknown as WorkspaceState;
+    if ("layers" in obj) return ws;
+    return { ...ws, layers: computeLayers(ws) };
   }
 
   const layers = obj.layers as Record<
@@ -88,5 +91,6 @@ export function migrateWorkspace(raw: unknown): WorkspaceState {
     3: { uiMode: (layers[3]?.uiMode ?? "horizontal-tabs") as LayerUiMode, visible: layers[3]?.visible ?? true } satisfies LayerConfig,
   };
 
-  return { l3, l2, l1, l0, layerConfig };
+  const ws = { l3, l2, l1, l0, layerConfig };
+  return { ...ws, layers: computeLayers(ws) };
 }

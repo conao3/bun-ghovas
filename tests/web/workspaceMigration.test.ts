@@ -1,5 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { migrateWorkspace } from "../../src/web/lib/workspaceMigration";
+import { computeLayers } from "../../src/web/lib/layerTree";
 
 const emptyLegacyLayer = (id: string) => ({
   canvases: [{ id, windows: [], panX: 0, panY: 0, zoom: 1 }],
@@ -107,7 +108,7 @@ describe("migrateWorkspace", () => {
   });
 
   it("is idempotent for new format", () => {
-    const newFormat = {
+    const base = {
       l3: [{ id: "default-l3", name: "L3" }],
       l2: [{ id: "default-l2", name: "L2", parentL3: "default-l3" }],
       l1: [{ id: "default-l1", name: "L1", parentL2: "default-l2" }],
@@ -126,6 +127,7 @@ describe("migrateWorkspace", () => {
         3: { uiMode: "horizontal-tabs", visible: true },
       },
     };
+    const newFormat = { ...base, layers: computeLayers(base) };
 
     const result = migrateWorkspace(newFormat);
     expect(result).toEqual(newFormat);
