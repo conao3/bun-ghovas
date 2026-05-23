@@ -1,6 +1,8 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
 import clsx from "clsx";
+import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
 export type ToastKind = "success" | "warning" | "error";
 
@@ -14,6 +16,12 @@ const KIND_BG_CLASSES: Record<ToastKind, string> = {
   success: "bg-status-success",
   warning: "bg-status-warning",
   error: "bg-status-error",
+};
+
+const KIND_ICONS: Record<ToastKind, LucideIcon> = {
+  success: CheckCircle,
+  warning: AlertTriangle,
+  error: XCircle,
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -36,18 +44,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     <ToastContext.Provider value={{ show }}>
       {children}
       <div className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none">
-        {toasts.map((toast) => (
-          <div
-            key={toast.id}
-            onClick={() => dismiss(toast.id)}
-            className={clsx(
-              "w-[280px] text-white py-2 px-3 rounded shadow-[0_2px_8px_var(--tw-shadow-color)] shadow-black/40 text-[12px] cursor-pointer pointer-events-auto",
-              KIND_BG_CLASSES[toast.kind],
-            )}
-          >
-            {toast.message}
-          </div>
-        ))}
+        {toasts.map((toast) => {
+          const Icon = KIND_ICONS[toast.kind];
+          return (
+            <div
+              key={toast.id}
+              onClick={() => dismiss(toast.id)}
+              className={clsx(
+                "w-[280px] text-white py-2 px-3 rounded shadow-[0_2px_8px_var(--tw-shadow-color)] shadow-black/40 text-[12px] cursor-pointer pointer-events-auto",
+                KIND_BG_CLASSES[toast.kind],
+              )}
+            >
+              <span className="inline-flex items-start gap-2">
+                <Icon size={14} className="shrink-0 mt-0.5" aria-hidden />
+                <span>{toast.message}</span>
+              </span>
+            </div>
+          );
+        })}
       </div>
     </ToastContext.Provider>
   );
