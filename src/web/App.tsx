@@ -198,6 +198,15 @@ export function App() {
             },
           }));
           setFocusedWindowId(null);
+        } else if (def.id === "cycle-next-window" || def.id === "cycle-prev-window") {
+          const canvas = workspace.layers[0].canvases.find((c) => c.id === activeIds[0]);
+          if (!canvas || canvas.windows.length === 0) break;
+          const windows = canvas.windows;
+          const currentIdx = windows.findIndex((w) => w.id === focusedWindowId);
+          const delta = def.id === "cycle-next-window" ? 1 : -1;
+          const nextIdx = currentIdx === -1 ? 0 : (currentIdx + delta + windows.length) % windows.length;
+          e.preventDefault();
+          setFocusedWindowId(windows[nextIdx]!.id);
         }
         break;
       }
