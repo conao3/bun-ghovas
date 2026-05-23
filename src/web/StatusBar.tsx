@@ -6,9 +6,10 @@ interface StatusBarProps {
   zoom: number;
   focusedWindowTitle: string | null;
   onCycleLayer: (level: LayerLevel) => void;
+  onResetZoom: () => void;
 }
 
-export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer }: StatusBarProps) {
+export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer, onResetZoom }: StatusBarProps) {
   const zoomPct = Math.round(zoom * 100);
   const paletteDef = SHORTCUTS.find((s) => s.id === "toggle-command-palette");
   const settingsDef = SHORTCUTS.find((s) => s.id === "open-settings");
@@ -32,7 +33,13 @@ export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer }:
       </span>
       <span>{focusedWindowTitle ?? "—"}</span>
       <span className="flex gap-3 whitespace-nowrap">
-        <span>zoom {zoomPct}%</span>
+        <button
+          aria-label="reset zoom"
+          className="text-text-muted hover:text-text-primary cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
+          onClick={onResetZoom}
+        >
+          zoom {zoomPct}%
+        </button>
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
       </span>

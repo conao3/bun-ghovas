@@ -391,6 +391,10 @@ export function App() {
     workspace.layers[0].canvases.find((c) => c.id === activeIds[0]) ??
     workspace.layers[0].canvases[0]!;
 
+  const resetViewport = useCallback(() => {
+    handleCanvasChange({ ...activeCanvas, viewport: { x: 0, y: 0, zoom: 1 } });
+  }, [activeCanvas, handleCanvasChange]);
+
   const focusedWindowTitle =
     focusedWindowId != null
       ? (activeCanvas.nodes.find((n) => n.id === focusedWindowId)?.data.title ?? null)
@@ -563,6 +567,7 @@ export function App() {
         zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
         focusedWindowTitle={focusedWindowTitle}
         onCycleLayer={cycleCanvas}
+        onResetZoom={resetViewport}
       />
       <CommandPalette
         isOpen={paletteOpen}
