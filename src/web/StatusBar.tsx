@@ -46,7 +46,7 @@ export function StatusBar({
   ];
 
   return (
-    <div
+    <footer
       className="[grid-area:bottom] h-[22px] flex items-center justify-between px-2
         bg-surface-dark border-t border-dark-hairline text-on-dark-soft text-[11px] font-mono select-none"
     >
@@ -104,6 +104,6 @@ export function StatusBar({
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
       </span>
-    </div>
+    </footer>
   );
 }
