@@ -1,5 +1,5 @@
 import { useState, useRef, useCallback } from "react";
-import { ArrowLeftRight, Eye } from "lucide-react";
+import { ArrowLeftRight, Copy, Eye, Pencil, Trash2 } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import { ContextMenu, MenuItem } from "./components/Menu";
@@ -121,9 +121,9 @@ function HorizontalStrip({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
-        <MenuItem id="rename">Rename</MenuItem>
-        <MenuItem id="duplicate">Duplicate</MenuItem>
-        <MenuItem id="delete">Delete</MenuItem>
+        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
+        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
+        <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div className="flex flex-col gap-3">
@@ -227,9 +227,9 @@ function VerticalColumn({
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
       >
-        <MenuItem id="rename">Rename</MenuItem>
-        <MenuItem id="duplicate">Duplicate</MenuItem>
-        <MenuItem id="delete">Delete</MenuItem>
+        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
+        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
+        <MenuItem id="delete"><span className="inline-flex items-center gap-2"><Trash2 size={12} aria-hidden /> Delete</span></MenuItem>
       </ContextMenu>
       <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)}>
         <div className="flex flex-col gap-3">

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Loader2, RotateCw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, Loader2, Pencil, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
@@ -165,9 +165,9 @@ export function Window({
         triggerRef={menuAnchorRef}
         onAction={handleMenuAction}
       >
-        <MenuItem id="rename">Rename</MenuItem>
-        <MenuItem id="duplicate">Duplicate</MenuItem>
-        <MenuItem id="close">Close</MenuItem>
+        <MenuItem id="rename"><span className="inline-flex items-center gap-2"><Pencil size={12} aria-hidden /> Rename</span></MenuItem>
+        <MenuItem id="duplicate"><span className="inline-flex items-center gap-2"><Copy size={12} aria-hidden /> Duplicate</span></MenuItem>
+        <MenuItem id="close"><span className="inline-flex items-center gap-2"><X size={12} aria-hidden /> Close</span></MenuItem>
       </ContextMenu>
       <Modal isOpen={renameOpen} onClose={() => setRenameOpen(false)}>
         <div className="flex flex-col gap-3">
