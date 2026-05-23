@@ -312,8 +312,21 @@ export function Canvas({
         <Controls />
         {setZoomRef && <ZoomController setZoomRef={setZoomRef} containerRef={containerRef} />}
         <MiniMap
-          nodeColor={() => "var(--color-primary)"}
-          maskColor="var(--color-surface-dark-elevated)"
+          style={{
+            width: 156,
+            height: 96,
+            bottom: 36,
+            right: 16,
+          }}
+          nodeColor={(node) =>
+            node.id === focusedWindowId ? "var(--color-primary)" : "var(--color-on-dark-soft)"
+          }
+          nodeStrokeWidth={0}
+          nodeBorderRadius={1}
+          maskColor="color-mix(in srgb, var(--color-surface-dark) 70%, transparent)"
+          maskStrokeColor="var(--color-primary)"
+          maskStrokeWidth={1.5}
+          className="!bg-surface-dark/85 backdrop-blur-md border border-dark-hairline rounded-md"
         />
         {canvasState.nodes.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-on-dark-muted font-mono text-[13px] pointer-events-none z-[5]">
