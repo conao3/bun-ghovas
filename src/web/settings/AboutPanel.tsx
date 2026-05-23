@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { ExternalLink } from "lucide-react";
 
 export function AboutPanel() {
   const [version, setVersion] = useState<string>("…");
@@ -20,9 +21,9 @@ export function AboutPanel() {
             href="https://github.com/conao3/bun-ghovas"
             target="_blank"
             rel="noreferrer"
-            className="text-white/50"
+            className="text-white/50 inline-flex items-center gap-1"
           >
-            GitHub
+            GitHub <ExternalLink size={11} aria-hidden />
           </a>
         </li>
         <li>
@@ -30,9 +31,9 @@ export function AboutPanel() {
             href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md"
             target="_blank"
             rel="noreferrer"
-            className="text-white/50"
+            className="text-white/50 inline-flex items-center gap-1"
           >
-            Concept
+            Concept <ExternalLink size={11} aria-hidden />
           </a>
         </li>
         <li>
@@ -40,9 +41,9 @@ export function AboutPanel() {
             href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas-design.md"
             target="_blank"
             rel="noreferrer"
-            className="text-white/50"
+            className="text-white/50 inline-flex items-center gap-1"
           >
-            Design
+            Design <ExternalLink size={11} aria-hidden />
           </a>
         </li>
       </ul>
