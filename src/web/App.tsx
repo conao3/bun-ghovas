@@ -385,6 +385,7 @@ export function App() {
     {
       id: "reset-workspace",
       label: "Reset workspace to default",
+      category: "Workspace",
       confirm: "This resets all layers and windows to the default workspace. Continue?",
       run: () => {
         setWorkspace(INITIAL_WORKSPACE);
@@ -394,11 +395,13 @@ export function App() {
     {
       id: "open-settings",
       label: "Open Settings",
+      category: "Settings",
       run: () => setSettingsOpen(true),
     },
     {
       id: "new-iframe-window",
       label: "New iframe window",
+      category: "Window",
       run: () =>
         handleAddWindow({
           id: crypto.randomUUID(),
@@ -414,11 +417,13 @@ export function App() {
     {
       id: "show-tutorial",
       label: "Show tutorial",
+      category: "Settings",
       run: () => setTutorialOpen(true),
     },
     {
       id: "new-terminal-window",
       label: "New terminal window",
+      category: "Window",
       run: () =>
         handleAddWindow({
           id: crypto.randomUUID(),
@@ -435,6 +440,7 @@ export function App() {
       workspace.layers[level as LayerLevel].canvases.map((canvas) => ({
         id: `switch-l${level}-${canvas.id}`,
         label: `Switch L${level} → ${canvas.id}`,
+        category: "Layer",
         run: () => handleActiveChange(level as LayerLevel, canvas.id),
       })),
     ),
@@ -444,6 +450,7 @@ export function App() {
           .map((canvas) => ({
             id: `move-window-to-${canvas.id}`,
             label: `Move window to ${canvas.name ?? canvas.id}`,
+            category: "Window",
             run: () => {
               const wid = focusedWindow.id;
               const srcId = activeCanvas.id;

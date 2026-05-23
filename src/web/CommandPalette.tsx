@@ -7,6 +7,7 @@ import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 
 const LS_KEY = "ghovas.recentCommands";
 const MAX_RECENT = 8;
+const CATEGORY_ORDER = ["Window", "Layer", "Workspace", "Settings"];
 
 function loadRecentCommands(): string[] {
   try {
@@ -33,6 +34,7 @@ function saveRecentCommands(recentIds: string[], id: string): string[] {
 export interface Command {
   id: string;
   label: string;
+  category: string;
   confirm?: string;
   run: () => void;
 }
@@ -41,6 +43,46 @@ interface CommandPaletteProps {
   isOpen: boolean;
   onClose: () => void;
   commands: Command[];
+}
+
+type DisplayRow =
+  | { type: "header"; label: string }
+  | { type: "item"; cmd: Command; itemIndex: number };
+
+function buildCategoryRows(commands: Command[], recentIds: string[]): DisplayRow[] {
+  const rows: DisplayRow[] = [];
+  let itemIndex = 0;
+
+  const recentItems = recentIds.flatMap((id) => {
+    const cmd = commands.find((c) => c.id === id);
+    return cmd ? [cmd] : [];
+  });
+
+  if (recentItems.length > 0) {
+    rows.push({ type: "header", label: "Recent" });
+    for (const cmd of recentItems) {
+      rows.push({ type: "item", cmd, itemIndex: itemIndex++ });
+    }
+  }
+
+  const recentSet = new Set(recentIds);
+  const nonRecent = commands.filter((c) => !recentSet.has(c.id));
+  const presentCategories = [...new Set(nonRecent.map((c) => c.category))];
+  const orderedCategories = [
+    ...CATEGORY_ORDER.filter((cat) => presentCategories.includes(cat)),
+    ...presentCategories.filter((cat) => !CATEGORY_ORDER.includes(cat)),
+  ];
+
+  for (const category of orderedCategories) {
+    const catCmds = nonRecent.filter((c) => c.category === category);
+    if (catCmds.length === 0) continue;
+    rows.push({ type: "header", label: category });
+    for (const cmd of catCmds) {
+      rows.push({ type: "item", cmd, itemIndex: itemIndex++ });
+    }
+  }
+
+  return rows;
 }
 
 export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProps) {
@@ -58,16 +100,15 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
     }
   }, [isOpen]);
 
-  const filtered =
-    query === ""
-      ? [
-          ...recentIds.flatMap((id) => {
-            const cmd = commands.find((c) => c.id === id);
-            return cmd ? [cmd] : [];
-          }),
-          ...commands.filter((c) => !recentIds.includes(c.id)),
-        ]
-      : commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()));
+  const isSearching = query !== "";
+  const searchResults = isSearching
+    ? commands.filter((c) => c.label.toLowerCase().includes(query.toLowerCase()))
+    : [];
+  const categoryRows = isSearching ? [] : buildCategoryRows(commands, recentIds);
+  const categoryItems = categoryRows.filter(
+    (r): r is { type: "item"; cmd: Command; itemIndex: number } => r.type === "item",
+  );
+  const itemCount = isSearching ? searchResults.length : categoryItems.length;
 
   const runCommand = (cmd: Command) => {
     if (cmd.confirm) {
@@ -98,16 +139,14 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightIndex((i) => Math.min(i + 1, filtered.length - 1));
+      setHighlightIndex((i) => Math.min(i + 1, itemCount - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setHighlightIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const cmd = filtered[highlightIndex];
-      if (cmd) {
-        runCommand(cmd);
-      }
+      const cmd = isSearching ? searchResults[highlightIndex] : categoryItems[highlightIndex]?.cmd;
+      if (cmd) runCommand(cmd);
     }
   };
 
@@ -144,31 +183,69 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             className="w-[440px]"
           />
           <div className="mt-2 max-h-[320px] overflow-y-auto">
-            {filtered.map((cmd, i) => (
-              <div
-                key={cmd.id}
-                onClick={() => runCommand(cmd)}
-                onMouseEnter={() => setHighlightIndex(i)}
-                className={clsx(
-                  "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
-                  i === highlightIndex ? "bg-white/12" : "bg-transparent",
+            {isSearching ? (
+              <>
+                {searchResults.map((cmd, i) => (
+                  <div
+                    key={cmd.id}
+                    onClick={() => runCommand(cmd)}
+                    onMouseEnter={() => setHighlightIndex(i)}
+                    className={clsx(
+                      "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
+                      i === highlightIndex ? "bg-white/12" : "bg-transparent",
+                    )}
+                  >
+                    <span>{cmd.label}</span>
+                    {(() => {
+                      const def = SHORTCUTS.find((s) => s.id === cmd.id);
+                      return def ? (
+                        <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                      ) : null;
+                    })()}
+                  </div>
+                ))}
+                {searchResults.length === 0 && (
+                  <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
+                    No commands found
+                  </div>
                 )}
-              >
-                <span>{cmd.label}</span>
-                {(() => {
-                  const def = SHORTCUTS.find((s) => s.id === cmd.id);
-                  return def ? (
-                    <span className="text-white/40 ml-4">
-                      {formatShortcut(def)}
-                    </span>
-                  ) : null;
-                })()}
-              </div>
-            ))}
-            {filtered.length === 0 && (
-              <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
-                No commands found
-              </div>
+              </>
+            ) : (
+              <>
+                {categoryRows.map((row) =>
+                  row.type === "header" ? (
+                    <div
+                      key={`header-${row.label}`}
+                      className="text-text-faint text-[11px] font-mono px-3 pt-1 pb-0.5"
+                    >
+                      {row.label}
+                    </div>
+                  ) : (
+                    <div
+                      key={row.cmd.id}
+                      onClick={() => runCommand(row.cmd)}
+                      onMouseEnter={() => setHighlightIndex(row.itemIndex)}
+                      className={clsx(
+                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
+                        row.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
+                      )}
+                    >
+                      <span>{row.cmd.label}</span>
+                      {(() => {
+                        const def = SHORTCUTS.find((s) => s.id === row.cmd.id);
+                        return def ? (
+                          <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                        ) : null;
+                      })()}
+                    </div>
+                  ),
+                )}
+                {categoryItems.length === 0 && (
+                  <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
+                    No commands found
+                  </div>
+                )}
+              </>
             )}
           </div>
         </div>
