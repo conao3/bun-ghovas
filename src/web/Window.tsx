@@ -8,6 +8,7 @@ import { Terminal } from "./components/Terminal";
 import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
+import { loadBackendSettings } from "./lib/backendSettings";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
@@ -286,6 +287,8 @@ export function Window({
     [win.id, win.x, win.y, win.width, win.height, zoom, onFocus, onResize],
   );
 
+  const backendSettings = loadBackendSettings();
+
   return (
     <>
       <div
@@ -410,7 +413,12 @@ export function Window({
             onKeyDown={(e) => e.stopPropagation()}
           >
             {win.sessionId ? (
-              <Terminal sessionId={win.sessionId} />
+              <Terminal
+                sessionId={win.sessionId}
+                shell={backendSettings.shell || undefined}
+                cwd={backendSettings.cwd || undefined}
+                scrollbackMiB={backendSettings.scrollbackMiB}
+              />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
                 no session bound
