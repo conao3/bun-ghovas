@@ -56,28 +56,65 @@ export function Settings({
 }: SettingsProps) {
   const [selected, setSelected] = useState<NavEntry>("General");
 
+  const handleArrowNav = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    const currentIndex = NAV_ENTRIES.indexOf(selected);
+    let nextIndex = currentIndex;
+    if (e.key === "ArrowDown") {
+      nextIndex = (currentIndex + 1) % NAV_ENTRIES.length;
+    } else if (e.key === "ArrowUp") {
+      nextIndex = (currentIndex - 1 + NAV_ENTRIES.length) % NAV_ENTRIES.length;
+    } else if (e.key === "Home") {
+      nextIndex = 0;
+    } else if (e.key === "End") {
+      nextIndex = NAV_ENTRIES.length - 1;
+    } else {
+      return;
+    }
+    e.preventDefault();
+    const next = NAV_ENTRIES[nextIndex];
+    setSelected(next);
+    document.getElementById(`settings-tab-${next.toLowerCase()}`)?.focus();
+  };
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Settings">
       <div className="bg-canvas rounded-md -m-5 p-5 flex gap-0 min-w-[560px] min-h-[360px]">
-        <nav className="w-[140px] bg-surface-soft border-r border-hairline pr-3 mr-3">
+        <div
+          role="tablist"
+          aria-label="設定カテゴリ"
+          aria-orientation="vertical"
+          className="w-[140px] bg-surface-soft border-r border-hairline pr-3 mr-3"
+        >
           {NAV_ENTRIES.map((entry) => {
             const Icon = NAV_ICONS[entry];
             return (
-              <div
+              <button
                 key={entry}
+                role="tab"
+                id={`settings-tab-${entry.toLowerCase()}`}
+                aria-selected={selected === entry}
+                aria-controls={`settings-panel-${entry.toLowerCase()}`}
+                tabIndex={selected === entry ? 0 : -1}
                 onClick={() => setSelected(entry)}
+                onKeyDown={handleArrowNav}
                 className={clsx(
-                  "flex items-center gap-2 px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px]",
+                  "flex items-center gap-2 px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px] w-full text-left",
                   selected === entry ? "text-ink bg-surface-card" : "text-muted bg-transparent",
                 )}
               >
                 <Icon size={14} aria-hidden />
                 {entry}
-              </div>
+              </button>
             );
           })}
-        </nav>
-        <div className="flex-1">
+        </div>
+        <div
+          role="tabpanel"
+          id={`settings-panel-${selected.toLowerCase()}`}
+          aria-labelledby={`settings-tab-${selected.toLowerCase()}`}
+          tabIndex={0}
+          className="flex-1 outline-none"
+        >
           {selected === "General" && <GeneralPanel />}
           {selected === "Layers" && (
             <LayersPanel
