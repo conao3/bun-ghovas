@@ -1,8 +1,23 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeftRight, Eye, GripVertical } from "lucide-react";
+import {
+  DndContext,
+  closestCenter,
+  useSensor,
+  useSensors,
+  PointerSensor,
+  useDndContext,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  horizontalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
-import type { LayerLevel, LayerState } from "../shared/types";
+import type { CanvasStateV2, LayerLevel, LayerState } from "../shared/types";
 
 interface LayerStripFloatingProps {
   level: LayerLevel;
@@ -13,6 +28,44 @@ interface LayerStripFloatingProps {
   onUiModeChange: () => void;
   onVisibilityChange: () => void;
   onNewCanvas: () => void;
+  onReorderCanvas: (activeId: string, overId: string) => void;
+}
+
+function SortableFloatingTabItem({
+  canvas,
+  level,
+}: {
+  canvas: CanvasStateV2;
+  level: LayerLevel;
+}) {
+  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: canvas.id,
+  });
+  const { active, over } = useDndContext();
+  const isOver = !isDragging && active !== null && over?.id === canvas.id;
+  const style: React.CSSProperties = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
+  };
+  return (
+    <Tab
+      id={canvas.id}
+      variant={level === 3 ? "layer-l3" : "layer"}
+      ref={setNodeRef}
+      style={style}
+      className={isOver ? "border-l-2 border-primary" : undefined}
+      {...listeners}
+    >
+      {canvas.statusHint && (
+        <span
+          className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${canvas.statusHint === "ok" ? "bg-success" : canvas.statusHint === "warn" ? "bg-warning" : "bg-error"}`}
+          aria-hidden
+        />
+      )}
+      {canvas.name ?? canvas.id}
+    </Tab>
+  );
 }
 
 export function LayerStripFloating({
@@ -24,6 +77,7 @@ export function LayerStripFloating({
   onUiModeChange,
   onVisibilityChange,
   onNewCanvas,
+  onReorderCanvas,
 }: LayerStripFloatingProps) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; elemX: number; elemY: number } | null>(
@@ -70,6 +124,18 @@ export function LayerStripFloating({
     }
   };
 
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const ids = layer.canvases.map((c) => c.id);
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        onReorderCanvas(active.id as string, over.id as string);
+      }
+    },
+    [onReorderCanvas],
+  );
+
   const initialBottom = 24 + floatingIndex * 56;
 
   return (
@@ -108,24 +174,31 @@ export function LayerStripFloating({
       >
         <Eye size={14} aria-hidden />
       </Button>
-      <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
-        <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
-          {(canvas) => (
-            <Tab id={canvas.id} variant={level === 3 ? "layer-l3" : "layer"}>
-              {canvas.statusHint && (
-                <span
-                  className={`inline-block w-1.5 h-1.5 rounded-full mr-1.5 ${canvas.statusHint === "ok" ? "bg-success" : canvas.statusHint === "warn" ? "bg-warning" : "bg-error"}`}
-                  aria-hidden
-                />
-              )}
-              {canvas.name ?? canvas.id}
-            </Tab>
-          )}
-        </TabList>
-        {layer.canvases.map((c) => (
-          <TabPanel key={c.id} id={c.id} style={{ padding: 0, height: 0, overflow: "hidden" }} />
-        ))}
-      </Tabs>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
+          <Tabs
+            selectedKey={activeId}
+            onSelectionChange={(key) => onSelectionChange(key as string)}
+          >
+            <TabList style={{ borderBottom: "none" }}>
+              {layer.canvases.map((canvas) => (
+                <SortableFloatingTabItem key={canvas.id} canvas={canvas} level={level} />
+              ))}
+            </TabList>
+            {layer.canvases.map((c) => (
+              <TabPanel
+                key={c.id}
+                id={c.id}
+                style={{ padding: 0, height: 0, overflow: "hidden" }}
+              />
+            ))}
+          </Tabs>
+        </SortableContext>
+      </DndContext>
       <button
         aria-label="new canvas"
         onClick={onNewCanvas}
