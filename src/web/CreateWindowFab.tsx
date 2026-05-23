@@ -37,7 +37,7 @@ export function CreateWindowFab({
         <Button
           data-tutorial="create-window"
           variant="primary"
-          className="absolute bottom-14 right-4 w-9 h-9 leading-none z-10"
+          className="absolute bottom-[152px] right-4 w-9 h-9 leading-none z-10"
           style={{
             borderRadius: "50%",
             padding: 0,
