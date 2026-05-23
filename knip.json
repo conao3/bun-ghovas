@@ -16,5 +16,8 @@
     "node-pty",
     "oxlint",
     "oxfmt"
+  ],
+  "ignore": [
+    "src/web/Minimap.tsx"
   ]
 }
