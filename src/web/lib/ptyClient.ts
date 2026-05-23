@@ -13,13 +13,14 @@ export interface ConnectPtySessionOpts {
   shell?: string;
   cwd?: string;
   scrollbackMiB?: number;
+  env?: Record<string, string>;
   onOutput: (data: string) => void;
   onExit: (code: number | null, signal?: string) => void;
   onError: (message: string) => void;
 }
 
 export function connectPtySession(opts: ConnectPtySessionOpts): PtyHandle {
-  const { sessionId, cols, rows, shell, cwd, scrollbackMiB, onOutput, onExit, onError } = opts;
+  const { sessionId, cols, rows, shell, cwd, scrollbackMiB, env, onOutput, onExit, onError } = opts;
 
   const proto = location.protocol === "https:" ? "wss:" : "ws:";
   const ws = new WebSocket(`${proto}//${location.host}/ws`);
@@ -39,6 +40,7 @@ export function connectPtySession(opts: ConnectPtySessionOpts): PtyHandle {
       ...(shell ? { shell } : {}),
       ...(cwd ? { cwd } : {}),
       ...(scrollbackMiB !== undefined ? { scrollbackMiB } : {}),
+      ...(env && Object.keys(env).length > 0 ? { env } : {}),
     });
   });
 
