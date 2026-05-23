@@ -381,6 +381,7 @@ export function Window({
                   shell={backendSettings.shell || undefined}
                   cwd={backendSettings.cwd || undefined}
                   scrollbackMiB={backendSettings.scrollbackMiB}
+                  env={undefined}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">

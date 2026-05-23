@@ -40,6 +40,7 @@ export type ClientMessage =
       shell?: string;
       cwd?: string;
       scrollbackMiB?: number;
+      env?: Record<string, string>;
       cols: number;
       rows: number;
     }
@@ -103,7 +104,7 @@ export function createPtyManager() {
   }
 
   function openSession(ws: WsSend, msg: Extract<ClientMessage, { type: "open" }>) {
-    const { sessionId, shell, cwd, scrollbackMiB, cols, rows } = msg;
+    const { sessionId, shell, cwd, scrollbackMiB, env, cols, rows } = msg;
 
     if (sessions.has(sessionId)) {
       const session = sessions.get(sessionId)!;
@@ -124,7 +125,7 @@ export function createPtyManager() {
       const result = ptyNative.fork(
         shellPath,
         [],
-        buildEnv({ TERM: "xterm-256color" }),
+        buildEnv({ TERM: "xterm-256color", ...(env ?? {}) }),
         cwdPath,
         cols,
         rows,

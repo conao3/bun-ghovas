@@ -11,9 +11,10 @@ interface TerminalProps {
   shell?: string;
   cwd?: string;
   scrollbackMiB?: number;
+  env?: Record<string, string>;
 }
 
-export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps) {
+export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [overlay, setOverlay] = useState<string | null>(null);
   const [reconnectKey, setReconnectKey] = useState(0);
@@ -58,6 +59,7 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps
           shell,
           cwd,
           scrollbackMiB,
+          env,
           onOutput: (data) => term?.write(data),
           onExit: (code, signal) => {
             const msg = signal ? `exited (signal ${signal})` : `exited (code ${code ?? "?"})`;
@@ -85,7 +87,7 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps
       handle?.close();
       term?.dispose();
     };
-  }, [sessionId, shell, cwd, scrollbackMiB, reconnectKey]);
+  }, [sessionId, shell, cwd, scrollbackMiB, env, reconnectKey]);
 
   const showReconnect =
     overlay !== null && !overlay.startsWith("init error:") && overlay !== "Reconnecting...";
