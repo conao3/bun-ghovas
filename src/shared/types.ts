@@ -31,20 +31,41 @@ export interface WorkspaceNode {
   data: WindowState;
 }
 
-export interface CanvasStateV2 {
+export interface L3Canvas {
+  id: string;
+  name?: string;
+}
+
+export interface L2Canvas {
+  id: string;
+  name?: string;
+  parentL3: string;
+}
+
+export interface L1Canvas {
+  id: string;
+  name?: string;
+  parentL2: string;
+}
+
+export interface L0Canvas {
   id: string;
   name?: string;
   statusHint?: "ok" | "warn" | "err";
+  parentL1: string;
   viewport: { x: number; y: number; zoom: number };
   nodes: WorkspaceNode[];
 }
 
-export interface LayerState {
-  canvases: CanvasStateV2[];
+export interface LayerConfig {
   uiMode: LayerUiMode;
   visible: boolean;
 }
 
 export interface WorkspaceState {
-  layers: Record<LayerLevel, LayerState>;
+  l3: L3Canvas[];
+  l2: L2Canvas[];
+  l1: L1Canvas[];
+  l0: L0Canvas[];
+  layerConfig: Record<LayerLevel, LayerConfig>;
 }

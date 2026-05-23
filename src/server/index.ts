@@ -166,25 +166,23 @@ const server = Bun.serve({
       const ws = body.workspace;
       if (
         !ws ||
-        !ws.layers ||
-        !("0" in ws.layers) ||
-        !("1" in ws.layers) ||
-        !("2" in ws.layers) ||
-        !("3" in ws.layers)
+        !Array.isArray(ws.l3) ||
+        !Array.isArray(ws.l2) ||
+        !Array.isArray(ws.l1) ||
+        !Array.isArray(ws.l0) ||
+        !ws.layerConfig
       ) {
         return Response.json(
-          { error: "workspace.layers must have keys 0, 1, 2, 3" },
+          { error: "workspace must have l3/l2/l1/l0/layerConfig" },
           { status: 400 },
         );
       }
-      for (const layer of Object.values(ws.layers)) {
-        for (const canvas of layer.canvases) {
-          if (canvas != null && typeof canvas === "object" && "windows" in canvas) {
-            return Response.json(
-              { error: "legacy workspace shape; client must migrate" },
-              { status: 400 },
-            );
-          }
+      for (const canvas of ws.l0) {
+        if (canvas != null && typeof canvas === "object" && "windows" in canvas) {
+          return Response.json(
+            { error: "legacy workspace shape; client must migrate" },
+            { status: 400 },
+          );
         }
       }
       await saveWorkspace(ws);
