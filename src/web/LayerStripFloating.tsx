@@ -108,7 +108,7 @@ export function LayerStripFloating({
       </Button>
       <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
         <TabList items={layer.canvases} style={{ borderBottom: "none" }}>
-          {(canvas) => <Tab id={canvas.id}>{canvas.id}</Tab>}
+          {(canvas) => <Tab id={canvas.id}>{canvas.name ?? canvas.id}</Tab>}
         </TabList>
         {layer.canvases.map((c) => (
           <TabPanel key={c.id} id={c.id} style={{ padding: 0, height: 0, overflow: "hidden" }} />
