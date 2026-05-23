@@ -86,9 +86,6 @@ html[data-theme="light"] {
   --color-text-muted-light: #444444;
   --color-text-faint: #aaaaaa;
   --color-white: #ffffff;
-  --color-status-success: #1f8c41;
-  --color-status-warning: #a07010;
-  --color-status-error: #b03030;
   --color-danger: #c0392b;
   --color-danger-light: #e05050;
 }

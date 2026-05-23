@@ -15,7 +15,7 @@ type Orientation = "horizontal" | "vertical";
 
 export function Tabs({ className, orientation = "horizontal", ...props }: RACTabsProps) {
   const base = [
-    "flex font-mono text-[13px] text-text-muted-light",
+    "flex font-mono text-[13px] text-on-dark-strong",
     orientation === "vertical" ? "flex-row" : "flex-col",
   ].join(" ");
   return (
@@ -41,8 +41,8 @@ export function TabList<T extends object>({
   const base = [
     "flex",
     orientation === "vertical"
-      ? "flex-col border-r border-border"
-      : "flex-row border-b border-border",
+      ? "flex-col border-r border-dark-hairline"
+      : "flex-row border-b border-dark-hairline",
   ].join(" ");
   return (
     <RACTabList<T>
@@ -65,12 +65,12 @@ export function Tab({
 }: TabProps & { orientation?: Orientation }) {
   const base = [
     "py-1.5 px-3.5 cursor-pointer bg-transparent outline-none",
-    "text-[13px] font-mono text-text-inactive font-normal",
-    "data-[selected]:text-accent data-[selected]:font-medium",
+    "text-[13px] font-mono text-on-dark-muted font-normal",
+    "data-[selected]:text-primary data-[selected]:font-medium",
     "data-[disabled]:opacity-40",
     orientation === "vertical"
-      ? "border-r-2 border-r-transparent data-[selected]:border-r-accent"
-      : "border-b-2 border-b-transparent data-[selected]:border-b-accent",
+      ? "border-r-2 border-r-transparent data-[selected]:border-r-primary"
+      : "border-b-2 border-b-transparent data-[selected]:border-b-primary",
   ].join(" ");
   return (
     <RACTab
@@ -87,7 +87,7 @@ export function Tab({
 }
 
 export function TabPanel({ className, ...props }: TabPanelProps) {
-  const base = "py-3 outline-none text-text-muted-light";
+  const base = "py-3 outline-none text-on-dark-strong";
   return (
     <RACTabPanel
       {...props}

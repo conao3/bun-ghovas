@@ -72,7 +72,7 @@ export function WorkspacesPanel(props: {
             />
           </div>
           {importError && (
-            <span className="text-danger-light font-mono text-[12px]">{importError}</span>
+            <span className="text-error font-mono text-[12px]">{importError}</span>
           )}
         </div>
         <div>

@@ -73,7 +73,7 @@ export function LayerStripFloating({
   return (
     <div
       ref={capsuleRef}
-      className="fixed z-[200] flex items-center bg-surface border border-white/[0.18] rounded-full"
+      className="fixed z-[200] flex items-center bg-surface-dark border border-white/[0.18] rounded-full"
       style={{
         boxShadow: "0 4px 16px color-mix(in srgb, black 50%, transparent)",
         ...(pos !== null
@@ -83,11 +83,11 @@ export function LayerStripFloating({
     >
       <div
         onMouseDown={handleGripMouseDown}
-        className="cursor-grab py-1.5 pl-2.5 pr-2 text-text-faint select-none shrink-0"
+        className="cursor-grab py-1.5 pl-2.5 pr-2 text-on-dark-muted select-none shrink-0"
       >
         <GripVertical size={14} aria-hidden />
       </div>
-      <span className="text-text-faint text-[11px] font-mono px-0.5 select-none shrink-0">
+      <span className="text-on-dark-muted text-[11px] font-mono px-0.5 select-none shrink-0">
         L{level}
       </span>
       <Button

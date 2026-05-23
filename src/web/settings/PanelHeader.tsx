@@ -7,7 +7,7 @@ interface PanelHeaderProps {
 
 export function PanelHeader({ icon: Icon, title }: PanelHeaderProps) {
   return (
-    <h2 className="text-text-muted-light font-mono mt-0 flex items-center gap-2">
+    <h2 className="text-on-dark-strong font-mono mt-0 flex items-center gap-2">
       <Icon size={16} aria-hidden />
       {title}
     </h2>

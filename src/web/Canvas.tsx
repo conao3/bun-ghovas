@@ -242,7 +242,7 @@ export function Canvas({
     <div
       data-tutorial="canvas"
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden bg-surface-deep"
+      className="absolute inset-0 overflow-hidden bg-dark-canvas"
     >
       <ReactFlow
         nodes={nodes}
@@ -261,15 +261,15 @@ export function Canvas({
       >
         <Background />
         <Controls />
-        <MiniMap nodeColor={() => "var(--color-accent)"} maskColor="var(--color-surface-overlay)" />
+        <MiniMap nodeColor={() => "var(--color-primary)"} maskColor="var(--color-surface-dark-elevated)" />
         {canvasState.nodes.length === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-text-faint font-mono text-[13px] pointer-events-none z-[5]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-on-dark-muted font-mono text-[13px] pointer-events-none z-[5]">
             <Plus size={32} aria-hidden />
-            <div className="font-medium text-text-muted-light">No windows yet</div>
-            <div className="max-w-[280px] text-center text-text-faint text-[12px] leading-relaxed">
-              Click the <span className="text-accent">+</span> button (right bottom) to add a terminal or browser window,
+            <div className="font-medium text-on-dark-strong">No windows yet</div>
+            <div className="max-w-[280px] text-center text-on-dark-muted text-[12px] leading-relaxed">
+              Click the <span className="text-primary">+</span> button (right bottom) to add a terminal or browser window,
               <br />
-              or press <kbd className="bg-surface-overlay border border-border px-1 rounded text-[11px]">Mod+K</kbd> for the command palette.
+              or press <kbd className="bg-surface-dark-elevated border border-dark-hairline px-1 rounded text-[11px]">Mod+K</kbd> for the command palette.
             </div>
           </div>
         )}

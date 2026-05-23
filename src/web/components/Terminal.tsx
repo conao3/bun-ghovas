@@ -99,7 +99,7 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps
     >
       <div ref={containerRef} className="w-full h-full" />
       {overlay && (
-        <div className="absolute bottom-0 left-0 right-0 py-1 px-2 bg-black/75 text-danger-light font-mono text-[12px] flex items-center gap-2">
+        <div className="absolute bottom-0 left-0 right-0 py-1 px-2 bg-black/75 text-error font-mono text-[12px] flex items-center gap-2">
           <span>{overlay}</span>
           {showReconnect && (
             <Button

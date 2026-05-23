@@ -24,10 +24,10 @@ export function Radio({ className, ...props }: RACRadioProps) {
   const base = [
     "py-[2px] px-[10px] rounded",
     "text-[12px] font-mono cursor-pointer outline-none",
-    "border border-border",
-    "text-text-muted bg-transparent",
-    "data-[selected]:bg-surface-active data-[selected]:text-text-muted-light",
-    "data-[hovered]:bg-surface-hover",
+    "border border-dark-hairline",
+    "text-on-dark-soft bg-transparent",
+    "data-[selected]:bg-surface-dark-elevated data-[selected]:text-on-dark-strong",
+    "data-[hovered]:bg-surface-dark-soft",
     "transition-colors duration-100",
   ].join(" ");
   return (

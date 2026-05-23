@@ -30,7 +30,7 @@ export function AboutPanel() {
 
   return (
     <div>
-      <h2 className="text-text-muted-light font-mono mt-0">ghovas</h2>
+      <h2 className="text-on-dark-strong font-mono mt-0">ghovas</h2>
       <p className="text-white/50 font-mono text-[13px]">Version: {version}</p>
       <p className="text-white/50 font-mono text-[13px]">Uptime: {uptime}</p>
       <ul className="text-white/50 font-mono text-[13px] pl-4 m-0">

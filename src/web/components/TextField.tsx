@@ -23,7 +23,7 @@ export function TextField({ label, inputStyle, className, ...props }: TextFieldP
     >
       {label && <RACLabel className="text-white/50 text-[11px]">{label}</RACLabel>}
       <RACInput
-        className="bg-black/40 border border-white/15 rounded-[3px] text-text-muted-light font-mono text-[12px] py-[3px] px-2 outline-none w-full"
+        className="bg-black/40 border border-white/15 rounded-[3px] text-on-dark-strong font-mono text-[12px] py-[3px] px-2 outline-none w-full"
         style={inputStyle}
       />
     </RACTextField>
