@@ -18,15 +18,15 @@ export function KeyboardPanel() {
     <div>
       <PanelHeader icon={Keyboard} title="Keyboard" />
       <div className="flex items-center gap-2 mb-3">
-        <Search size={14} className="text-white/40 shrink-0" />
+        <Search size={14} className="text-muted shrink-0" />
         <TextField label="Search" value={query} onChange={setQuery} />
       </div>
       <table className="w-full border-collapse font-mono text-[13px]">
         <tbody>
           {filtered.map((def) => (
-            <tr key={def.id} className="border-b border-white/10">
-              <td className="text-white/80 py-[6px] px-0">{def.label}</td>
-              <td className="text-on-dark-strong text-right py-[6px] px-0 tracking-[0.05em]">
+            <tr key={def.id} className="border-b border-hairline">
+              <td className="text-body py-[6px] px-0">{def.label}</td>
+              <td className="text-ink text-right py-[6px] px-0 tracking-[0.05em]">
                 {formatShortcut(def)}
               </td>
             </tr>

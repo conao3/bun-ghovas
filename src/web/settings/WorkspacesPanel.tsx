@@ -58,11 +58,11 @@ export function WorkspacesPanel(props: {
       <PanelHeader icon={LayoutGrid} title="Workspaces" />
       <div className="flex flex-col gap-3">
         <div>
-          <Button onPress={handleExport}>Export workspace</Button>
+          <Button onPress={handleExport} className="!bg-surface-card !text-body-strong !border-hairline">Export workspace</Button>
         </div>
         <div className="flex flex-col gap-1">
           <div>
-            <Button onPress={handleImportClick}>Import workspace</Button>
+            <Button onPress={handleImportClick} className="!bg-surface-card !text-body-strong !border-hairline">Import workspace</Button>
             <input
               ref={fileInputRef}
               type="file"
@@ -76,7 +76,7 @@ export function WorkspacesPanel(props: {
           )}
         </div>
         <div>
-          <Button variant="secondary" onPress={handleReset}>
+          <Button variant="secondary" onPress={handleReset} className="!bg-surface-card !text-body-strong !border-hairline">
             Reset to default
           </Button>
         </div>

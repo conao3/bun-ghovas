@@ -18,7 +18,7 @@ export function GeneralPanel() {
     <div>
       <PanelHeader icon={Settings} title="General" />
       <div className="flex items-center gap-4 font-mono text-[13px]">
-        <span className="text-on-dark-soft">Theme</span>
+        <span className="text-muted">Theme</span>
         <RadioGroup value={theme} onChange={handleChange} aria-label="Theme">
           <Radio value="dark">Dark</Radio>
           <Radio value="light">Light</Radio>

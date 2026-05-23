@@ -52,8 +52,8 @@ export function Settings({
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
-      <div className="flex gap-0 min-w-[560px] min-h-[360px]">
-        <nav className="w-[140px] border-r border-white/10 pr-3 mr-3">
+      <div className="bg-canvas rounded-md -m-5 p-5 flex gap-0 min-w-[560px] min-h-[360px]">
+        <nav className="w-[140px] bg-surface-soft border-r border-hairline pr-3 mr-3">
           {NAV_ENTRIES.map((entry) => {
             const Icon = NAV_ICONS[entry];
             return (
@@ -62,7 +62,7 @@ export function Settings({
                 onClick={() => setSelected(entry)}
                 className={clsx(
                   "flex items-center gap-2 px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px]",
-                  selected === entry ? "text-white bg-white/12" : "text-white/50 bg-transparent",
+                  selected === entry ? "text-ink bg-surface-card" : "text-muted bg-transparent",
                 )}
               >
                 <Icon size={14} aria-hidden />
