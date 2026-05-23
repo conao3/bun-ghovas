@@ -62,10 +62,23 @@ export interface LayerConfig {
   visible: boolean;
 }
 
+export interface CanvasStateV2 {
+  id: string;
+  name?: string;
+  statusHint?: "ok" | "warn" | "err";
+}
+
+export interface LayerState {
+  canvases: CanvasStateV2[];
+  uiMode: LayerUiMode;
+  visible: boolean;
+}
+
 export interface WorkspaceState {
   l3: L3Canvas[];
   l2: L2Canvas[];
   l1: L1Canvas[];
   l0: L0Canvas[];
   layerConfig: Record<LayerLevel, LayerConfig>;
+  layers: Record<LayerLevel, LayerState>;
 }

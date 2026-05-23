@@ -2,7 +2,7 @@ import { useRef, useCallback, useMemo } from "react";
 import { Plus } from "lucide-react";
 import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
-import type { CanvasStateV2, WindowState, WorkspaceNode } from "../shared/types";
+import type { L0Canvas, WindowState, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
 import type { WindowCallbacks } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
@@ -31,8 +31,8 @@ function WindowNode({ data }: NodeProps) {
 const nodeTypes = { window: WindowNode };
 
 interface CanvasProps {
-  canvasState: CanvasStateV2;
-  onCanvasChange: (next: CanvasStateV2) => void;
+  canvasState: L0Canvas;
+  onCanvasChange: (next: L0Canvas) => void;
   onUrlChange: (id: string, url: string) => void;
   onAddWindow: (node: WorkspaceNode) => void;
   focusedWindowId: string | null;
