@@ -268,7 +268,10 @@ export function Canvas({
       >
         <Background />
         <Controls />
-        <MiniMap />
+        <MiniMap
+          nodeColor={() => "var(--color-accent)"}
+          maskColor="var(--color-surface-overlay)"
+        />
       </ReactFlow>
       <CreateWindowFab
         onCreateIframeWindow={handleCreateIframeWindow}
