@@ -587,6 +587,7 @@ export function App() {
       </div>
       <StatusBar
         activeIds={activeIds}
+        activeCanvasWindowCount={activeCanvas.nodes.length}
         zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
         focusedWindowTitle={focusedWindowTitle}
         onCycleLayer={cycleCanvas}
