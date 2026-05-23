@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Eye } from "lucide-react";
+import { ArrowLeftRight, Eye, GripVertical } from "lucide-react";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import type { LayerLevel, LayerState } from "../shared/types";
@@ -83,9 +83,9 @@ export function LayerStripFloating({
     >
       <div
         onMouseDown={handleGripMouseDown}
-        className="cursor-grab py-1.5 pl-2.5 pr-2 text-text-faint select-none text-[14px] shrink-0 leading-none"
+        className="cursor-grab py-1.5 pl-2.5 pr-2 text-text-faint select-none shrink-0"
       >
-        ⠿
+        <GripVertical size={14} aria-hidden />
       </div>
       <span className="text-text-faint text-[11px] font-mono px-0.5 select-none shrink-0">
         L{level}
@@ -93,9 +93,10 @@ export function LayerStripFloating({
       <Button
         variant="ghost"
         onPress={onUiModeChange}
-        style={{ padding: "2px 4px", fontSize: 10, minWidth: "unset", flexShrink: 0 }}
+        aria-label="cycle UI mode"
+        style={{ padding: "2px 4px", minWidth: "unset", flexShrink: 0 }}
       >
-        ⊞
+        <ArrowLeftRight size={12} aria-hidden />
       </Button>
       <Button
         variant="ghost"
