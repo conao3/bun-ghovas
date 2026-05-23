@@ -8,7 +8,7 @@ interface WelcomeProps {
 
 export function Welcome({ onDismiss }: WelcomeProps) {
   return (
-    <Modal isOpen={true} onClose={onDismiss}>
+    <Modal isOpen={true} onClose={onDismiss} ariaLabel="Welcome">
       <div className="flex flex-col items-center gap-4 py-3 px-2 text-center font-mono text-ink bg-canvas rounded-md -m-5">
         <LayoutGrid size={56} className="text-primary" aria-hidden />
         <h1 className="m-0 text-[28px] font-bold font-serif tracking-[2px] text-ink">ghovas</h1>
