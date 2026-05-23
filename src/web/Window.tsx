@@ -3,9 +3,11 @@ import type { CSSProperties } from "react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
 import { TextField } from "./components/TextField";
+import { UrlComboBox } from "./components/UrlComboBox";
 import { Terminal } from "./components/Terminal";
 import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
+import { recordVisit } from "./lib/iframeUrlHistory";
 
 const MIN_WIDTH = 160;
 const MIN_HEIGHT = 80;
@@ -168,6 +170,7 @@ export function Window({
   const handleUrlSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
+      recordVisit(urlInput);
       onUrlChange(win.id, urlInput);
     },
     [win.id, urlInput, onUrlChange],
@@ -369,7 +372,7 @@ export function Window({
               onMouseDown={(e) => e.stopPropagation()}
               className="px-2 py-1 shrink-0"
             >
-              <TextField
+              <UrlComboBox
                 value={urlInput}
                 onChange={setUrlInput}
                 aria-label="URL"
