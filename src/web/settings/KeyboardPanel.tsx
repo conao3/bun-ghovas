@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Keyboard, Search } from "lucide-react";
 import { SHORTCUTS, formatShortcut } from "../lib/shortcuts";
 import type { ShortcutDef } from "../lib/shortcuts";
 import { TextField } from "../components/TextField";
+import { PanelHeader } from "./PanelHeader";
 
 function matchesQuery(def: ShortcutDef, query: string): boolean {
   const q = query.toLowerCase();
@@ -15,7 +16,7 @@ export function KeyboardPanel() {
 
   return (
     <div>
-      <h2 className="text-text-muted-light font-mono mt-0">Keyboard</h2>
+      <PanelHeader icon={Keyboard} title="Keyboard" />
       <div className="flex items-center gap-2 mb-3">
         <Search size={14} className="text-white/40 shrink-0" />
         <TextField label="Search" value={query} onChange={setQuery} />

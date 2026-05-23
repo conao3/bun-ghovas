@@ -1,7 +1,9 @@
 import { useState } from "react";
+import { Server } from "lucide-react";
 import { TextField } from "../components/TextField";
 import { loadBackendSettings, saveBackendSettings } from "../lib/backendSettings";
 import type { BackendSettings } from "../lib/backendSettings";
+import { PanelHeader } from "./PanelHeader";
 
 export function BackendPanel() {
   const [settings, setSettings] = useState<BackendSettings>(loadBackendSettings);
@@ -14,7 +16,7 @@ export function BackendPanel() {
 
   return (
     <div>
-      <h2 className="text-text-muted-light font-mono mt-0">Backend</h2>
+      <PanelHeader icon={Server} title="Backend" />
       <div className="flex flex-col gap-3">
         <TextField
           label="Default shell"
