@@ -37,8 +37,8 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps
           fontSize: 13,
           fontFamily: "monospace",
           theme: {
-            background: rootStyle.getPropertyValue("--color-surface").trim(),
-            foreground: rootStyle.getPropertyValue("--color-text-muted-light").trim(),
+            background: rootStyle.getPropertyValue("--color-surface-dark").trim(),
+            foreground: rootStyle.getPropertyValue("--color-on-dark-strong").trim(),
           },
         });
 
