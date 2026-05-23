@@ -1,4 +1,5 @@
 import { useRef, useCallback, useMemo } from "react";
+import { Plus } from "lucide-react";
 import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
 import type { CanvasStateV2, WindowState, WorkspaceNode } from "../shared/types";
@@ -261,6 +262,17 @@ export function Canvas({
         <Background />
         <Controls />
         <MiniMap nodeColor={() => "var(--color-accent)"} maskColor="var(--color-surface-overlay)" />
+        {canvasState.nodes.length === 0 && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-text-faint font-mono text-[13px] pointer-events-none z-[5]">
+            <Plus size={32} aria-hidden />
+            <div className="font-medium text-text-muted-light">No windows yet</div>
+            <div className="max-w-[280px] text-center text-text-faint text-[12px] leading-relaxed">
+              Click the <span className="text-accent">+</span> button (right bottom) to add a terminal or browser window,
+              <br />
+              or press <kbd className="bg-surface-overlay border border-border px-1 rounded text-[11px]">Mod+K</kbd> for the command palette.
+            </div>
+          </div>
+        )}
       </ReactFlow>
       <CreateWindowFab
         onCreateIframeWindow={handleCreateIframeWindow}
