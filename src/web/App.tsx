@@ -162,6 +162,15 @@ export function App() {
         } else if (def.id === "open-settings") {
           e.preventDefault();
           setSettingsOpen(true);
+        } else if (def.id === "cycle-l0-canvas") {
+          const layer = workspace.layers[0];
+          if (!layer.visible) break;
+          const canvases = layer.canvases;
+          const currentIdx = canvases.findIndex((c) => c.id === activeIds[0]);
+          const nextIdx = (currentIdx + 1) % canvases.length;
+          const nextCanvasId = canvases[nextIdx]!.id;
+          e.preventDefault();
+          setActiveIds((prev) => ({ ...prev, 0: nextCanvasId }));
         } else if (def.id === "cycle-l1-canvas" || def.id === "cycle-l2-canvas" || def.id === "cycle-l3-canvas") {
           const level = def.id === "cycle-l1-canvas" ? 1 : def.id === "cycle-l2-canvas" ? 2 : 3;
           const layer = workspace.layers[level as LayerLevel];
@@ -172,13 +181,30 @@ export function App() {
           const nextCanvasId = canvases[nextIdx]!.id;
           e.preventDefault();
           setActiveIds((prev) => ({ ...prev, [level]: nextCanvasId }));
+        } else if (def.id === "close-focused-window") {
+          if (focusedWindowId == null) break;
+          const windowId = focusedWindowId;
+          e.preventDefault();
+          setWorkspace((prev) => ({
+            ...prev,
+            layers: {
+              ...prev.layers,
+              0: {
+                ...prev.layers[0],
+                canvases: prev.layers[0].canvases.map((c) =>
+                  c.id === activeIds[0] ? { ...c, windows: c.windows.filter((w) => w.id !== windowId) } : c,
+                ),
+              },
+            },
+          }));
+          setFocusedWindowId(null);
         }
         break;
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [workspace.layers, activeIds]);
+  }, [workspace.layers, activeIds, focusedWindowId]);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
     setActiveIds((prev) => {
