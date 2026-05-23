@@ -73,3 +73,20 @@ html[data-theme="light"] {
     letter-spacing: 0.02em;
   }
 }
+
+@layer base {
+  [data-theme="dark"] .react-flow {
+    --xy-background-color-default: var(--color-surface-deep);
+    --xy-background-pattern-dots-color-default: var(--color-surface-hover);
+    --xy-background-pattern-lines-color-default: var(--color-surface-hover);
+    --xy-background-pattern-cross-color-default: var(--color-surface-hover);
+    --xy-controls-button-background-color-default: var(--color-surface-panel);
+    --xy-controls-button-background-color-hover-default: var(--color-surface-hover);
+    --xy-controls-button-color-default: var(--color-text-muted-light);
+    --xy-controls-button-color-hover-default: var(--color-text-primary);
+    --xy-controls-button-border-color-default: var(--color-border);
+    --xy-minimap-background-color-default: var(--color-surface-overlay);
+    --xy-node-background-color-default: var(--color-surface-panel);
+    --xy-node-border-default: 1px solid var(--color-border);
+  }
+}
