@@ -174,6 +174,16 @@ const server = Bun.serve({
           { status: 400 },
         );
       }
+      for (const layer of Object.values(ws.layers)) {
+        for (const canvas of layer.canvases) {
+          if (canvas != null && typeof canvas === "object" && "windows" in canvas) {
+            return Response.json(
+              { error: "legacy workspace shape; client must migrate" },
+              { status: 400 },
+            );
+          }
+        }
+      }
       await saveWorkspace(ws);
       return Response.json({ ok: true });
     }

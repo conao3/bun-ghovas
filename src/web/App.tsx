@@ -8,8 +8,8 @@ import type {
   WorkspaceState,
   LayerLevel,
   LayerUiMode,
-  CanvasState,
-  WindowState,
+  CanvasStateV2,
+  WorkspaceNode,
 } from "../shared/types";
 import { useWorkspacePersistence } from "./lib/useWorkspacePersistence";
 import { Settings } from "./Settings";
@@ -39,77 +39,103 @@ export const INITIAL_WORKSPACE: WorkspaceState = {
       canvases: [
         {
           id: "canvas-1",
-          windows: [
+          viewport: { x: 0, y: 0, zoom: 1 },
+          nodes: [
             {
               id: "w1",
-              kind: "terminal",
-              x: 60,
-              y: 40,
+              type: "window",
+              position: { x: 60, y: 40 },
               width: 440,
               height: 300,
-              title: "Terminal 1",
-              sessionId: "seed-w1",
+              data: {
+                id: "w1",
+                kind: "terminal",
+                x: 60,
+                y: 40,
+                width: 440,
+                height: 300,
+                title: "Terminal 1",
+                sessionId: "seed-w1",
+              },
             },
             {
               id: "w2",
-              kind: "terminal",
-              x: 540,
-              y: 40,
+              type: "window",
+              position: { x: 540, y: 40 },
               width: 440,
               height: 300,
-              title: "Terminal 2",
-              sessionId: "seed-w2",
+              data: {
+                id: "w2",
+                kind: "terminal",
+                x: 540,
+                y: 40,
+                width: 440,
+                height: 300,
+                title: "Terminal 2",
+                sessionId: "seed-w2",
+              },
             },
             {
               id: "w3",
-              kind: "terminal",
-              x: 60,
-              y: 380,
+              type: "window",
+              position: { x: 60, y: 380 },
               width: 440,
               height: 320,
-              title: "Terminal 3",
-              sessionId: "seed-w3",
+              data: {
+                id: "w3",
+                kind: "terminal",
+                x: 60,
+                y: 380,
+                width: 440,
+                height: 320,
+                title: "Terminal 3",
+                sessionId: "seed-w3",
+              },
             },
             {
               id: "w4",
-              kind: "iframe",
-              x: 540,
-              y: 380,
+              type: "window",
+              position: { x: 540, y: 380 },
               width: 580,
               height: 320,
-              title: "Browser",
-              url: "https://example.com",
+              data: {
+                id: "w4",
+                kind: "iframe",
+                x: 540,
+                y: 380,
+                width: 580,
+                height: 320,
+                title: "Browser",
+                url: "https://example.com",
+              },
             },
           ],
-          panX: 0,
-          panY: 0,
-          zoom: 1,
         },
-        { id: "canvas-2", windows: [], panX: 0, panY: 0, zoom: 1 },
+        { id: "canvas-2", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
       ],
       uiMode: "horizontal-tabs",
       visible: true,
     },
     1: {
       canvases: [
-        { id: "alpha", windows: [], panX: 0, panY: 0, zoom: 1 },
-        { id: "beta", windows: [], panX: 0, panY: 0, zoom: 1 },
+        { id: "alpha", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
+        { id: "beta", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
       ],
       uiMode: "horizontal-tabs",
       visible: true,
     },
     2: {
       canvases: [
-        { id: "ui", windows: [], panX: 0, panY: 0, zoom: 1 },
-        { id: "api", windows: [], panX: 0, panY: 0, zoom: 1 },
+        { id: "ui", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
+        { id: "api", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
       ],
       uiMode: "horizontal-tabs",
       visible: true,
     },
     3: {
       canvases: [
-        { id: "main", windows: [], panX: 0, panY: 0, zoom: 1 },
-        { id: "docs", windows: [], panX: 0, panY: 0, zoom: 1 },
+        { id: "main", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
+        { id: "docs", viewport: { x: 0, y: 0, zoom: 1 }, nodes: [] },
       ],
       uiMode: "horizontal-tabs",
       visible: true,
@@ -192,7 +218,7 @@ export function App() {
               0: {
                 ...prev.layers[0],
                 canvases: prev.layers[0].canvases.map((c) =>
-                  c.id === activeIds[0] ? { ...c, windows: c.windows.filter((w) => w.id !== windowId) } : c,
+                  c.id === activeIds[0] ? { ...c, nodes: c.nodes.filter((n) => n.id !== windowId) } : c,
                 ),
               },
             },
@@ -200,13 +226,13 @@ export function App() {
           setFocusedWindowId(null);
         } else if (def.id === "cycle-next-window" || def.id === "cycle-prev-window") {
           const canvas = workspace.layers[0].canvases.find((c) => c.id === activeIds[0]);
-          if (!canvas || canvas.windows.length === 0) break;
-          const windows = canvas.windows;
-          const currentIdx = windows.findIndex((w) => w.id === focusedWindowId);
+          if (!canvas || canvas.nodes.length === 0) break;
+          const nodes = canvas.nodes;
+          const currentIdx = nodes.findIndex((n) => n.id === focusedWindowId);
           const delta = def.id === "cycle-next-window" ? 1 : -1;
-          const nextIdx = currentIdx === -1 ? 0 : (currentIdx + delta + windows.length) % windows.length;
+          const nextIdx = currentIdx === -1 ? 0 : (currentIdx + delta + nodes.length) % nodes.length;
           e.preventDefault();
-          setFocusedWindowId(windows[nextIdx]!.id);
+          setFocusedWindowId(nodes[nextIdx]!.id);
         }
         break;
       }
@@ -228,7 +254,7 @@ export function App() {
     });
   };
 
-  const handleCanvasChange = useCallback((next: CanvasState) => {
+  const handleCanvasChange = useCallback((next: CanvasStateV2) => {
     setWorkspace((prev) => ({
       ...prev,
       layers: {
@@ -250,7 +276,7 @@ export function App() {
           ...prev.layers[0],
           canvases: prev.layers[0].canvases.map((c) => ({
             ...c,
-            windows: c.windows.map((w) => (w.id === id ? { ...w, url } : w)),
+            nodes: c.nodes.map((n) => (n.id === id ? { ...n, data: { ...n.data, url } } : n)),
           })),
         },
       },
@@ -298,15 +324,22 @@ export function App() {
       const idx = layer.canvases.findIndex((c) => c.id === canvasId);
       if (idx === -1) return prev;
       const orig = layer.canvases[idx];
-      const clone: CanvasState = {
+      const clone: CanvasStateV2 = {
         ...orig,
         id: crypto.randomUUID(),
         name: (orig.name ?? orig.id) + " copy",
-        windows: orig.windows.map((w) => ({
-          ...w,
-          id: crypto.randomUUID(),
-          ...(w.kind === "terminal" ? { sessionId: crypto.randomUUID() } : {}),
-        })),
+        nodes: orig.nodes.map((n) => {
+          const newId = crypto.randomUUID();
+          return {
+            ...n,
+            id: newId,
+            data: {
+              ...n.data,
+              id: newId,
+              ...(n.data.kind === "terminal" ? { sessionId: crypto.randomUUID() } : {}),
+            },
+          };
+        }),
       };
       const next = [...layer.canvases];
       next.splice(idx + 1, 0, clone);
@@ -350,12 +383,12 @@ export function App() {
 
   const focusedWindowTitle =
     focusedWindowId != null
-      ? (activeCanvas.windows.find((w) => w.id === focusedWindowId)?.title ?? null)
+      ? (activeCanvas.nodes.find((n) => n.id === focusedWindowId)?.data.title ?? null)
       : null;
 
-  const focusedWindow =
+  const focusedNode =
     focusedWindowId != null
-      ? (activeCanvas.windows.find((w) => w.id === focusedWindowId) ?? null)
+      ? (activeCanvas.nodes.find((n) => n.id === focusedWindowId) ?? null)
       : null;
 
   const handleFocusWindow = useCallback((id: string) => {
@@ -363,7 +396,7 @@ export function App() {
   }, []);
 
   const handleAddWindow = useCallback(
-    (win: WindowState) => {
+    (node: WorkspaceNode) => {
       const targetId = activeCanvas.id;
       setWorkspace((prev) => ({
         ...prev,
@@ -372,7 +405,7 @@ export function App() {
           0: {
             ...prev.layers[0],
             canvases: prev.layers[0].canvases.map((c) =>
-              c.id === targetId ? { ...c, windows: [...c.windows, win] } : c,
+              c.id === targetId ? { ...c, nodes: [...c.nodes, node] } : c,
             ),
           },
         },
@@ -402,17 +435,17 @@ export function App() {
       id: "new-iframe-window",
       label: "New iframe window",
       category: "Window",
-      run: () =>
+      run: () => {
+        const id = crypto.randomUUID();
         handleAddWindow({
-          id: crypto.randomUUID(),
-          kind: "iframe",
-          x: 100,
-          y: 100,
+          id,
+          type: "window",
+          position: { x: 100, y: 100 },
           width: 480,
           height: 320,
-          title: "Browser",
-          url: "about:blank",
-        }),
+          data: { id, kind: "iframe", x: 100, y: 100, width: 480, height: 320, title: "Browser", url: "about:blank" },
+        });
+      },
     },
     {
       id: "show-tutorial",
@@ -424,17 +457,17 @@ export function App() {
       id: "new-terminal-window",
       label: "New terminal window",
       category: "Window",
-      run: () =>
+      run: () => {
+        const id = crypto.randomUUID();
         handleAddWindow({
-          id: crypto.randomUUID(),
-          kind: "terminal",
-          x: 100,
-          y: 100,
+          id,
+          type: "window",
+          position: { x: 100, y: 100 },
           width: 560,
           height: 360,
-          title: "Terminal",
-          sessionId: crypto.randomUUID(),
-        }),
+          data: { id, kind: "terminal", x: 100, y: 100, width: 560, height: 360, title: "Terminal", sessionId: crypto.randomUUID() },
+        });
+      },
     },
     ...[1, 2, 3].flatMap((level) =>
       workspace.layers[level as LayerLevel].canvases.map((canvas) => ({
@@ -444,7 +477,7 @@ export function App() {
         run: () => handleActiveChange(level as LayerLevel, canvas.id),
       })),
     ),
-    ...(focusedWindow != null
+    ...(focusedNode != null
       ? workspace.layers[0].canvases
           .filter((c) => c.id !== activeCanvas.id)
           .map((canvas) => ({
@@ -452,7 +485,7 @@ export function App() {
             label: `Move window to ${canvas.name ?? canvas.id}`,
             category: "Window",
             run: () => {
-              const wid = focusedWindow.id;
+              const nid = focusedNode.id;
               const srcId = activeCanvas.id;
               setWorkspace((prev) => ({
                 ...prev,
@@ -462,9 +495,9 @@ export function App() {
                     ...prev.layers[0],
                     canvases: prev.layers[0].canvases.map((c) => {
                       if (c.id === srcId)
-                        return { ...c, windows: c.windows.filter((w) => w.id !== wid) };
+                        return { ...c, nodes: c.nodes.filter((n) => n.id !== nid) };
                       if (c.id === canvas.id)
-                        return { ...c, windows: [...c.windows, focusedWindow] };
+                        return { ...c, nodes: [...c.nodes, focusedNode] };
                       return c;
                     }),
                   },
@@ -502,7 +535,7 @@ export function App() {
       </div>
       <StatusBar
         activeIds={activeIds}
-        zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.zoom ?? 1}
+        zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
         focusedWindowTitle={focusedWindowTitle}
       />
       <CommandPalette

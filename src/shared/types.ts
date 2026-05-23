@@ -16,17 +16,26 @@ export type LayerLevel = 0 | 1 | 2 | 3;
 
 export type LayerUiMode = "horizontal-tabs" | "floating" | "vertical-tabs";
 
-export interface CanvasState {
+export interface WorkspaceNode {
   id: string;
-  name?: string;
-  windows: WindowState[];
-  panX: number;
-  panY: number;
-  zoom: number;
+  type: "window";
+  position: { x: number; y: number };
+  width: number;
+  height: number;
+  data: WindowState;
 }
 
+export interface CanvasStateV2 {
+  id: string;
+  name?: string;
+  viewport: { x: number; y: number; zoom: number };
+  nodes: WorkspaceNode[];
+}
+
+export type CanvasState = CanvasStateV2;
+
 export interface LayerState {
-  canvases: CanvasState[];
+  canvases: CanvasStateV2[];
   uiMode: LayerUiMode;
   visible: boolean;
 }
