@@ -155,17 +155,30 @@ export function App() {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       for (const def of SHORTCUTS) {
-        if (matchesShortcut(e, def)) {
+        if (!matchesShortcut(e, def)) continue;
+        if (def.id === "toggle-command-palette") {
           e.preventDefault();
-          if (def.id === "toggle-command-palette") setPaletteOpen((open) => !open);
-          else if (def.id === "open-settings") setSettingsOpen(true);
-          break;
+          setPaletteOpen((open) => !open);
+        } else if (def.id === "open-settings") {
+          e.preventDefault();
+          setSettingsOpen(true);
+        } else if (def.id === "cycle-l1-canvas" || def.id === "cycle-l2-canvas" || def.id === "cycle-l3-canvas") {
+          const level = def.id === "cycle-l1-canvas" ? 1 : def.id === "cycle-l2-canvas" ? 2 : 3;
+          const layer = workspace.layers[level as LayerLevel];
+          if (!layer.visible) break;
+          const canvases = layer.canvases;
+          const currentIdx = canvases.findIndex((c) => c.id === activeIds[level as LayerLevel]);
+          const nextIdx = (currentIdx + 1) % canvases.length;
+          const nextCanvasId = canvases[nextIdx]!.id;
+          e.preventDefault();
+          setActiveIds((prev) => ({ ...prev, [level]: nextCanvasId }));
         }
+        break;
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, []);
+  }, [workspace.layers, activeIds]);
 
   const handleActiveChange = (level: LayerLevel, id: string) => {
     setActiveIds((prev) => {
