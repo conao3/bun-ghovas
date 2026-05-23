@@ -6,7 +6,6 @@ import {
   MiniMap,
 } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
-import "@xyflow/react/dist/style.css";
 import type { CanvasStateV2, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
 import { CreateWindowFab } from "./CreateWindowFab";
