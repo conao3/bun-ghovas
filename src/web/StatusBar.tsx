@@ -9,7 +9,13 @@ interface StatusBarProps {
   onResetZoom: () => void;
 }
 
-export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer, onResetZoom }: StatusBarProps) {
+export function StatusBar({
+  activeIds,
+  zoom,
+  focusedWindowTitle,
+  onCycleLayer,
+  onResetZoom,
+}: StatusBarProps) {
   const zoomPct = Math.round(zoom * 100);
   const paletteDef = SHORTCUTS.find((s) => s.id === "toggle-command-palette");
   const settingsDef = SHORTCUTS.find((s) => s.id === "open-settings");
