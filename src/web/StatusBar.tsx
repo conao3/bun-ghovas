@@ -3,6 +3,7 @@ import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 
 interface StatusBarProps {
   activeIds: Record<LayerLevel, string>;
+  activeCanvasWindowCount: number;
   zoom: number;
   focusedWindowTitle: string | null;
   onCycleLayer: (level: LayerLevel) => void;
@@ -11,6 +12,7 @@ interface StatusBarProps {
 
 export function StatusBar({
   activeIds,
+  activeCanvasWindowCount,
   zoom,
   focusedWindowTitle,
   onCycleLayer,
@@ -33,7 +35,9 @@ export function StatusBar({
             className="text-on-dark-soft hover:text-on-dark cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
             onClick={() => onCycleLayer(level)}
           >
-            L{level}:{activeIds[level]}
+            {level === 0
+              ? `L${level}:${activeIds[level]} (${activeCanvasWindowCount})`
+              : `L${level}:${activeIds[level]}`}
           </button>
         ))}
       </span>
