@@ -158,7 +158,7 @@ export function KeyboardPanel() {
                 <td className="py-[6px] pl-2 px-0 whitespace-nowrap">
                   {!isCapturing && hasOverride && (
                     <button
-                      className="text-muted-soft hover:text-error focus:outline-none"
+                      className="text-muted-soft hover:text-error"
                       title="Reset to default"
                       onClick={(e) => handleResetOne(e, def.id)}
                     >
@@ -174,7 +174,7 @@ export function KeyboardPanel() {
       {hasAnyOverride && (
         <div className="mt-4 flex justify-end">
           <button
-            className="text-xs text-muted hover:text-error focus:outline-none"
+            className="text-xs text-muted hover:text-error"
             onClick={handleResetAll}
           >
             Reset all
