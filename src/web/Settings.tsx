@@ -1,5 +1,7 @@
 import { useState } from "react";
 import clsx from "clsx";
+import { Settings as SettingsIcon, Layers as LayersIcon, Keyboard as KeyboardIcon, Server, LayoutGrid, Info } from "lucide-react";
+import type { LucideProps } from "lucide-react";
 import { Modal } from "./components/Modal";
 import { GeneralPanel } from "./settings/GeneralPanel";
 import { LayersPanel } from "./settings/LayersPanel";
@@ -12,6 +14,15 @@ import type { WorkspaceState, LayerLevel, LayerUiMode } from "../shared/types";
 type NavEntry = "General" | "Layers" | "Keyboard" | "Backend" | "Workspaces" | "About";
 
 const NAV_ENTRIES: NavEntry[] = ["General", "Layers", "Keyboard", "Backend", "Workspaces", "About"];
+
+const NAV_ICONS: Record<NavEntry, React.ComponentType<LucideProps>> = {
+  General: SettingsIcon,
+  Layers: LayersIcon,
+  Keyboard: KeyboardIcon,
+  Backend: Server,
+  Workspaces: LayoutGrid,
+  About: Info,
+};
 
 interface SettingsProps {
   isOpen: boolean;
@@ -36,18 +47,22 @@ export function Settings({
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="flex gap-0 min-w-[560px] min-h-[360px]">
         <nav className="w-[140px] border-r border-white/10 pr-3 mr-3">
-          {NAV_ENTRIES.map((entry) => (
-            <div
-              key={entry}
-              onClick={() => setSelected(entry)}
-              className={clsx(
-                "px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px]",
-                selected === entry ? "text-white bg-white/12" : "text-white/50 bg-transparent",
-              )}
-            >
-              {entry}
-            </div>
-          ))}
+          {NAV_ENTRIES.map((entry) => {
+            const Icon = NAV_ICONS[entry];
+            return (
+              <div
+                key={entry}
+                onClick={() => setSelected(entry)}
+                className={clsx(
+                  "flex items-center gap-2 px-[10px] py-[6px] rounded-[3px] cursor-pointer font-mono text-[13px]",
+                  selected === entry ? "text-white bg-white/12" : "text-white/50 bg-transparent",
+                )}
+              >
+                <Icon size={14} aria-hidden />
+                {entry}
+              </div>
+            );
+          })}
         </nav>
         <div className="flex-1">
           {selected === "General" && <GeneralPanel />}
