@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Copy, Loader2, Pencil, RotateCw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Copy, Loader2, Minimize2, Pencil, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
@@ -205,15 +205,32 @@ export function Window({
         <div
           onContextMenu={handleTitleContextMenu}
           className={[
-            "drag-handle h-8 min-h-8 flex items-center justify-between pr-1 pl-3 cursor-move select-none",
+            "drag-handle h-8 min-h-8 flex items-center gap-2 pr-1 pl-3 cursor-move select-none",
             "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
-            isFocused ? "bg-surface-dark-elevated" : "bg-surface-dark",
+            isFocused ? "bg-dark-titlebar-focused" : "bg-dark-titlebar",
           ].join(" ")}
         >
-          <span className="text-[13px] font-mono text-on-dark-strong overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
+          <div className="flex gap-1.5 shrink-0">
+            <span className="w-3 h-3 rounded-full bg-error" />
+            <span className="w-3 h-3 rounded-full bg-warning" />
+            <span className="w-3 h-3 rounded-full bg-success" />
+          </div>
+          <span className="text-[13px] font-mono text-on-dark-strong truncate flex-1 min-w-0">
             {win.title}
           </span>
-          <div onMouseDown={(e) => e.stopPropagation()} className="shrink-0">
+          <div onMouseDown={(e) => e.stopPropagation()} className="flex shrink-0">
+            <Button
+              variant="ghost"
+              aria-label="minimize"
+              style={{
+                padding: "0 4px",
+                color: "var(--color-on-dark-soft)",
+                minWidth: 24,
+                height: 24,
+              }}
+            >
+              <Minimize2 size={14} aria-hidden />
+            </Button>
             <Button
               variant="ghost"
               onPress={() => onClose(win.id)}
