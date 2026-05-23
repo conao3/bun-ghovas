@@ -104,6 +104,7 @@ export function Window({
 
   const handleReload = useCallback(() => {
     if (iframeRef.current) {
+      // oxlint-disable-next-line no-self-assign
       iframeRef.current.src = iframeRef.current.src;
       setIframeState("loading");
     }
@@ -306,6 +307,7 @@ export function Window({
                       onClick={() => {
                         setIframeState("loading");
                         if (iframeRef.current) {
+                          // oxlint-disable-next-line no-self-assign
                           iframeRef.current.src = iframeRef.current.src;
                         }
                       }}
