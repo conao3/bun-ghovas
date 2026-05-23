@@ -17,9 +17,11 @@ export const SHORTCUTS: ShortcutDef[] = [
     key: "k",
   },
   { id: "open-settings", label: "Open settings", mod: true, shift: false, alt: false, key: "," },
+  { id: "cycle-l0-canvas", label: "Cycle next canvas in L0", mod: false, shift: false, alt: true, key: "0" },
   { id: "cycle-l1-canvas", label: "Cycle next canvas in L1", mod: false, shift: false, alt: true, key: "1" },
   { id: "cycle-l2-canvas", label: "Cycle next canvas in L2", mod: false, shift: false, alt: true, key: "2" },
   { id: "cycle-l3-canvas", label: "Cycle next canvas in L3", mod: false, shift: false, alt: true, key: "3" },
+  { id: "close-focused-window", label: "Close focused window", mod: true, shift: false, alt: false, key: "w" },
 ];
 
 export function matchesShortcut(e: KeyboardEvent, def: ShortcutDef): boolean {
