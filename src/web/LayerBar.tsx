@@ -11,7 +11,7 @@ import type {
   LayerLevel,
   LayerState,
   LayerUiMode,
-  CanvasState,
+  CanvasStateV2,
 } from "../shared/types";
 
 interface LayerBarProps {
@@ -26,7 +26,7 @@ interface LayerBarProps {
 }
 
 function useTabContextMenu(
-  canvases: CanvasState[],
+  canvases: CanvasStateV2[],
   onRename: (id: string, name: string) => void,
   onDuplicate: (id: string) => void,
   onDelete: (id: string) => void,
@@ -144,10 +144,7 @@ function HorizontalStrip({
         </div>
       </Modal>
       <div
-        className={[
-          "flex items-center",
-          isLast ? "" : "border-b border-border-subtle",
-        ].join(" ")}
+        className={["flex items-center", isLast ? "" : "border-b border-border-subtle"].join(" ")}
       >
         <span className="text-text-faint text-[11px] font-mono px-1 min-w-6 select-none">
           L{level}
@@ -254,9 +251,7 @@ function VerticalColumn({
       </Modal>
       <div className="flex flex-col border-r border-border-subtle py-1">
         <div className="flex flex-col items-center gap-0.5 px-0.5 pb-1">
-          <span className="text-text-faint text-[11px] font-mono select-none">
-            L{level}
-          </span>
+          <span className="text-text-faint text-[11px] font-mono select-none">L{level}</span>
           <Button
             variant="ghost"
             onPress={onUiModeChange}

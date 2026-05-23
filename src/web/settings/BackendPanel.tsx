@@ -21,11 +21,7 @@ export function BackendPanel() {
           value={settings.shell}
           onChange={(v) => update({ shell: v })}
         />
-        <TextField
-          label="Default cwd"
-          value={settings.cwd}
-          onChange={(v) => update({ cwd: v })}
-        />
+        <TextField label="Default cwd" value={settings.cwd} onChange={(v) => update({ cwd: v })} />
         <TextField
           label="Scrollback limit (MiB)"
           inputMode="numeric"

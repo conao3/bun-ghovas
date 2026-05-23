@@ -1,6 +1,13 @@
 import { useState } from "react";
 import clsx from "clsx";
-import { Settings as SettingsIcon, Layers as LayersIcon, Keyboard as KeyboardIcon, Server, LayoutGrid, Info } from "lucide-react";
+import {
+  Settings as SettingsIcon,
+  Layers as LayersIcon,
+  Keyboard as KeyboardIcon,
+  Server,
+  LayoutGrid,
+  Info,
+} from "lucide-react";
 import type { LucideProps } from "lucide-react";
 import { Modal } from "./components/Modal";
 import { GeneralPanel } from "./settings/GeneralPanel";

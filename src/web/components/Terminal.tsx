@@ -87,7 +87,8 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB }: TerminalProps
     };
   }, [sessionId, shell, cwd, scrollbackMiB, reconnectKey]);
 
-  const showReconnect = overlay !== null && !overlay.startsWith("init error:") && overlay !== "Reconnecting...";
+  const showReconnect =
+    overlay !== null && !overlay.startsWith("init error:") && overlay !== "Reconnecting...";
 
   return (
     <div

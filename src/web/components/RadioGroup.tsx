@@ -1,7 +1,4 @@
-import {
-  RadioGroup as RACRadioGroup,
-  Radio as RACRadio,
-} from "react-aria-components";
+import { RadioGroup as RACRadioGroup, Radio as RACRadio } from "react-aria-components";
 import type {
   RadioGroupProps as RACRadioGroupProps,
   RadioProps as RACRadioProps,

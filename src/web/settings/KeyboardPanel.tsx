@@ -18,11 +18,7 @@ export function KeyboardPanel() {
       <h2 className="text-text-muted-light font-mono mt-0">Keyboard</h2>
       <div className="flex items-center gap-2 mb-3">
         <Search size={14} className="text-white/40 shrink-0" />
-        <TextField
-          label="Search"
-          value={query}
-          onChange={setQuery}
-        />
+        <TextField label="Search" value={query} onChange={setQuery} />
       </div>
       <table className="w-full border-collapse font-mono text-[13px]">
         <tbody>
