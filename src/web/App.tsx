@@ -413,7 +413,7 @@ export function App() {
 
   return (
     <div
-      className="grid h-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
+      className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']"
     >
       <LayerBar
         workspace={workspace}
