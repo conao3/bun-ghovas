@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, RotateCw, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Loader2, RotateCw, X } from "lucide-react";
 import { NodeResizer } from "@xyflow/react";
 import type { WindowState } from "../shared/types";
 import { Button } from "./components/Button";
@@ -261,12 +261,22 @@ export function Window({
               >
                 <RotateCw size={14} aria-hidden />
               </Button>
-              <UrlComboBox
-                value={urlInput}
-                onChange={setUrlInput}
-                aria-label="URL"
-                inputStyle={{ width: "100%" }}
-              />
+              <div className="flex-1">
+                <UrlComboBox
+                  value={urlInput}
+                  onChange={setUrlInput}
+                  aria-label="URL"
+                  inputStyle={{ width: "100%" }}
+                />
+              </div>
+              {iframeState === "loading" && (
+                <Loader2
+                  size={14}
+                  className="animate-spin text-text-muted"
+                  aria-label="loading"
+                  role="status"
+                />
+              )}
             </form>
             <div className="flex-1 overflow-hidden relative">
               <div
