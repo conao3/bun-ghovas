@@ -6,6 +6,14 @@ import { UrlComboBox } from "./components/UrlComboBox";
 import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
 
+function normalizeUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed === "") return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  return `https://${trimmed}`;
+}
+
 interface CreateWindowFabProps {
   onCreateIframeWindow: (url: string) => void;
   onCreateTerminalWindow: () => void;
@@ -19,10 +27,10 @@ export function CreateWindowFab({
   const [url, setUrl] = useState("");
 
   const handleOk = () => {
-    const trimmed = url.trim();
-    if (!trimmed) return;
-    recordVisit(trimmed);
-    onCreateIframeWindow(trimmed);
+    const normalized = normalizeUrl(url);
+    if (!normalized) return;
+    recordVisit(normalized);
+    onCreateIframeWindow(normalized);
     setUrlModalOpen(false);
     setUrl("");
   };

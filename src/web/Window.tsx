@@ -14,6 +14,14 @@ import { useFlowZoom } from "./lib/useFlowZoom";
 
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
+function normalizeUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (trimmed === "") return trimmed;
+  if (/^https?:\/\//i.test(trimmed)) return trimmed;
+  if (trimmed.startsWith("//")) return `https:${trimmed}`;
+  return `https://${trimmed}`;
+}
+
 export interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
@@ -69,13 +77,15 @@ export function Window({
   const handleUrlSubmit = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
-      recordVisit(urlInput);
+      const normalized = normalizeUrl(urlInput);
+      if (normalized === "") return;
+      recordVisit(normalized);
       setUrlNav((prev) => {
-        const base = prev.history.slice(0, prev.index + 1).concat(urlInput);
+        const base = prev.history.slice(0, prev.index + 1).concat(normalized);
         const trimmed = base.length > 50 ? base.slice(base.length - 50) : base;
         return { history: trimmed, index: trimmed.length - 1 };
       });
-      onUrlChange(win.id, urlInput);
+      onUrlChange(win.id, normalized);
     },
     [win.id, urlInput, onUrlChange],
   );
