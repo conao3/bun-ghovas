@@ -1,5 +1,5 @@
 import { describe, test, expect } from "vitest";
-import { matchesShortcut, formatShortcut } from "../../src/web/lib/shortcuts";
+import { matchesShortcut, formatShortcut, isGlobalShortcut } from "../../src/web/lib/shortcuts";
 import type { ShortcutDef } from "../../src/web/lib/shortcuts";
 
 const def: ShortcutDef = {
@@ -63,5 +63,39 @@ describe("formatShortcut", () => {
     const result = formatShortcut(def);
     expect(result.length).toBeGreaterThan(0);
     expect(result).toContain(def.key.toUpperCase());
+  });
+});
+
+describe("isGlobalShortcut", () => {
+  test("Ctrl+K matches toggle-command-palette", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "k" }))).toBe(true);
+  });
+
+  test("Ctrl+, matches open-settings", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "," }))).toBe(true);
+  });
+
+  test("plain key is not a global shortcut", () => {
+    expect(isGlobalShortcut(makeEvent({ key: "a" }))).toBe(false);
+  });
+
+  test("Ctrl+W matches close-focused-window", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "w" }))).toBe(true);
+  });
+
+  test("Ctrl+] matches cycle-next-window", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "]" }))).toBe(true);
+  });
+
+  test("Ctrl+[ matches cycle-prev-window", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "[" }))).toBe(true);
+  });
+
+  test("Alt+1 matches cycle-l1-canvas", () => {
+    expect(isGlobalShortcut(makeEvent({ altKey: true, key: "1" }))).toBe(true);
+  });
+
+  test("Ctrl+Z is not a global shortcut", () => {
+    expect(isGlobalShortcut(makeEvent({ ctrlKey: true, key: "z" }))).toBe(false);
   });
 });
