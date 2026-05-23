@@ -184,7 +184,7 @@ export function App() {
       setTutorialOpen(true);
     }
   }, []);
-  useWorkspacePersistence(workspace, setWorkspace);
+  const { currentName: currentWorkspaceName, switchCurrent: switchWorkspace } = useWorkspacePersistence(workspace, setWorkspace);
 
   const cycleCanvas = useCallback(
     (level: LayerLevel) => {
@@ -664,6 +664,8 @@ export function App() {
           onUiModeChange={handleUiModeChange}
           onVisibilityChange={handleVisibilityChange}
           onWorkspaceReplace={setWorkspace}
+          currentWorkspaceName={currentWorkspaceName}
+          onWorkspaceCurrentChange={switchWorkspace}
         />
       </div>
     </TerminalSessionCtx.Provider>

@@ -1,7 +1,16 @@
 import tailwind from "bun-plugin-tailwind";
 import { watch } from "fs";
 import { createPtyManager } from "./pty";
-import { loadWorkspace, saveWorkspace } from "./workspaceStore";
+import {
+  migrateFromLegacy,
+  listWorkspaceNames,
+  loadNamedWorkspace,
+  saveNamedWorkspace,
+  workspaceExists,
+  deleteNamedWorkspace,
+  loadWorkspace,
+  saveWorkspace,
+} from "./workspaceStore";
 import type { WorkspaceState } from "../shared/types";
 
 const PORT = Number(process.env.PORT ?? 3000);
@@ -100,6 +109,8 @@ for (const dir of [
 }
 watch(new URL("../../package.json", import.meta.url).pathname, scheduleInstallAndRebuild);
 
+await migrateFromLegacy();
+
 const ptyManager = createPtyManager();
 console.log("node-pty native module loaded successfully");
 
@@ -149,14 +160,55 @@ const server = Bun.serve({
         headers: { "content-type": "text/css; charset=utf-8" },
       });
     }
+    if (url.pathname === "/workspaces" && req.method === "GET") {
+      const names = await listWorkspaceNames();
+      return Response.json({ names, current: "default" });
+    }
+    if (url.pathname === "/workspaces" && req.method === "POST") {
+      let body: { name?: string; workspace?: WorkspaceState };
+      try {
+        body = await req.json();
+      } catch {
+        return Response.json({ error: "invalid JSON body" }, { status: 400 });
+      }
+      const { name, workspace: ws } = body;
+      if (!name || !/^[a-zA-Z0-9_-]+$/.test(name)) {
+        return Response.json({ error: "name must match [a-zA-Z0-9_-]+" }, { status: 400 });
+      }
+      if (name === "default") {
+        return Response.json({ error: "cannot create: 'default' is reserved" }, { status: 400 });
+      }
+      if (await workspaceExists(name)) {
+        return Response.json({ error: `workspace '${name}' already exists` }, { status: 400 });
+      }
+      if (!ws || !Array.isArray(ws.l3) || !Array.isArray(ws.l2) || !Array.isArray(ws.l1) || !Array.isArray(ws.l0) || !ws.layerConfig) {
+        return Response.json({ error: "workspace must have l3/l2/l1/l0/layerConfig" }, { status: 400 });
+      }
+      await saveNamedWorkspace(name, ws);
+      return Response.json({ ok: true });
+    }
+    const deleteMatch = url.pathname.match(/^\/workspaces\/([^/]+)$/);
+    if (deleteMatch && req.method === "DELETE") {
+      const name = deleteMatch[1];
+      if (name === "default") {
+        return Response.json({ error: "cannot delete default workspace" }, { status: 400 });
+      }
+      if (!(await workspaceExists(name))) {
+        return Response.json({ error: `workspace '${name}' not found` }, { status: 404 });
+      }
+      await deleteNamedWorkspace(name);
+      return Response.json({ ok: true });
+    }
     if (url.pathname === "/workspace" && req.method === "GET") {
-      const workspace = await loadWorkspace();
+      const name = url.searchParams.get("name") ?? "default";
+      const workspace = await loadNamedWorkspace(name);
       if (workspace === null) {
         return Response.json({ error: "no workspace saved" }, { status: 404 });
       }
       return Response.json({ workspace });
     }
     if (url.pathname === "/workspace" && req.method === "PUT") {
+      const name = url.searchParams.get("name") ?? "default";
       let body: { workspace?: WorkspaceState };
       try {
         body = await req.json();
@@ -185,7 +237,7 @@ const server = Bun.serve({
           );
         }
       }
-      await saveWorkspace(ws);
+      await saveNamedWorkspace(name, ws);
       return Response.json({ ok: true });
     }
     return new Response("not found", { status: 404 });
