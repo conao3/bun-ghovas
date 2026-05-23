@@ -164,13 +164,13 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
     <Modal isOpen={isOpen} onClose={onClose}>
       {pendingConfirm ? (
         <div className="w-[440px]">
-          <div className="text-text-muted-light font-mono text-[13px] mb-4 leading-[1.5]">
+          <div className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">
             {pendingConfirm.confirm}
           </div>
           <div className="flex gap-2 justify-end">
             <button
               onClick={handleCancel}
-              className="py-[5px] px-[14px] rounded-[3px] border border-white/20 bg-transparent text-text-muted-light font-mono text-[13px] cursor-pointer"
+              className="py-[5px] px-[14px] rounded-[3px] border border-white/20 bg-transparent text-on-dark-strong font-mono text-[13px] cursor-pointer"
             >
               Cancel
             </button>
@@ -201,7 +201,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                     onClick={() => runCommand(cmd)}
                     onMouseEnter={() => setHighlightIndex(i)}
                     className={clsx(
-                      "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
+                      "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
                       i === highlightIndex ? "bg-white/12" : "bg-transparent",
                     )}
                   >
@@ -226,7 +226,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   row.type === "header" ? (
                     <div
                       key={`header-${row.label}`}
-                      className="text-text-faint text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
+                      className="text-on-dark-muted text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
                     >
                       {(() => {
                         const Icon = CATEGORY_ICONS[row.label] ?? Hash;
@@ -240,7 +240,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                       onClick={() => runCommand(row.cmd)}
                       onMouseEnter={() => setHighlightIndex(row.itemIndex)}
                       className={clsx(
-                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-text-muted-light font-mono text-[13px] flex justify-between items-center",
+                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
                         row.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
                       )}
                     >

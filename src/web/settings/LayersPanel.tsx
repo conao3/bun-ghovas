@@ -37,17 +37,17 @@ export function LayersPanel(props: {
             const layer = props.workspace.layers[level];
             return (
               <tr key={level}>
-                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
-                  <span className="text-text-muted-light font-bold">L{level}</span>
-                  <span className="ml-2 text-text-muted text-[11px]">
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-dark-hairline">
+                  <span className="text-on-dark-strong font-bold">L{level}</span>
+                  <span className="ml-2 text-on-dark-soft text-[11px]">
                     {layer.canvases.length} {layer.canvases.length === 1 ? "canvas" : "canvases"}
                   </span>
                 </td>
-                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-dark-hairline">
                   <select
                     value={layer.uiMode}
                     onChange={(e) => props.onUiModeChange(level, e.target.value as LayerUiMode)}
-                    className="bg-white/8 border border-white/15 rounded text-text-muted-light font-mono text-[12px] py-[2px] px-[6px] cursor-pointer"
+                    className="bg-white/8 border border-white/15 rounded text-on-dark-strong font-mono text-[12px] py-[2px] px-[6px] cursor-pointer"
                   >
                     {UI_MODE_OPTIONS.map((opt) => (
                       <option key={opt.value} value={opt.value}>
@@ -56,7 +56,7 @@ export function LayersPanel(props: {
                     ))}
                   </select>
                 </td>
-                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
+                <td className="py-[6px] pr-3 pl-0 align-middle border-b border-dark-hairline">
                   <input
                     type="checkbox"
                     checked={layer.visible}

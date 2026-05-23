@@ -194,8 +194,8 @@ export function Window({
       <div
         onMouseDown={handleWindowMouseDown}
         className={[
-          "absolute box-border rounded-[6px] bg-surface-raised flex flex-col overflow-visible",
-          isFocused ? "border-[1.5px] border-accent" : "border border-white/15",
+          "absolute box-border rounded-[6px] bg-surface-dark flex flex-col overflow-visible",
+          isFocused ? "border-[1.5px] border-primary" : "border border-white/15",
         ].join(" ")}
         style={{
           inset: 0,
@@ -207,10 +207,10 @@ export function Window({
           className={[
             "drag-handle h-8 min-h-8 flex items-center justify-between pr-1 pl-3 cursor-move select-none",
             "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
-            isFocused ? "bg-surface-active" : "bg-surface-panel",
+            isFocused ? "bg-surface-dark-elevated" : "bg-surface-dark",
           ].join(" ")}
         >
-          <span className="text-[13px] font-mono text-text-muted-light overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
+          <span className="text-[13px] font-mono text-on-dark-strong overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">
             {win.title}
           </span>
           <div onMouseDown={(e) => e.stopPropagation()} className="shrink-0">
@@ -220,7 +220,7 @@ export function Window({
               aria-label="close window"
               style={{
                 padding: "0 4px",
-                color: "var(--color-text-muted)",
+                color: "var(--color-on-dark-soft)",
                 minWidth: 24,
                 height: 24,
               }}
@@ -231,7 +231,7 @@ export function Window({
         </div>
 
         {win.kind === "iframe" ? (
-          <div className="flex-1 overflow-hidden bg-surface flex flex-col rounded-b-[5px]">
+          <div className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]">
             <form
               onSubmit={handleUrlSubmit}
               onMouseDown={(e) => e.stopPropagation()}
@@ -276,7 +276,7 @@ export function Window({
               {iframeState === "loading" && (
                 <Loader2
                   size={14}
-                  className="animate-spin text-text-muted"
+                  className="animate-spin text-on-dark-soft"
                   aria-label="loading"
                   role="status"
                 />
@@ -301,12 +301,12 @@ export function Window({
                   className="absolute inset-0 border-0 w-full h-full"
                 />
                 {(iframeState === "failed" || iframeState === "likely-blocked") && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-surface/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
+                  <div className="absolute bottom-0 left-0 right-0 bg-surface-dark/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
                     <span>This page may not allow embedding.</span>
                     <button
                       type="button"
                       aria-label="retry"
-                      className="inline-flex items-center gap-1 text-accent hover:text-text-primary bg-transparent border-0 p-0 cursor-pointer"
+                      className="inline-flex items-center gap-1 text-primary hover:text-on-dark bg-transparent border-0 p-0 cursor-pointer"
                       onClick={() => {
                         setIframeState("loading");
                         if (iframeRef.current) {
@@ -321,7 +321,7 @@ export function Window({
                       href={win.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-accent no-underline"
+                      className="text-primary no-underline"
                     >
                       Open in new tab
                     </a>
@@ -332,7 +332,7 @@ export function Window({
           </div>
         ) : (
           <div
-            className="flex-1 overflow-hidden bg-surface rounded-b-[5px]"
+            className="flex-1 overflow-hidden bg-surface-dark rounded-b-[5px]"
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
@@ -365,8 +365,8 @@ export function Window({
           isVisible={isFocused}
           minWidth={120}
           minHeight={60}
-          lineClassName="!border-accent"
-          handleClassName="!bg-accent"
+          lineClassName="!border-primary"
+          handleClassName="!bg-primary"
         />
       </div>
     </>

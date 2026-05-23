@@ -50,17 +50,17 @@ export function UrlComboBox({
       {label && <RACLabel className="text-white/50 text-[11px]">{label}</RACLabel>}
       <RACInput
         autoFocus={autoFocus}
-        className="bg-black/40 border border-white/15 rounded-[3px] text-text-muted-light font-mono text-[12px] py-[3px] px-2 outline-none w-full"
+        className="bg-black/40 border border-white/15 rounded-[3px] text-on-dark-strong font-mono text-[12px] py-[3px] px-2 outline-none w-full"
         style={inputStyle}
       />
       {filtered.length > 0 && (
-        <RACPopover className="bg-surface-overlay border border-white/15 rounded-[4px] p-1 outline-none z-50 min-w-[var(--trigger-width)]">
+        <RACPopover className="bg-surface-dark-elevated border border-white/15 rounded-[4px] p-1 outline-none z-50 min-w-[var(--trigger-width)]">
           <RACListBox<HistoryItem> className="outline-none max-h-48 overflow-auto">
             {(item) => (
               <RACListBoxItem
                 id={item.id}
                 textValue={item.id}
-                className="px-2 py-1 font-mono text-[12px] text-text-muted-light rounded-[3px] cursor-pointer outline-none data-[focused]:bg-white/10 truncate"
+                className="px-2 py-1 font-mono text-[12px] text-on-dark-strong rounded-[3px] cursor-pointer outline-none data-[focused]:bg-white/10 truncate"
               >
                 {item.id}
               </RACListBoxItem>

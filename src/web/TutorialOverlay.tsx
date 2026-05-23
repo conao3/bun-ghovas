@@ -115,7 +115,7 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
     >
       {rect && (
         <div
-          className="absolute rounded border-2 border-accent pointer-events-none"
+          className="absolute rounded border-2 border-primary pointer-events-none"
           style={{
             top: rect.top - HIGHLIGHT_PADDING,
             left: rect.left - HIGHLIGHT_PADDING,
@@ -124,14 +124,14 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           }}
         />
       )}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-80 bg-surface border border-border rounded-lg p-4 flex flex-col gap-3">
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 w-80 bg-surface-dark border border-dark-hairline rounded-lg p-4 flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <span className="text-text-faint text-[11px] font-mono">
+          <span className="text-on-dark-muted text-[11px] font-mono">
             {stepIndex + 1} / {STEPS.length}
           </span>
-          <span className="text-text-primary text-sm font-mono font-semibold">{step.title}</span>
+          <span className="text-on-dark text-sm font-mono font-semibold">{step.title}</span>
         </div>
-        <p className="m-0 text-text-muted-light text-[13px] font-mono">{step.description}</p>
+        <p className="m-0 text-on-dark-strong text-[13px] font-mono">{step.description}</p>
         <div className="flex justify-between items-center">
           <Button variant="ghost" onPress={handleBack} isDisabled={stepIndex === 0}>
             <span className="inline-flex items-center gap-1.5">

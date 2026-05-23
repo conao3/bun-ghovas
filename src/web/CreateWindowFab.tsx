@@ -50,7 +50,7 @@ export function CreateWindowFab({
         </Button>
         <Popover
           placement="top end"
-          className="bg-surface-overlay border border-white/15 rounded-[6px] p-1 outline-none z-20"
+          className="bg-surface-dark-elevated border border-white/15 rounded-[6px] p-1 outline-none z-20"
         >
           <Dialog className="outline-none flex flex-col gap-0.5">
             {({ close }) => (

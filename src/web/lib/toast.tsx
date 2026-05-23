@@ -13,9 +13,9 @@ type ToastContextValue = { show: (kind: ToastKind, message: string) => void };
 const ToastContext = createContext<ToastContextValue | null>(null);
 
 const KIND_BG_CLASSES: Record<ToastKind, string> = {
-  success: "bg-status-success",
-  warning: "bg-status-warning",
-  error: "bg-status-error",
+  success: "bg-success",
+  warning: "bg-warning",
+  error: "bg-error",
 };
 
 const KIND_ICONS: Record<ToastKind, LucideIcon> = {

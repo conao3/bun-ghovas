@@ -26,7 +26,7 @@ export function KeyboardPanel() {
           {filtered.map((def) => (
             <tr key={def.id} className="border-b border-white/10">
               <td className="text-white/80 py-[6px] px-0">{def.label}</td>
-              <td className="text-text-muted-light text-right py-[6px] px-0 tracking-[0.05em]">
+              <td className="text-on-dark-strong text-right py-[6px] px-0 tracking-[0.05em]">
                 {formatShortcut(def)}
               </td>
             </tr>

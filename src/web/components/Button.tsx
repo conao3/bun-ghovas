@@ -8,9 +8,9 @@ interface ButtonProps extends RACButtonProps {
 }
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-white border-accent",
-  secondary: "bg-white/8 text-text-muted-light border-white/15",
-  ghost: "bg-transparent text-text-muted-light border-transparent",
+  primary: "bg-primary text-on-primary border-primary",
+  secondary: "bg-white/8 text-on-dark-strong border-white/15",
+  ghost: "bg-transparent text-on-dark-strong border-transparent",
 };
 
 export function Button({ variant = "secondary", className, ...props }: ButtonProps) {

@@ -32,7 +32,7 @@ export function ContextMenu({
       <Popover
         triggerRef={triggerRef}
         placement="bottom start"
-        className="bg-surface border border-white/15 rounded py-1 min-w-[120px] outline-none shadow-[0_4px_16px_color-mix(in_srgb,black_50%,transparent)]"
+        className="bg-surface-dark border border-white/15 rounded py-1 min-w-[120px] outline-none shadow-[0_4px_16px_color-mix(in_srgb,black_50%,transparent)]"
       >
         <RACMenu
           onAction={(key) => {
@@ -51,9 +51,9 @@ export function ContextMenu({
 export function MenuItem({ className, ...props }: MenuItemProps) {
   const base = [
     "py-1.5 px-3.5 text-[13px] font-mono",
-    "text-text-muted-light bg-transparent cursor-default outline-none select-none",
-    "data-[hovered]:text-white data-[hovered]:bg-surface-hover",
-    "data-[focused]:text-white data-[focused]:bg-surface-hover",
+    "text-on-dark-strong bg-transparent cursor-default outline-none select-none",
+    "data-[hovered]:text-white data-[hovered]:bg-surface-dark-soft",
+    "data-[focused]:text-white data-[focused]:bg-surface-dark-soft",
   ].join(" ");
   return (
     <RACMenuItem

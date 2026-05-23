@@ -17,14 +17,14 @@ export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer, o
   return (
     <div
       className="[grid-area:bottom] h-[22px] flex items-center justify-between px-2
-        bg-surface border-t border-border text-text-muted text-[11px] font-mono select-none"
+        bg-surface-dark border-t border-dark-hairline text-on-dark-soft text-[11px] font-mono select-none"
     >
       <span className="flex gap-2">
         {([3, 2, 1, 0] as LayerLevel[]).map((level) => (
           <button
             key={level}
             aria-label={`cycle L${level} canvas`}
-            className="text-text-muted hover:text-text-primary cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
+            className="text-on-dark-soft hover:text-on-dark cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
             onClick={() => onCycleLayer(level)}
           >
             L{level}:{activeIds[level]}
@@ -35,7 +35,7 @@ export function StatusBar({ activeIds, zoom, focusedWindowTitle, onCycleLayer, o
       <span className="flex gap-3 whitespace-nowrap">
         <button
           aria-label="reset zoom"
-          className="text-text-muted hover:text-text-primary cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
+          className="text-on-dark-soft hover:text-on-dark cursor-pointer bg-transparent border-0 p-0 font-mono text-[11px]"
           onClick={onResetZoom}
         >
           zoom {zoomPct}%

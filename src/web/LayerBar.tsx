@@ -153,9 +153,9 @@ function HorizontalStrip({
         </div>
       </Modal>
       <div
-        className={["flex items-center", isLast ? "" : "border-b border-border-subtle"].join(" ")}
+        className={["flex items-center", isLast ? "" : "border-b border-dark-hairline"].join(" ")}
       >
-        <span className="text-text-faint text-[11px] font-mono px-1 min-w-6 select-none">
+        <span className="text-on-dark-muted text-[11px] font-mono px-1 min-w-6 select-none">
           L{level}
         </span>
         <Button
@@ -259,9 +259,9 @@ function VerticalColumn({
           </div>
         </div>
       </Modal>
-      <div className="flex flex-col border-r border-border-subtle py-1">
+      <div className="flex flex-col border-r border-dark-hairline py-1">
         <div className="flex flex-col items-center gap-0.5 px-0.5 pb-1">
-          <span className="text-text-faint text-[11px] font-mono select-none">L{level}</span>
+          <span className="text-on-dark-muted text-[11px] font-mono select-none">L{level}</span>
           <Button
             variant="ghost"
             onPress={onUiModeChange}
@@ -344,8 +344,8 @@ export function LayerBar({
       <div
         data-tutorial="layer-bar"
         className={[
-          "[grid-area:top] bg-surface shrink-0",
-          horizontalLevels.length > 0 ? "border-b border-border" : "",
+          "[grid-area:top] bg-surface-dark shrink-0",
+          horizontalLevels.length > 0 ? "border-b border-dark-hairline" : "",
         ].join(" ")}
       >
         {horizontalLevels.map((level, i) => (
@@ -367,8 +367,8 @@ export function LayerBar({
       </div>
       <div
         className={[
-          "[grid-area:left] bg-surface flex flex-row",
-          verticalLevels.length > 0 ? "border-r border-border" : "",
+          "[grid-area:left] bg-surface-dark flex flex-row",
+          verticalLevels.length > 0 ? "border-r border-dark-hairline" : "",
         ].join(" ")}
       >
         {verticalLevels.map((level) => (
