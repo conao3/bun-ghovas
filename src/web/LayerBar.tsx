@@ -172,13 +172,11 @@ function HorizontalStrip({
         >
           <TabList items={layer.canvases}>
             {(canvas) => (
-              <Tab id={canvas.id}>
-                <span
-                  onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-                  className="block -my-1.5 -mx-3.5 py-1.5 px-3.5"
-                >
-                  {canvas.name ?? canvas.id}
-                </span>
+              <Tab
+                id={canvas.id}
+                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+              >
+                {canvas.name ?? canvas.id}
               </Tab>
             )}
           </TabList>
@@ -275,13 +273,12 @@ function VerticalColumn({
         >
           <TabList items={layer.canvases} orientation="vertical">
             {(canvas) => (
-              <Tab id={canvas.id} orientation="vertical">
-                <span
-                  onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
-                  className="block -my-1.5 -mx-3.5 py-1.5 px-3.5"
-                >
-                  {canvas.name ?? canvas.id}
-                </span>
+              <Tab
+                id={canvas.id}
+                orientation="vertical"
+                onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+              >
+                {canvas.name ?? canvas.id}
               </Tab>
             )}
           </TabList>
