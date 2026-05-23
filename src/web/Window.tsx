@@ -24,17 +24,11 @@ interface WindowCallbacks {
 
 interface WindowProps extends WindowCallbacks {
   win: WindowState;
-  panX: number;
-  panY: number;
-  zoom: number;
   isFocused: boolean;
 }
 
 export function Window({
   win,
-  panX,
-  panY,
-  zoom,
   isFocused,
   onFocus,
   onClose,
@@ -58,11 +52,6 @@ export function Window({
     }, 6000);
     return () => clearTimeout(timer);
   }, [win.url, win.kind]);
-
-  const screenX = panX + win.x * zoom;
-  const screenY = panY + win.y * zoom;
-  const screenW = win.width * zoom;
-  const screenH = win.height * zoom;
 
   const handleIframeLoad = useCallback(() => {
     setIframeState("loaded");
@@ -166,10 +155,7 @@ export function Window({
           isFocused ? "border-[1.5px] border-accent" : "border border-white/15",
         ].join(" ")}
         style={{
-          left: screenX,
-          top: screenY,
-          width: screenW,
-          height: screenH,
+          inset: 0,
           zIndex: isFocused ? 100 : 10,
         }}
       >
@@ -279,7 +265,13 @@ export function Window({
           </div>
         )}
 
-        <NodeResizer isVisible={isFocused} minWidth={120} minHeight={60} lineClassName="!border-accent" handleClassName="!bg-accent" />
+        <NodeResizer
+          isVisible={isFocused}
+          minWidth={120}
+          minHeight={60}
+          lineClassName="!border-accent"
+          handleClassName="!bg-accent"
+        />
       </div>
     </>
   );

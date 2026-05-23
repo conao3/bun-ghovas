@@ -1,10 +1,5 @@
 import { useRef, useCallback, useMemo } from "react";
-import {
-  ReactFlow,
-  Background,
-  Controls,
-  MiniMap,
-} from "@xyflow/react";
+import { ReactFlow, Background, Controls, MiniMap } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
 import type { CanvasStateV2, WorkspaceNode } from "../shared/types";
 import { Window } from "./Window";
@@ -29,9 +24,6 @@ function WindowNode({ data }: NodeProps) {
   return (
     <Window
       win={win}
-      panX={-win.x}
-      panY={-win.y}
-      zoom={1}
       isFocused={isFocused}
       onFocus={callbacks.onFocus}
       onClose={callbacks.onClose}
@@ -135,17 +127,13 @@ export function Canvas({
         if (change.type === "position" && change.position) {
           const { x, y } = change.position;
           nodes = nodes.map((n) =>
-            n.id === change.id
-              ? { ...n, position: { x, y }, data: { ...n.data, x, y } }
-              : n,
+            n.id === change.id ? { ...n, position: { x, y }, data: { ...n.data, x, y } } : n,
           );
           changed = true;
         } else if (change.type === "dimensions" && change.dimensions) {
           const { width, height } = change.dimensions;
           nodes = nodes.map((n) =>
-            n.id === change.id
-              ? { ...n, width, height, data: { ...n.data, width, height } }
-              : n,
+            n.id === change.id ? { ...n, width, height, data: { ...n.data, width, height } } : n,
           );
           changed = true;
         }
@@ -211,7 +199,16 @@ export function Canvas({
       position: { x, y },
       width,
       height,
-      data: { id, kind: "terminal", sessionId: crypto.randomUUID(), title: "Terminal", x, y, width, height },
+      data: {
+        id,
+        kind: "terminal",
+        sessionId: crypto.randomUUID(),
+        title: "Terminal",
+        x,
+        y,
+        width,
+        height,
+      },
     };
     onAddWindow(node);
     onFocusWindow(id);
@@ -225,13 +222,7 @@ export function Canvas({
       onRename: handleWindowRename,
       onDuplicate: handleWindowDuplicate,
     }),
-    [
-      onFocusWindow,
-      handleWindowClose,
-      onUrlChange,
-      handleWindowRename,
-      handleWindowDuplicate,
-    ],
+    [onFocusWindow, handleWindowClose, onUrlChange, handleWindowRename, handleWindowDuplicate],
   );
 
   const nodes = useMemo(
@@ -254,24 +245,29 @@ export function Canvas({
   );
 
   return (
-    <div data-tutorial="canvas" ref={containerRef} className="absolute inset-0 overflow-hidden bg-surface-deep">
+    <div
+      data-tutorial="canvas"
+      ref={containerRef}
+      className="absolute inset-0 overflow-hidden bg-surface-deep"
+    >
       <ReactFlow
         nodes={nodes}
         nodeTypes={nodeTypes}
         edges={[]}
         onNodesChange={handleNodesChange}
         onViewportChange={handleViewportChange}
-        defaultViewport={{ x: canvasState.viewport.x, y: canvasState.viewport.y, zoom: canvasState.viewport.zoom }}
+        defaultViewport={{
+          x: canvasState.viewport.x,
+          y: canvasState.viewport.y,
+          zoom: canvasState.viewport.zoom,
+        }}
         minZoom={0.25}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
       >
         <Background />
         <Controls />
-        <MiniMap
-          nodeColor={() => "var(--color-accent)"}
-          maskColor="var(--color-surface-overlay)"
-        />
+        <MiniMap nodeColor={() => "var(--color-accent)"} maskColor="var(--color-surface-overlay)" />
       </ReactFlow>
       <CreateWindowFab
         onCreateIframeWindow={handleCreateIframeWindow}
