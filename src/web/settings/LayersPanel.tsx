@@ -39,6 +39,9 @@ export function LayersPanel(props: {
               <tr key={level}>
                 <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
                   <span className="text-text-muted-light font-bold">L{level}</span>
+                  <span className="ml-2 text-text-muted text-[11px]">
+                    {layer.canvases.length} {layer.canvases.length === 1 ? "canvas" : "canvases"}
+                  </span>
                 </td>
                 <td className="py-[6px] pr-3 pl-0 align-middle border-b border-border-subtle">
                   <select
