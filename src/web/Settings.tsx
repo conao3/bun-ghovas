@@ -39,6 +39,8 @@ interface SettingsProps {
   onUiModeChange: (level: LayerLevel, mode: LayerUiMode) => void;
   onVisibilityChange: (level: LayerLevel, visible: boolean) => void;
   onWorkspaceReplace: (next: WorkspaceState) => void;
+  currentWorkspaceName: string;
+  onWorkspaceCurrentChange: (name: string) => void;
 }
 
 export function Settings({
@@ -49,6 +51,8 @@ export function Settings({
   onUiModeChange,
   onVisibilityChange,
   onWorkspaceReplace,
+  currentWorkspaceName,
+  onWorkspaceCurrentChange,
 }: SettingsProps) {
   const [selected, setSelected] = useState<NavEntry>("General");
 
@@ -86,7 +90,12 @@ export function Settings({
           {selected === "Keyboard" && <KeyboardPanel />}
           {selected === "Backend" && <BackendPanel />}
           {selected === "Workspaces" && (
-            <WorkspacesPanel workspace={workspace} onWorkspaceReplace={onWorkspaceReplace} />
+            <WorkspacesPanel
+              workspace={workspace}
+              onWorkspaceReplace={onWorkspaceReplace}
+              currentWorkspaceName={currentWorkspaceName}
+              onWorkspaceCurrentChange={onWorkspaceCurrentChange}
+            />
           )}
           {selected === "About" && <AboutPanel />}
         </div>
