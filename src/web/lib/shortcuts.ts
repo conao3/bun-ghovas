@@ -172,6 +172,10 @@ export function matchesShortcut(e: KeyboardEvent, def: ShortcutDef): boolean {
   );
 }
 
+export function isGlobalShortcut(e: KeyboardEvent): boolean {
+  return SHORTCUTS.some((def) => matchesShortcut(e, getShortcutBinding(def.id)));
+}
+
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad|iPod/.test(navigator.platform);
 
 export function formatShortcut(def: ShortcutDef): string {
