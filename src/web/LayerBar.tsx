@@ -166,7 +166,11 @@ function HorizontalStrip({
           </span>
         </MenuItem>
       </ContextMenu>
-      <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)} ariaLabel="Rename canvas">
+      <Modal
+        isOpen={ctx.renameOpen}
+        onClose={() => ctx.setRenameOpen(false)}
+        ariaLabel="Rename canvas"
+      >
         <div className="flex flex-col gap-3">
           <TextField
             value={ctx.renameValue}
@@ -311,7 +315,11 @@ function VerticalColumn({
           </span>
         </MenuItem>
       </ContextMenu>
-      <Modal isOpen={ctx.renameOpen} onClose={() => ctx.setRenameOpen(false)} ariaLabel="Rename canvas">
+      <Modal
+        isOpen={ctx.renameOpen}
+        onClose={() => ctx.setRenameOpen(false)}
+        ariaLabel="Rename canvas"
+      >
         <div className="flex flex-col gap-3">
           <TextField
             value={ctx.renameValue}

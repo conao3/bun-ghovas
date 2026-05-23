@@ -456,10 +456,7 @@ export function App() {
   );
 
   const handleCreateTerminalWindow = useCallback(
-    (
-      sessionId: string,
-      opts: { shell?: string; cwd?: string; env?: Record<string, string> },
-    ) => {
+    (sessionId: string, opts: { shell?: string; cwd?: string; env?: Record<string, string> }) => {
       setSessionOptsMap((prev) => new Map(prev).set(sessionId, opts));
       const id = crypto.randomUUID();
       handleAddWindow({
@@ -603,52 +600,52 @@ export function App() {
 
   return (
     <TerminalSessionCtx.Provider value={terminalSessionCtxValue}>
-    <div className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']">
-      <LayerBar
-        workspace={workspace}
-        activeIds={activeIds}
-        onActiveChange={handleActiveChange}
-        onUiModeChange={handleUiModeChange}
-        onVisibilityChange={handleVisibilityChange}
-        onRenameCanvas={handleRenameCanvas}
-        onDuplicateCanvas={handleDuplicateCanvas}
-        onDeleteCanvas={handleDeleteCanvas}
-        onNewCanvas={handleNewCanvas}
-      />
-      <div className="[grid-area:center] relative overflow-hidden">
-        <Canvas
-          canvasState={activeCanvas}
-          onCanvasChange={handleCanvasChange}
-          onUrlChange={handleUrlChange}
-          onAddWindow={handleAddWindow}
-          focusedWindowId={focusedWindowId}
-          onFocusWindow={handleFocusWindow}
+      <div className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']">
+        <LayerBar
+          workspace={workspace}
+          activeIds={activeIds}
+          onActiveChange={handleActiveChange}
+          onUiModeChange={handleUiModeChange}
+          onVisibilityChange={handleVisibilityChange}
+          onRenameCanvas={handleRenameCanvas}
+          onDuplicateCanvas={handleDuplicateCanvas}
+          onDeleteCanvas={handleDeleteCanvas}
+          onNewCanvas={handleNewCanvas}
+        />
+        <div className="[grid-area:center] relative overflow-hidden">
+          <Canvas
+            canvasState={activeCanvas}
+            onCanvasChange={handleCanvasChange}
+            onUrlChange={handleUrlChange}
+            onAddWindow={handleAddWindow}
+            focusedWindowId={focusedWindowId}
+            onFocusWindow={handleFocusWindow}
+          />
+        </div>
+        <StatusBar
+          activeIds={activeIds}
+          activeCanvasWindowCount={activeCanvas.nodes.length}
+          zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
+          focusedWindowTitle={focusedWindowTitle}
+          onCycleLayer={cycleCanvas}
+          onResetZoom={resetViewport}
+        />
+        <CommandPalette
+          isOpen={paletteOpen}
+          onClose={() => setPaletteOpen(false)}
+          commands={commands}
+        />
+        {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
+        {tutorialOpen && <TutorialOverlay onDone={() => setTutorialOpen(false)} />}
+        <Settings
+          isOpen={settingsOpen}
+          onClose={() => setSettingsOpen(false)}
+          workspace={workspace}
+          onUiModeChange={handleUiModeChange}
+          onVisibilityChange={handleVisibilityChange}
+          onWorkspaceReplace={setWorkspace}
         />
       </div>
-      <StatusBar
-        activeIds={activeIds}
-        activeCanvasWindowCount={activeCanvas.nodes.length}
-        zoom={workspace.layers[0].canvases.find((c) => c.id === activeIds[0])?.viewport.zoom ?? 1}
-        focusedWindowTitle={focusedWindowTitle}
-        onCycleLayer={cycleCanvas}
-        onResetZoom={resetViewport}
-      />
-      <CommandPalette
-        isOpen={paletteOpen}
-        onClose={() => setPaletteOpen(false)}
-        commands={commands}
-      />
-      {welcomeOpen && <Welcome onDismiss={handleDismissWelcome} />}
-      {tutorialOpen && <TutorialOverlay onDone={() => setTutorialOpen(false)} />}
-      <Settings
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        workspace={workspace}
-        onUiModeChange={handleUiModeChange}
-        onVisibilityChange={handleVisibilityChange}
-        onWorkspaceReplace={setWorkspace}
-      />
-    </div>
     </TerminalSessionCtx.Provider>
   );
 }

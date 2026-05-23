@@ -22,8 +22,6 @@ export function CreateWindowFab({
   const [urlModalOpen, setUrlModalOpen] = useState(false);
   const [url, setUrl] = useState("");
   const [sessionPickerOpen, setSessionPickerOpen] = useState(false);
-  const [newSessionFormOpen, setNewSessionFormOpen] = useState(false);
-  void newSessionFormOpen;
 
   const handleOk = () => {
     const normalized = normalizeUrl(url);
@@ -118,7 +116,6 @@ export function CreateWindowFab({
         isOpen={sessionPickerOpen}
         onClose={() => setSessionPickerOpen(false)}
         onAttach={(id) => onCreateTerminalWindow(id)}
-        onCreateNew={() => setNewSessionFormOpen(true)}
         windowTitles={windowTitles}
       />
     </>
