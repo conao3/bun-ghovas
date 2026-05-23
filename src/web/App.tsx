@@ -33,7 +33,7 @@ function readTutorialSeen(): boolean {
   }
 }
 
-const INITIAL_WORKSPACE: WorkspaceState = {
+export const INITIAL_WORKSPACE: WorkspaceState = {
   layers: {
     0: {
       canvases: [
