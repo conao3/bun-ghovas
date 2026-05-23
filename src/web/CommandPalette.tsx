@@ -4,7 +4,6 @@ import clsx from "clsx";
 import { History, AppWindow, Layers, LayoutGrid, Settings, Hash } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Modal } from "./components/Modal";
-import { TextField } from "./components/TextField";
 import { SHORTCUTS, formatShortcut } from "./lib/shortcuts";
 
 const LS_KEY = "ghovas.recentCommands";
@@ -120,6 +119,15 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   );
   const itemCount = isSearching ? searchResults.length : categoryItems.length;
 
+  const activeDescendant =
+    itemCount > 0 && highlightIndex >= 0 && highlightIndex < itemCount
+      ? isSearching
+        ? `cmd-option-${searchResults[highlightIndex].id}`
+        : categoryItems[highlightIndex]
+          ? `cmd-option-${categoryItems[highlightIndex].cmd.id}`
+          : undefined
+      : undefined;
+
   const runCommand = (cmd: Command) => {
     if (cmd.confirm) {
       setPendingConfirm(cmd);
@@ -185,35 +193,50 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
         </div>
       ) : (
         <div onKeyDown={handleKeyDown}>
-          <TextField
+          <input
             autoFocus
-            value={query}
-            onChange={handleQueryChange}
+            role="combobox"
+            aria-autocomplete="list"
+            aria-controls="command-palette-listbox"
+            aria-expanded={itemCount > 0}
+            aria-activedescendant={activeDescendant}
             aria-label="コマンド検索"
-            className="w-[440px]"
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            className="bg-black/40 border border-white/15 rounded-[3px] text-on-dark-strong font-mono text-[12px] py-[3px] px-2 outline-none w-[440px]"
           />
           <div className="mt-2 max-h-[320px] overflow-y-auto">
             {isSearching ? (
               <>
-                {searchResults.map((cmd, i) => (
-                  <div
-                    key={cmd.id}
-                    onClick={() => runCommand(cmd)}
-                    onMouseEnter={() => setHighlightIndex(i)}
-                    className={clsx(
-                      "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                      i === highlightIndex ? "bg-white/12" : "bg-transparent",
-                    )}
-                  >
-                    <span>{cmd.label}</span>
-                    {(() => {
-                      const def = SHORTCUTS.find((s) => s.id === cmd.id);
-                      return def ? (
-                        <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
-                      ) : null;
-                    })()}
-                  </div>
-                ))}
+                <ul
+                  role="listbox"
+                  id="command-palette-listbox"
+                  aria-label="コマンド候補"
+                  className="list-none p-0 m-0"
+                >
+                  {searchResults.map((cmd, i) => (
+                    <li
+                      key={cmd.id}
+                      id={`cmd-option-${cmd.id}`}
+                      role="option"
+                      aria-selected={i === highlightIndex}
+                      onClick={() => runCommand(cmd)}
+                      onMouseEnter={() => setHighlightIndex(i)}
+                      className={clsx(
+                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
+                        i === highlightIndex ? "bg-white/12" : "bg-transparent",
+                      )}
+                    >
+                      <span>{cmd.label}</span>
+                      {(() => {
+                        const def = SHORTCUTS.find((s) => s.id === cmd.id);
+                        return def ? (
+                          <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                        ) : null;
+                      })()}
+                    </li>
+                  ))}
+                </ul>
                 {searchResults.length === 0 && (
                   <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
                     No commands found
@@ -222,38 +245,49 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
               </>
             ) : (
               <>
-                {categoryRows.map((row) =>
-                  row.type === "header" ? (
-                    <div
-                      key={`header-${row.label}`}
-                      className="text-on-dark-muted text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
-                    >
-                      {(() => {
-                        const Icon = CATEGORY_ICONS[row.label] ?? Hash;
-                        return <Icon size={12} aria-hidden />;
-                      })()}
-                      {row.label}
-                    </div>
-                  ) : (
-                    <div
-                      key={row.cmd.id}
-                      onClick={() => runCommand(row.cmd)}
-                      onMouseEnter={() => setHighlightIndex(row.itemIndex)}
-                      className={clsx(
-                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                        row.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
-                      )}
-                    >
-                      <span>{row.cmd.label}</span>
-                      {(() => {
-                        const def = SHORTCUTS.find((s) => s.id === row.cmd.id);
-                        return def ? (
-                          <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
-                        ) : null;
-                      })()}
-                    </div>
-                  ),
-                )}
+                <ul
+                  role="listbox"
+                  id="command-palette-listbox"
+                  aria-label="コマンド候補"
+                  className="list-none p-0 m-0"
+                >
+                  {categoryRows.map((row) =>
+                    row.type === "header" ? (
+                      <li
+                        key={`header-${row.label}`}
+                        role="presentation"
+                        className="text-on-dark-muted text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
+                      >
+                        {(() => {
+                          const Icon = CATEGORY_ICONS[row.label] ?? Hash;
+                          return <Icon size={12} aria-hidden />;
+                        })()}
+                        {row.label}
+                      </li>
+                    ) : (
+                      <li
+                        key={row.cmd.id}
+                        id={`cmd-option-${row.cmd.id}`}
+                        role="option"
+                        aria-selected={row.itemIndex === highlightIndex}
+                        onClick={() => runCommand(row.cmd)}
+                        onMouseEnter={() => setHighlightIndex(row.itemIndex)}
+                        className={clsx(
+                          "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
+                          row.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
+                        )}
+                      >
+                        <span>{row.cmd.label}</span>
+                        {(() => {
+                          const def = SHORTCUTS.find((s) => s.id === row.cmd.id);
+                          return def ? (
+                            <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                          ) : null;
+                        })()}
+                      </li>
+                    ),
+                  )}
+                </ul>
                 {categoryItems.length === 0 && (
                   <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
                     No commands found
