@@ -1,4 +1,6 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
+import { TerminalSessionCtx } from "./SessionPicker";
+import type { TerminalSessionCtxValue } from "./SessionPicker";
 import { Canvas } from "./Canvas";
 import { LayerBar } from "./LayerBar";
 import { StatusBar } from "./StatusBar";
@@ -158,6 +160,9 @@ export function App() {
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
+  const [sessionOptsMap, setSessionOptsMap] = useState<
+    Map<string, { shell?: string; cwd?: string; env?: Record<string, string> }>
+  >(new Map());
 
   useEffect(() => {
     if (!readOnboarded()) {
@@ -450,6 +455,40 @@ export function App() {
     [activeCanvas.id],
   );
 
+  const handleCreateTerminalWindow = useCallback(
+    (
+      sessionId: string,
+      opts: { shell?: string; cwd?: string; env?: Record<string, string> },
+    ) => {
+      setSessionOptsMap((prev) => new Map(prev).set(sessionId, opts));
+      const id = crypto.randomUUID();
+      handleAddWindow({
+        id,
+        type: "window",
+        position: { x: 100, y: 100 },
+        width: 560,
+        height: 360,
+        data: {
+          id,
+          kind: "terminal",
+          sessionId,
+          title: "Terminal",
+          x: 100,
+          y: 100,
+          width: 560,
+          height: 360,
+        },
+      });
+      handleFocusWindow(id);
+    },
+    [handleAddWindow, handleFocusWindow],
+  );
+
+  const terminalSessionCtxValue = useMemo<TerminalSessionCtxValue>(
+    () => ({ createTerminalWindow: handleCreateTerminalWindow, sessionOptsMap }),
+    [handleCreateTerminalWindow, sessionOptsMap],
+  );
+
   const commands: Command[] = [
     {
       id: "reset-workspace",
@@ -563,6 +602,7 @@ export function App() {
   ];
 
   return (
+    <TerminalSessionCtx.Provider value={terminalSessionCtxValue}>
     <div className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']">
       <LayerBar
         workspace={workspace}
@@ -609,5 +649,6 @@ export function App() {
         onWorkspaceReplace={setWorkspace}
       />
     </div>
+    </TerminalSessionCtx.Provider>
   );
 }
