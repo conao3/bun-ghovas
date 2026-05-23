@@ -74,6 +74,7 @@ console.log("node-pty native module loaded successfully");
 
 const server = Bun.serve({
   port: PORT,
+  idleTimeout: 0,
   async fetch(req, server) {
     const url = new URL(req.url);
     if (url.pathname === "/dev-events") {
