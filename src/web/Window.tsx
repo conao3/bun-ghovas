@@ -20,6 +20,7 @@ type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocke
 export interface WindowCallbacks {
   onFocus: (id: string) => void;
   onClose: (id: string) => void;
+  onMinimize: (id: string) => void;
   onUrlChange: (id: string, url: string) => void;
   onRename: (id: string, title: string) => void;
   onDuplicate: (id: string) => void;
@@ -35,6 +36,7 @@ export function Window({
   isFocused,
   onFocus,
   onClose,
+  onMinimize,
   onUrlChange,
   onRename,
   onDuplicate,
@@ -296,6 +298,7 @@ export function Window({
           <div onMouseDown={(e) => e.stopPropagation()} className="flex shrink-0">
             <Button
               variant="ghost"
+              onPress={() => onMinimize(win.id)}
               aria-label="minimize"
               style={{
                 padding: "0 4px",
@@ -322,7 +325,7 @@ export function Window({
           </div>
         </div>
 
-        {win.kind === "iframe" ? (
+        {!win.minimized && (win.kind === "iframe" ? (
           <div data-window-content className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]">
             <form
               onSubmit={handleUrlSubmit}
@@ -456,10 +459,10 @@ export function Window({
               )}
             </div>
           </div>
-        )}
+        ))}
 
         <NodeResizer
-          isVisible={isFocused}
+          isVisible={isFocused && !win.minimized}
           minWidth={120}
           minHeight={60}
           lineClassName="!border-primary"
