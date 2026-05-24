@@ -260,42 +260,55 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   aria-label="Command suggestions"
                   className="list-none p-0 m-0"
                 >
-                  {categoryRows.map((row) =>
-                    row.type === "header" ? (
-                      <li
-                        key={`header-${row.label}`}
-                        role="presentation"
-                        className="text-on-dark-muted text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
-                      >
-                        {(() => {
-                          const Icon = CATEGORY_ICONS[row.label] ?? Hash;
-                          return <Icon size={12} aria-hidden />;
-                        })()}
-                        {row.label}
-                      </li>
-                    ) : (
-                      <li
-                        key={row.cmd.id}
-                        id={`cmd-option-${row.cmd.id}`}
-                        role="option"
-                        aria-selected={row.itemIndex === highlightIndex}
-                        onClick={() => runCommand(row.cmd)}
-                        onMouseEnter={() => setHighlightIndex(row.itemIndex)}
-                        className={clsx(
-                          "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                          row.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
-                        )}
-                      >
-                        <span>{row.cmd.label}</span>
-                        {(() => {
-                          const def = SHORTCUTS.find((s) => s.id === row.cmd.id);
-                          return def ? (
-                            <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
-                          ) : null;
-                        })()}
-                      </li>
-                    ),
-                  )}
+                  {(() => {
+                    const sections: { label: string; items: { cmd: Command; itemIndex: number }[] }[] = [];
+                    let currentSection: { label: string; items: { cmd: Command; itemIndex: number }[] } | null = null;
+                    for (const row of categoryRows) {
+                      if (row.type === "header") {
+                        currentSection = { label: row.label, items: [] };
+                        sections.push(currentSection);
+                      } else if (currentSection) {
+                        currentSection.items.push({ cmd: row.cmd, itemIndex: row.itemIndex });
+                      }
+                    }
+                    return sections.map((section) => (
+                      <div role="group" aria-labelledby={`cat-header-${section.label}`} key={section.label}>
+                        <li
+                          id={`cat-header-${section.label}`}
+                          role="presentation"
+                          className="text-on-dark-muted text-[11px] font-mono px-3 pt-1 pb-0.5 flex items-center gap-1.5"
+                        >
+                          {(() => {
+                            const Icon = CATEGORY_ICONS[section.label] ?? Hash;
+                            return <Icon size={12} aria-hidden />;
+                          })()}
+                          {section.label}
+                        </li>
+                        {section.items.map((item) => (
+                          <li
+                            key={item.cmd.id}
+                            id={`cmd-option-${item.cmd.id}`}
+                            role="option"
+                            aria-selected={item.itemIndex === highlightIndex}
+                            onClick={() => runCommand(item.cmd)}
+                            onMouseEnter={() => setHighlightIndex(item.itemIndex)}
+                            className={clsx(
+                              "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
+                              item.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
+                            )}
+                          >
+                            <span>{item.cmd.label}</span>
+                            {(() => {
+                              const def = SHORTCUTS.find((s) => s.id === item.cmd.id);
+                              return def ? (
+                                <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                              ) : null;
+                            })()}
+                          </li>
+                        ))}
+                      </div>
+                    ));
+                  })()}
                 </ul>
                 {categoryItems.length === 0 && (
                   <div role="status" aria-live="polite" className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
