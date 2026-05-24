@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import clsx from "clsx";
 import { ArrowLeftRight, Copy, Eye, Pencil, Plus, Trash2 } from "lucide-react";
 import {
@@ -56,10 +56,12 @@ function SortableTabItem({
   canvas,
   level,
   onContextMenu,
+  onContextMenuFromKeyboard,
 }: {
   canvas: CanvasStateV2;
   level: LayerLevel;
   onContextMenu: (e: React.MouseEvent) => void;
+  onContextMenuFromKeyboard: (el: Element, canvasId: string) => void;
 }) {
   const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
@@ -71,12 +73,33 @@ function SortableTabItem({
     transition,
     ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
   };
+  const elRef = useRef<HTMLElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLElement | null) => {
+      elRef.current = node;
+      setNodeRef(node);
+    },
+    [setNodeRef],
+  );
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+        e.preventDefault();
+        e.stopPropagation();
+        onContextMenuFromKeyboard(el, canvas.id);
+      }
+    };
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
+  }, [canvas.id, onContextMenuFromKeyboard]);
   return (
     <Tab
       id={canvas.id}
       variant={level === 3 ? "layer-l3" : "layer"}
       onContextMenu={onContextMenu}
-      ref={setNodeRef}
+      ref={setRef}
       style={style}
       className={isOver ? "border-l-2 border-primary" : undefined}
       {...listeners}
@@ -95,9 +118,11 @@ function SortableTabItem({
 function SortableVerticalTabItem({
   canvas,
   onContextMenu,
+  onContextMenuFromKeyboard,
 }: {
   canvas: CanvasStateV2;
   onContextMenu: (e: React.MouseEvent) => void;
+  onContextMenuFromKeyboard: (el: Element, canvasId: string) => void;
 }) {
   const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
@@ -109,12 +134,33 @@ function SortableVerticalTabItem({
     transition,
     ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
   };
+  const elRef = useRef<HTMLElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLElement | null) => {
+      elRef.current = node;
+      setNodeRef(node);
+    },
+    [setNodeRef],
+  );
+  useEffect(() => {
+    const el = elRef.current;
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+        e.preventDefault();
+        e.stopPropagation();
+        onContextMenuFromKeyboard(el, canvas.id);
+      }
+    };
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
+  }, [canvas.id, onContextMenuFromKeyboard]);
   return (
     <Tab
       id={canvas.id}
       variant="layer-vertical"
       onContextMenu={onContextMenu}
-      ref={setNodeRef}
+      ref={setRef}
       style={style}
       className={isOver ? "border-t-2 border-primary" : undefined}
       {...listeners}
@@ -143,12 +189,22 @@ function useTabContextMenu(
   const [targetId, setTargetId] = useState<string | null>(null);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+  const [fromKeyboard, setFromKeyboard] = useState(false);
   const menuAnchorRef = useRef<HTMLDivElement>(null);
 
   const handleContextMenu = useCallback((e: React.MouseEvent, canvasId: string) => {
     e.preventDefault();
+    setFromKeyboard(false);
     setTargetId(canvasId);
     setMenuPos({ x: e.clientX, y: e.clientY });
+    setMenuOpen(true);
+  }, []);
+
+  const handleContextMenuFromKeyboard = useCallback((el: Element, canvasId: string) => {
+    const rect = el.getBoundingClientRect();
+    setFromKeyboard(true);
+    setTargetId(canvasId);
+    setMenuPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
     setMenuOpen(true);
   }, []);
 
@@ -184,11 +240,13 @@ function useTabContextMenu(
     setMenuOpen,
     menuPos,
     menuAnchorRef,
+    fromKeyboard,
     renameOpen,
     setRenameOpen,
     renameValue,
     setRenameValue,
     handleContextMenu,
+    handleContextMenuFromKeyboard,
     handleMenuAction,
     handleRenameCommit,
   };
@@ -263,6 +321,7 @@ function HorizontalStrip({
         onOpenChange={ctx.setMenuOpen}
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
+        autoFocus={ctx.fromKeyboard}
       >
         <MenuItem id="new">
           <span className="inline-flex items-center gap-2">
@@ -349,6 +408,9 @@ function HorizontalStrip({
                     canvas={canvas}
                     level={level}
                     onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+                    onContextMenuFromKeyboard={(el) =>
+                      ctx.handleContextMenuFromKeyboard(el, canvas.id)
+                    }
                   />
                 ))}
               </TabList>
@@ -432,6 +494,7 @@ function VerticalColumn({
         onOpenChange={ctx.setMenuOpen}
         triggerRef={ctx.menuAnchorRef}
         onAction={ctx.handleMenuAction}
+        autoFocus={ctx.fromKeyboard}
       >
         <MenuItem id="new">
           <span className="inline-flex items-center gap-2">
@@ -520,6 +583,9 @@ function VerticalColumn({
                     key={canvas.id}
                     canvas={canvas}
                     onContextMenu={(e) => ctx.handleContextMenu(e, canvas.id)}
+                    onContextMenuFromKeyboard={(el) =>
+                      ctx.handleContextMenuFromKeyboard(el, canvas.id)
+                    }
                   />
                 ))}
               </TabList>

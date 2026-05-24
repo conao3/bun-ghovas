@@ -42,6 +42,7 @@ export function Window({
   const [urlInput, setUrlInput] = useState(win.url ?? "");
   const [menuPos, setMenuPos] = useState({ x: 0, y: 0 });
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuFromKeyboard, setMenuFromKeyboard] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [iframeState, setIframeState] = useState<IframeLoadState>("idle");
@@ -128,8 +129,24 @@ export function Window({
       e.preventDefault();
       e.stopPropagation();
       onFocus(win.id);
+      setMenuFromKeyboard(false);
       setMenuPos({ x: e.clientX, y: e.clientY });
       setMenuOpen(true);
+    },
+    [win.id, onFocus],
+  );
+
+  const handleTitleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+        e.preventDefault();
+        e.stopPropagation();
+        onFocus(win.id);
+        setMenuFromKeyboard(true);
+        const rect = e.currentTarget.getBoundingClientRect();
+        setMenuPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        setMenuOpen(true);
+      }
     },
     [win.id, onFocus],
   );
@@ -173,6 +190,7 @@ export function Window({
         onOpenChange={setMenuOpen}
         triggerRef={menuAnchorRef}
         onAction={handleMenuAction}
+        autoFocus={menuFromKeyboard}
       >
         <MenuItem id="rename">
           <span className="inline-flex items-center gap-2">
@@ -221,8 +239,10 @@ export function Window({
       >
         <div
           onContextMenu={handleTitleContextMenu}
+          onKeyDown={handleTitleKeyDown}
+          tabIndex={0}
           className={clsx(
-            "drag-handle h-8 min-h-8 flex items-center gap-2 pr-1 pl-3 cursor-move select-none",
+            "drag-handle h-8 min-h-8 flex items-center gap-2 pr-1 pl-3 cursor-move select-none outline-none",
             "border-b border-white/[0.08] shrink-0 rounded-t-[5px] overflow-hidden",
             isFocused ? "bg-dark-titlebar-focused" : "bg-dark-titlebar",
           )}

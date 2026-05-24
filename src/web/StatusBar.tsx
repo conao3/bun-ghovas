@@ -103,6 +103,7 @@ export function StatusBar({
         </DialogTrigger>
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
+        <span>Shift+F10 menu</span>
       </span>
     </footer>
   );

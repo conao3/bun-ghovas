@@ -14,6 +14,7 @@ interface ContextMenuProps {
   triggerRef: RefObject<Element | null>;
   onAction: (key: string) => void;
   children: ReactNode;
+  autoFocus?: boolean;
 }
 
 export function ContextMenu({
@@ -22,6 +23,7 @@ export function ContextMenu({
   triggerRef,
   onAction,
   children,
+  autoFocus,
 }: ContextMenuProps) {
   return (
     <MenuTrigger isOpen={isOpen} onOpenChange={onOpenChange}>
@@ -42,6 +44,7 @@ export function ContextMenu({
             onAction(String(key));
             onOpenChange(false);
           }}
+          autoFocus={autoFocus ? "first" : false}
           className="list-none m-0 p-0 outline-none"
         >
           {children}
