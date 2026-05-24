@@ -223,28 +223,29 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   aria-label="Command suggestions"
                   className="list-none p-0 m-0"
                 >
-                  {searchResults.map((cmd, i) => (
-                    <li
-                      key={cmd.id}
-                      id={`cmd-option-${cmd.id}`}
-                      role="option"
-                      aria-selected={i === highlightIndex}
-                      onClick={() => runCommand(cmd)}
-                      onMouseEnter={() => setHighlightIndex(i)}
-                      className={clsx(
-                        "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                        i === highlightIndex ? "bg-white/12" : "bg-transparent",
-                      )}
-                    >
-                      <span>{cmd.label}</span>
-                      {(() => {
-                        const def = SHORTCUTS.find((s) => s.id === cmd.id);
-                        return def ? (
-                          <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
-                        ) : null;
-                      })()}
-                    </li>
-                  ))}
+                  {searchResults.map((cmd, i) => {
+                    const def = SHORTCUTS.find((s) => s.id === cmd.id);
+                    return (
+                      <li
+                        key={cmd.id}
+                        id={`cmd-option-${cmd.id}`}
+                        role="option"
+                        aria-selected={i === highlightIndex}
+                        aria-label={`${cmd.label}${def ? `, shortcut ${formatShortcut(def)}` : ""}`}
+                        onClick={() => runCommand(cmd)}
+                        onMouseEnter={() => setHighlightIndex(i)}
+                        className={clsx(
+                          "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
+                          i === highlightIndex ? "bg-white/12" : "bg-transparent",
+                        )}
+                      >
+                        <span>{cmd.label}</span>
+                        {def && (
+                          <span aria-hidden="true" className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
                 {searchResults.length === 0 && (
                   <div role="status" aria-live="polite" className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
@@ -284,28 +285,29 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                           })()}
                           {section.label}
                         </li>
-                        {section.items.map((item) => (
-                          <li
-                            key={item.cmd.id}
-                            id={`cmd-option-${item.cmd.id}`}
-                            role="option"
-                            aria-selected={item.itemIndex === highlightIndex}
-                            onClick={() => runCommand(item.cmd)}
-                            onMouseEnter={() => setHighlightIndex(item.itemIndex)}
-                            className={clsx(
-                              "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                              item.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
-                            )}
-                          >
-                            <span>{item.cmd.label}</span>
-                            {(() => {
-                              const def = SHORTCUTS.find((s) => s.id === item.cmd.id);
-                              return def ? (
-                                <span className="text-white/40 ml-4">{formatShortcut(def)}</span>
-                              ) : null;
-                            })()}
-                          </li>
-                        ))}
+                        {section.items.map((item) => {
+                          const def = SHORTCUTS.find((s) => s.id === item.cmd.id);
+                          return (
+                            <li
+                              key={item.cmd.id}
+                              id={`cmd-option-${item.cmd.id}`}
+                              role="option"
+                              aria-selected={item.itemIndex === highlightIndex}
+                              aria-label={`${item.cmd.label}${def ? `, shortcut ${formatShortcut(def)}` : ""}`}
+                              onClick={() => runCommand(item.cmd)}
+                              onMouseEnter={() => setHighlightIndex(item.itemIndex)}
+                              className={clsx(
+                                "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
+                                item.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
+                              )}
+                            >
+                              <span>{item.cmd.label}</span>
+                              {def && (
+                                <span aria-hidden="true" className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                              )}
+                            </li>
+                          );
+                        })}
                       </div>
                     ));
                   })()}
