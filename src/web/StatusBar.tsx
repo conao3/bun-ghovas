@@ -111,6 +111,7 @@ export function StatusBar({
         <span>↑↓←→ pan  +/- zoom  0 fit</span>
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
+        <span>Shift+F10 menu</span>
       </span>
     </footer>
   );
