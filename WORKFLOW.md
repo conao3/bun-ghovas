@@ -24,7 +24,7 @@ agent:
   max_concurrent_agents: 10
   max_turns: 10
 codex:
-  command: ANTHROPIC_MODEL=claude-sonnet-4-6 claude-app-server
+  command: CLAUDE_CONFIG_DIR=$HOME/.agents/.claude.worker ANTHROPIC_MODEL=claude-sonnet-4-6 claude-app-server
   approval_policy: never
   thread_sandbox: workspace-write
   turn_sandbox_policy:
@@ -40,6 +40,20 @@ Continuation context:
 - Resume from the current workspace state instead of restarting from scratch.
 - Do not repeat already-completed investigation or validation unless needed for new code changes.
 - Do not end the turn while the issue remains in an active state unless you are blocked by missing required permissions/secrets.
+{% endif %}
+
+{% if final_attempt %}
+Final-attempt context (scope-violation cap reached):
+
+- This issue exceeded the per-issue attempt cap. You are the recording agent, **not** an implementer.
+- **Do not modify code, do not run typecheck/lint/tests, do not push.**
+- Read the workspace state (`git status`, `git log --oneline -10`, any open PR via `gh pr view`) and the existing `## Agent Workpad` comment to understand what was completed and where the work stalled.
+- Append a `### Final-attempt summary` section to the workpad with:
+  - What is complete (files changed, gates passed).
+  - What is not complete (failing validation, blockers, gate not satisfied).
+  - Why the scope was too large (which subtasks should be split off — propose 3-5 concrete sub-issues with one-line scope each).
+- Move the Linear state to `Cancelled` via `mcp__linear__save_issue` (`state="Cancelled"`). The operator will read your summary, split the work, and reinject.
+- Then end the turn. Do not attempt to keep working.
 {% endif %}
 
 Issue context:
@@ -81,6 +95,7 @@ The agent talks to Linear via the configured Linear MCP server (`mcp__linear__*`
 - When meaningful out-of-scope improvements are discovered during execution, file a separate Linear issue instead of expanding scope. The follow-up issue must include a clear title, description, and acceptance criteria, be placed in `Backlog`, be assigned to the same project as the current issue, link the current issue as `related`, and use `blockedBy` when the follow-up depends on the current issue.
 - Move status only when the matching quality bar is met.
 - Operate autonomously end-to-end unless blocked by missing requirements, secrets, or permissions.
+- **Edit-Read efficiency**: after editing a file, do not Re-Read it just to confirm the result. Batch multiple Edits and rely on Edit's atomic semantics. Re-Read only when you need new context the prior Read did not capture. If you find yourself reading the same file 5+ times in one session, stop and rethink the approach.
 - Use the blocked-access escape hatch only for true external blockers (missing required tools/auth) after exhausting documented fallbacks.
 - **Write all GitHub communication in English**: PR title, PR description (Summary / Test plan / etc.), commit messages, PR review replies, and any inline `gh pr comment` posts must be in English regardless of the language used in the Linear issue body or workpad. The Linear workpad itself may stay in the issue's language, but anything that surfaces on GitHub is English.
 
