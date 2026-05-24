@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { init, Terminal as GhosttyTerminal, FitAddon } from "ghostty-web";
 import { connectPtySession, type PtyHandle } from "../lib/ptyClient";
+import { useAnnounce } from "../lib/LiveAnnouncer";
 import { useToast } from "../lib/toast";
 import { Button } from "./Button";
 
@@ -19,7 +20,9 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: Terminal
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [overlay, setOverlay] = useState<string | null>(null);
   const [reconnectKey, setReconnectKey] = useState(0);
+  const announce = useAnnounce();
   const toast = useToast();
+  const prevOverlayRef = useRef<string | null | undefined>(undefined);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -91,6 +94,19 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: Terminal
       term?.dispose();
     };
   }, [sessionId, shell, cwd, scrollbackMiB, env, reconnectKey]);
+
+  useEffect(() => {
+    const prev = prevOverlayRef.current;
+    prevOverlayRef.current = overlay;
+    if (prev === undefined) return;
+    if (overlay !== null && overlay !== "Reconnecting..." && !overlay.startsWith("init error:")) {
+      announce(`Terminal ${sessionId}: connection lost. Press Reconnect to retry.`, "assertive");
+    } else if (overlay === "Reconnecting...") {
+      announce(`Terminal ${sessionId}: reconnecting…`, "polite");
+    } else if (overlay === null && prev === "Reconnecting...") {
+      announce(`Terminal ${sessionId}: reconnected.`, "polite");
+    }
+  }, [overlay, sessionId, announce]);
 
   useEffect(() => {
     const el = wrapperRef.current;
