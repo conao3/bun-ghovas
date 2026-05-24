@@ -211,6 +211,21 @@ export function Window({
     [win.id, onFocus],
   );
 
+  const handleGripKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLButtonElement>) => {
+      if (e.key === " " || e.key === "Enter") {
+        e.preventDefault();
+        e.stopPropagation();
+        onFocus(win.id);
+        setMenuFromKeyboard(true);
+        const rect = e.currentTarget.getBoundingClientRect();
+        setMenuPos({ x: rect.left, y: rect.bottom });
+        setMenuOpen(true);
+      }
+    },
+    [win.id, onFocus],
+  );
+
   const handleMenuAction = useCallback(
     (key: string) => {
       if (key === "rename") {
@@ -330,10 +345,11 @@ export function Window({
             type="button"
             aria-label="Window menu"
             aria-haspopup="menu"
-            tabIndex={-1}
-            className="flex gap-1.5 shrink-0 bg-transparent border-0 p-0 m-0 cursor-pointer outline-none"
+            tabIndex={0}
+            className="flex gap-1.5 shrink-0 bg-transparent border-0 p-0 m-0 cursor-pointer outline-none focus-visible:outline-2 focus-visible:outline-primary focus-visible:outline-offset-2"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={handleTitleContextMenu}
+            onKeyDown={handleGripKeyDown}
           >
             <span className="w-3 h-3 rounded-full bg-error" aria-hidden="true" />
             <span className="w-3 h-3 rounded-full bg-warning" aria-hidden="true" />
