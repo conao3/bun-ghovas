@@ -82,11 +82,11 @@ export function Window({
     const el = iframeContainerRef.current;
     if (!el) return;
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "F6" && !e.shiftKey) {
-        e.preventDefault();
-        e.stopPropagation();
-        document.querySelector<HTMLElement>(".react-flow")?.focus();
-      }
+      if (e.key !== "F6" || e.shiftKey) return;
+      if (!el.contains(document.activeElement)) return;
+      e.preventDefault();
+      e.stopPropagation();
+      document.querySelector<HTMLElement>(".react-flow")?.focus();
     };
     const handleFocusIn = () => setIframeFocused(true);
     const handleFocusOut = (e: FocusEvent) => {
@@ -94,11 +94,11 @@ export function Window({
         setIframeFocused(false);
       }
     };
-    el.addEventListener("keydown", handleKeyDown, { capture: true });
+    window.addEventListener("keydown", handleKeyDown, { capture: true });
     el.addEventListener("focusin", handleFocusIn);
     el.addEventListener("focusout", handleFocusOut);
     return () => {
-      el.removeEventListener("keydown", handleKeyDown, { capture: true });
+      window.removeEventListener("keydown", handleKeyDown, { capture: true });
       el.removeEventListener("focusin", handleFocusIn);
       el.removeEventListener("focusout", handleFocusOut);
     };
