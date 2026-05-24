@@ -71,6 +71,7 @@ function SortableFloatingTabItem({
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
     data: { label: canvas.name ?? canvas.id },
+    attributes: { roleDescription: "sortable" },
   });
   const { active, over } = useDndContext();
   const isOver = !isDragging && active !== null && over?.id === canvas.id;
