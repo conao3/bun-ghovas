@@ -12,6 +12,7 @@ import { ContextMenu, MenuItem } from "./components/Menu";
 import { Modal } from "./components/Modal";
 import { recordVisit } from "./lib/iframeUrlHistory";
 import { loadBackendSettings } from "./lib/backendSettings";
+import { loadConfirmWindowClose } from "./lib/generalSettings";
 import { useFlowZoom } from "./lib/useFlowZoom";
 import { normalizeUrl } from "./lib/normalizeUrl";
 
@@ -47,6 +48,7 @@ export function Window({
   const [menuFromKeyboard, setMenuFromKeyboard] = useState(false);
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
+  const [confirmCloseOpen, setConfirmCloseOpen] = useState(false);
   const [iframeState, setIframeState] = useState<IframeLoadState>("idle");
   const [iframeFocused, setIframeFocused] = useState(false);
   const [urlNav, setUrlNav] = useState<{ history: string[]; index: number }>({
@@ -240,6 +242,18 @@ export function Window({
     [win.id, onFocus],
   );
 
+  const handleCloseClick = useCallback(() => {
+    if (loadConfirmWindowClose()) {
+      setConfirmCloseOpen(true);
+    } else {
+      onClose(win.id);
+    }
+  }, [win.id, onClose]);
+
+  const handleCloseConfirm = useCallback(() => {
+    onClose(win.id);
+    setConfirmCloseOpen(false);
+  }, [win.id, onClose]);
   const handleMenuAction = useCallback(
     (key: string) => {
       if (key === "rename") {
@@ -248,10 +262,10 @@ export function Window({
       } else if (key === "duplicate") {
         onDuplicate(win.id);
       } else if (key === "close") {
-        onClose(win.id);
+        handleCloseClick();
       }
     },
-    [win.id, win.title, onDuplicate, onClose],
+    [win.id, win.title, onDuplicate, handleCloseClick],
   );
 
   const handleRenameCommit = useCallback(() => {
@@ -331,6 +345,31 @@ export function Window({
           </div>
         </div>
       </Modal>
+      <Modal
+        isOpen={confirmCloseOpen}
+        onClose={() => setConfirmCloseOpen(false)}
+        ariaLabelledby={`close-confirm-heading-${win.id}`}
+      >
+        <div className="w-[360px]">
+          <h2
+            id={`close-confirm-heading-${win.id}`}
+            className="text-on-dark-strong font-mono text-[14px] font-semibold mb-2 mt-0"
+          >
+            Close window?
+          </h2>
+          <p className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">
+            &ldquo;{win.title}&rdquo; will be closed. Unsaved changes will be lost.
+          </p>
+          <div className="flex gap-2 justify-end">
+            <Button variant="secondary" onPress={() => setConfirmCloseOpen(false)}>
+              Cancel
+            </Button>
+            <Button variant="destructive" autoFocus onPress={handleCloseConfirm}>
+              Close window
+            </Button>
+          </div>
+        </div>
+      </Modal>
       <div
         ref={windowElRef}
         data-window-id={win.id}
@@ -397,7 +436,7 @@ export function Window({
             </Button>
             <Button
               variant="ghost"
-              onPress={() => onClose(win.id)}
+              onPress={handleCloseClick}
               aria-label="close window"
               style={{
                 padding: "0 4px",
