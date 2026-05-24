@@ -41,17 +41,13 @@ function SortableFloatingTabItem({
     transition,
     ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
   };
-  const elRef = useRef<HTMLElement | null>(null);
   const setRef = useCallback(
     (node: HTMLElement | null) => {
-      elRef.current = node;
       setNodeRef(node);
+      if (node) node.setAttribute("aria-roledescription", "sortable");
     },
     [setNodeRef],
   );
-  useEffect(() => {
-    elRef.current?.setAttribute("aria-roledescription", "sortable");
-  }, []);
   return (
     <Tab
       id={canvas.id}
@@ -61,6 +57,7 @@ function SortableFloatingTabItem({
       className={isOver ? "border-l-2 border-primary" : undefined}
       {...attributes}
       {...listeners}
+      aria-roledescription="sortable"
     >
       {canvas.statusHint && (
         <span

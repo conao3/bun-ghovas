@@ -112,6 +112,7 @@ function SortableTabItem({
     (node: HTMLElement | null) => {
       elRef.current = node;
       setNodeRef(node);
+      if (node) node.setAttribute("aria-roledescription", "sortable");
     },
     [setNodeRef],
   );
@@ -128,9 +129,6 @@ function SortableTabItem({
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
   }, [canvas.id, onContextMenuFromKeyboard]);
-  useEffect(() => {
-    elRef.current?.setAttribute("aria-roledescription", "sortable");
-  }, []);
   return (
     <Tab
       id={canvas.id}
@@ -141,6 +139,7 @@ function SortableTabItem({
       className={isOver ? "border-l-2 border-primary" : undefined}
       {...attributes}
       {...listeners}
+      aria-roledescription="sortable"
     >
       {canvas.statusHint && (
         <span
@@ -181,6 +180,7 @@ function SortableVerticalTabItem({
     (node: HTMLElement | null) => {
       elRef.current = node;
       setNodeRef(node);
+      if (node) node.setAttribute("aria-roledescription", "sortable");
     },
     [setNodeRef],
   );
@@ -197,9 +197,6 @@ function SortableVerticalTabItem({
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
   }, [canvas.id, onContextMenuFromKeyboard]);
-  useEffect(() => {
-    elRef.current?.setAttribute("aria-roledescription", "sortable");
-  }, []);
   return (
     <Tab
       id={canvas.id}
@@ -210,6 +207,7 @@ function SortableVerticalTabItem({
       className={isOver ? "border-t-2 border-primary" : undefined}
       {...attributes}
       {...listeners}
+      aria-roledescription="sortable"
     >
       <span
         className="w-[3px] h-[14px] rounded-[2px] shrink-0 bg-transparent group-data-[selected]:bg-primary"
