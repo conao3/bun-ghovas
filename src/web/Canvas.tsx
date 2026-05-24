@@ -56,6 +56,52 @@ function WindowNode({ data }: NodeProps) {
 
 const nodeTypes = { window: WindowNode };
 
+function MinimapKeyboardController() {
+  const { fitView, setViewport, getViewport } = useReactFlow();
+
+  useEffect(() => {
+    const minimap = document.querySelector<HTMLDivElement>(".react-flow__minimap");
+    if (!minimap) return;
+
+    minimap.setAttribute("tabindex", "0");
+    minimap.setAttribute("role", "button");
+    minimap.setAttribute(
+      "aria-label",
+      "Canvas overview minimap. Press Enter to fit view, arrow keys to pan.",
+    );
+
+    const PAN_STEP = 100;
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        void fitView({ duration: 300 });
+        return;
+      }
+      if (e.key === "Escape") {
+        minimap.blur();
+        document.querySelector<HTMLElement>(".react-flow__pane")?.focus();
+        return;
+      }
+      let dx = 0;
+      let dy = 0;
+      if (e.key === "ArrowLeft") dx = PAN_STEP;
+      else if (e.key === "ArrowRight") dx = -PAN_STEP;
+      else if (e.key === "ArrowUp") dy = PAN_STEP;
+      else if (e.key === "ArrowDown") dy = -PAN_STEP;
+      else return;
+      e.preventDefault();
+      const { x, y, zoom } = getViewport();
+      void setViewport({ x: x + dx, y: y + dy, zoom }, { duration: 100 });
+    };
+
+    minimap.addEventListener("keydown", onKeyDown);
+    return () => minimap.removeEventListener("keydown", onKeyDown);
+  }, [fitView, setViewport, getViewport]);
+
+  return null;
+}
+
 interface CanvasProps {
   canvasState: L0Canvas;
   onCanvasChange: (next: L0Canvas) => void;
@@ -78,14 +124,6 @@ export function Canvas({
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const minimap = document.querySelector(".react-flow__minimap");
-    if (minimap) {
-      minimap.setAttribute("aria-label", "Canvas overview minimap");
-      minimap.setAttribute("role", "img");
-    }
-  }, []);
 
   const handleWindowClose = useCallback(
     (id: string) => {
@@ -324,6 +362,7 @@ export function Canvas({
         <Background />
         <Controls />
         {setZoomRef && <ZoomController setZoomRef={setZoomRef} containerRef={containerRef} />}
+        <MinimapKeyboardController />
         <MiniMap
           aria-label="Canvas overview minimap"
           style={{
