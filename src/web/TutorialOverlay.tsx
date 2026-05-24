@@ -11,24 +11,23 @@ interface TutorialStep {
 const STEPS: TutorialStep[] = [
   {
     key: "layer-bar",
-    title: "レイヤーバー",
-    description:
-      "レイヤーは水平 / 垂直に並ぶタブで切り替えます。クリックまたはショートカットで移動。",
+    title: "Layer bar",
+    description: "Switch layers via horizontal/vertical tabs. Click or use shortcuts.",
   },
   {
     key: "canvas",
-    title: "キャンバス",
-    description: "中ドラッグでパン、Ctrl+ホイールでズーム。ミニマップで広いワークスペースを俯瞰。",
+    title: "Canvas",
+    description: "Middle-drag to pan, Ctrl+wheel to zoom. Minimap overviews wide workspaces.",
   },
   {
     key: "create-window",
-    title: "新規ウィンドウ",
-    description: "ここから terminal / iframe ウィンドウを作成。",
+    title: "Create window",
+    description: "Open terminal or iframe windows from here.",
   },
   {
     key: "command-palette",
-    title: "コマンドパレット",
-    description: "Mod+K でコマンドパレット。全コマンドにアクセス。",
+    title: "Command palette",
+    description: "Press Mod+K for the palette. Access every command.",
   },
 ];
 
