@@ -59,9 +59,9 @@ export function Settings({
   const handleArrowNav = (e: React.KeyboardEvent<HTMLButtonElement>) => {
     const currentIndex = NAV_ENTRIES.indexOf(selected);
     let nextIndex = currentIndex;
-    if (e.key === "ArrowDown") {
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
       nextIndex = (currentIndex + 1) % NAV_ENTRIES.length;
-    } else if (e.key === "ArrowUp") {
+    } else if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
       nextIndex = (currentIndex - 1 + NAV_ENTRIES.length) % NAV_ENTRIES.length;
     } else if (e.key === "Home") {
       nextIndex = 0;
