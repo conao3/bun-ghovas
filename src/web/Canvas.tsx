@@ -294,6 +294,7 @@ export function Canvas({
       className="absolute inset-0 overflow-hidden bg-dark-canvas"
     >
       <ReactFlow
+        aria-label="Window manager canvas"
         nodes={nodes}
         nodeTypes={nodeTypes}
         edges={[]}
