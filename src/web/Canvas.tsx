@@ -1,5 +1,5 @@
 import { useRef, useCallback, useMemo, useEffect } from "react";
-import type { RefObject } from "react";
+import type { RefObject, KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Plus } from "lucide-react";
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow } from "@xyflow/react";
 import type { NodeChange, NodeProps, Viewport } from "@xyflow/react";
@@ -30,6 +30,24 @@ function ZoomController({
     [setViewport, getViewport, containerRef],
   );
   setZoomRef.current = zoomFn;
+  return null;
+}
+
+type KeyboardActions = {
+  getViewport: () => Viewport;
+  setViewport: (viewport: Viewport) => void;
+  zoomIn: () => void;
+  zoomOut: () => void;
+  fitView: () => void;
+};
+
+function KeyboardController({
+  keyboardActionsRef,
+}: {
+  keyboardActionsRef: RefObject<KeyboardActions | null>;
+}) {
+  const { getViewport, setViewport, zoomIn, zoomOut, fitView } = useReactFlow();
+  keyboardActionsRef.current = { getViewport, setViewport, zoomIn, zoomOut, fitView };
   return null;
 }
 
@@ -124,6 +142,64 @@ export function Canvas({
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
   const containerRef = useRef<HTMLDivElement>(null);
+  const keyboardActionsRef = useRef<KeyboardActions | null>(null);
+
+  const handleCanvasKeyDown = useCallback((e: ReactKeyboardEvent) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.tagName === "INPUT" ||
+      target.tagName === "TEXTAREA" ||
+      target.getAttribute("role") === "textbox"
+    ) {
+      return;
+    }
+    const actions = keyboardActionsRef.current;
+    if (!actions) return;
+    const step = e.shiftKey ? 200 : 50;
+    switch (e.key) {
+      case "ArrowLeft": {
+        e.preventDefault();
+        const vp = actions.getViewport();
+        actions.setViewport({ x: vp.x + step, y: vp.y, zoom: vp.zoom });
+        break;
+      }
+      case "ArrowRight": {
+        e.preventDefault();
+        const vp = actions.getViewport();
+        actions.setViewport({ x: vp.x - step, y: vp.y, zoom: vp.zoom });
+        break;
+      }
+      case "ArrowUp": {
+        e.preventDefault();
+        const vp = actions.getViewport();
+        actions.setViewport({ x: vp.x, y: vp.y + step, zoom: vp.zoom });
+        break;
+      }
+      case "ArrowDown": {
+        e.preventDefault();
+        const vp = actions.getViewport();
+        actions.setViewport({ x: vp.x, y: vp.y - step, zoom: vp.zoom });
+        break;
+      }
+      case "+":
+      case "=":
+        e.preventDefault();
+        actions.zoomIn();
+        break;
+      case "-":
+        e.preventDefault();
+        actions.zoomOut();
+        break;
+      case "0":
+        e.preventDefault();
+        actions.fitView();
+        break;
+      case "Home":
+        e.preventDefault();
+        actions.setViewport({ x: 0, y: 0, zoom: 1 });
+        break;
+    }
+  }, []);
 
   const handleWindowClose = useCallback(
     (id: string) => {
@@ -345,6 +421,8 @@ export function Canvas({
     >
       <ReactFlow
         aria-label="Window manager canvas"
+        tabIndex={0}
+        onKeyDown={handleCanvasKeyDown}
         nodes={nodes}
         nodeTypes={nodeTypes}
         edges={[]}
@@ -363,6 +441,7 @@ export function Canvas({
         <Controls />
         {setZoomRef && <ZoomController setZoomRef={setZoomRef} containerRef={containerRef} />}
         <MinimapKeyboardController />
+        <KeyboardController keyboardActionsRef={keyboardActionsRef} />
         <MiniMap
           aria-label="Canvas overview minimap"
           style={{

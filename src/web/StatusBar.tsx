@@ -102,6 +102,7 @@ export function StatusBar({
           </Popover>
         </DialogTrigger>
         <span>F6 exit terminal</span>
+        <span>↑↓←→ pan  +/- zoom  0 fit</span>
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
       </span>
