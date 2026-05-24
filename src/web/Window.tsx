@@ -48,12 +48,14 @@ export function Window({
   const [renameOpen, setRenameOpen] = useState(false);
   const [renameValue, setRenameValue] = useState("");
   const [iframeState, setIframeState] = useState<IframeLoadState>("idle");
+  const [iframeFocused, setIframeFocused] = useState(false);
   const [urlNav, setUrlNav] = useState<{ history: string[]; index: number }>({
     history: [win.url ?? ""],
     index: 0,
   });
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const iframeContainerRef = useRef<HTMLDivElement>(null);
   const windowElRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -64,6 +66,33 @@ export function Window({
     }, 6000);
     return () => clearTimeout(timer);
   }, [win.url, win.kind]);
+
+  useEffect(() => {
+    if (win.kind !== "iframe") return;
+    const el = iframeContainerRef.current;
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F6" && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.querySelector<HTMLElement>(".react-flow")?.focus();
+      }
+    };
+    const handleFocusIn = () => setIframeFocused(true);
+    const handleFocusOut = (e: FocusEvent) => {
+      if (!el.contains(e.relatedTarget as Node | null)) {
+        setIframeFocused(false);
+      }
+    };
+    el.addEventListener("keydown", handleKeyDown, { capture: true });
+    el.addEventListener("focusin", handleFocusIn);
+    el.addEventListener("focusout", handleFocusOut);
+    return () => {
+      el.removeEventListener("keydown", handleKeyDown, { capture: true });
+      el.removeEventListener("focusin", handleFocusIn);
+      el.removeEventListener("focusout", handleFocusOut);
+    };
+  }, [win.kind]);
 
   useEffect(() => {
     const el = windowElRef.current?.closest<HTMLElement>(".react-flow__node");
@@ -377,7 +406,18 @@ export function Window({
                 />
               )}
             </form>
-            <div className="flex-1 overflow-hidden relative">
+            <div className="flex-1 overflow-hidden relative" ref={iframeContainerRef}>
+              <span id={`iframe-escape-hint-${win.id}`} className="sr-only">
+                Press F6 to exit iframe and return to canvas
+              </span>
+              {iframeFocused && (
+                <div
+                  className="absolute top-0 left-0 right-0 z-10 bg-surface-dark/80 py-0.5 px-2 text-[11px] text-on-dark-soft text-center pointer-events-none"
+                  aria-hidden="true"
+                >
+                  Press F6 to exit
+                </div>
+              )}
               <div
                 style={{
                   transform: `scale(${1 / flowZoom})`,
@@ -395,6 +435,7 @@ export function Window({
                   onLoad={handleIframeLoad}
                   onError={handleIframeError}
                   className="absolute inset-0 border-0 w-full h-full"
+                  aria-describedby={`iframe-escape-hint-${win.id}`}
                 />
                 {(iframeState === "failed" || iframeState === "likely-blocked") && (
                   <div className="absolute bottom-0 left-0 right-0 bg-surface-dark/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
