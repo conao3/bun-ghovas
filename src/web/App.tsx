@@ -626,6 +626,12 @@ export function App() {
   return (
     <TerminalSessionCtx.Provider value={terminalSessionCtxValue}>
       <div className="grid h-screen w-screen [grid-template-rows:auto_1fr_auto] [grid-template-columns:auto_1fr] [grid-template-areas:'top_top'_'left_center'_'bottom_bottom']">
+        <a
+          href="#main-workspace"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[1000] focus:px-3 focus:py-2 focus:bg-surface-dark focus:text-text focus:border focus:border-accent focus:rounded"
+        >
+          Skip to main content
+        </a>
         <LayerBar
           workspace={workspace}
           activeIds={activeIds}
@@ -638,7 +644,7 @@ export function App() {
           onNewCanvas={handleNewCanvas}
           onReorderCanvas={handleReorderCanvas}
         />
-        <main className="[grid-area:center] relative overflow-hidden" aria-label="Workspace canvas">
+        <main id="main-workspace" tabIndex={-1} className="[grid-area:center] relative overflow-hidden" aria-label="Workspace canvas">
           <Canvas
             canvasState={activeCanvas}
             onCanvasChange={handleCanvasChange}
