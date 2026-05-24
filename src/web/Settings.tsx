@@ -81,7 +81,7 @@ export function Settings({
       <div className="bg-canvas rounded-md -m-5 p-5 flex gap-0 min-w-[560px] min-h-[360px]">
         <div
           role="tablist"
-          aria-label="設定カテゴリ"
+          aria-label="Settings categories"
           aria-orientation="vertical"
           className="w-[140px] bg-surface-soft border-r border-hairline pr-3 mr-3"
         >

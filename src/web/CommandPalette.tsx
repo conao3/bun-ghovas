@@ -200,7 +200,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             aria-controls="command-palette-listbox"
             aria-expanded={itemCount > 0}
             aria-activedescendant={activeDescendant}
-            aria-label="コマンド検索"
+            aria-label="Search commands"
             value={query}
             onChange={(e) => handleQueryChange(e.target.value)}
             className="bg-black/40 border border-white/15 rounded-[3px] text-on-dark-strong font-mono text-[12px] py-[3px] px-2 outline-none w-[440px]"
@@ -211,7 +211,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                 <ul
                   role="listbox"
                   id="command-palette-listbox"
-                  aria-label="コマンド候補"
+                  aria-label="Command suggestions"
                   className="list-none p-0 m-0"
                 >
                   {searchResults.map((cmd, i) => (
@@ -248,7 +248,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                 <ul
                   role="listbox"
                   id="command-palette-listbox"
-                  aria-label="コマンド候補"
+                  aria-label="Command suggestions"
                   className="list-none p-0 m-0"
                 >
                   {categoryRows.map((row) =>
