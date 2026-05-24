@@ -16,6 +16,7 @@ interface TerminalProps {
 
 export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: TerminalProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const [overlay, setOverlay] = useState<string | null>(null);
   const [reconnectKey, setReconnectKey] = useState(0);
   const toast = useToast();
@@ -89,11 +90,26 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: Terminal
     };
   }, [sessionId, shell, cwd, scrollbackMiB, env, reconnectKey]);
 
+  useEffect(() => {
+    const el = wrapperRef.current;
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F6" && !e.shiftKey) {
+        e.preventDefault();
+        e.stopPropagation();
+        document.querySelector<HTMLElement>(".react-flow")?.focus();
+      }
+    };
+    el.addEventListener("keydown", handleKeyDown, { capture: true });
+    return () => el.removeEventListener("keydown", handleKeyDown, { capture: true });
+  }, []);
+
   const showReconnect =
     overlay !== null && !overlay.startsWith("init error:") && overlay !== "Reconnecting...";
 
   return (
     <div
+      ref={wrapperRef}
       className="relative w-full h-full"
       onPointerDown={(e) => e.stopPropagation()}
       onWheel={(e) => e.stopPropagation()}
