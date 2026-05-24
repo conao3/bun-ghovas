@@ -242,8 +242,14 @@ export function App() {
           const delta = def.id === "cycle-next-window" ? 1 : -1;
           const nextIdx =
             currentIdx === -1 ? 0 : (currentIdx + delta + nodes.length) % nodes.length;
+          const targetId = nodes[nextIdx]!.id;
           e.preventDefault();
-          setFocusedWindowId(nodes[nextIdx]!.id);
+          setFocusedWindowId(targetId);
+          setTimeout(() => {
+            document
+              .querySelector<HTMLElement>(`.react-flow__node-window[data-id="${targetId}"]`)
+              ?.focus();
+          }, 0);
         }
         break;
       }
