@@ -54,6 +54,7 @@ export function Window({
     index: 0,
   });
   const [resizeAnnouncement, setResizeAnnouncement] = useState("");
+  const [iframeStatusAnnouncement, setIframeStatusAnnouncement] = useState("");
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
@@ -76,6 +77,19 @@ export function Window({
     }, 6000);
     return () => clearTimeout(timer);
   }, [win.url, win.kind]);
+
+  useEffect(() => {
+    if (win.kind !== "iframe") return;
+    if (iframeState === "likely-blocked") {
+      setIframeStatusAnnouncement(
+        `${win.title}: site blocked iframe embedding. Press Retry or change URL.`,
+      );
+    } else if (iframeState === "failed") {
+      setIframeStatusAnnouncement(`${win.title}: failed to load.`);
+    } else {
+      setIframeStatusAnnouncement("");
+    }
+  }, [iframeState, win.title, win.kind]);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -247,6 +261,14 @@ export function Window({
         className="sr-only"
       >
         {resizeAnnouncement}
+      </div>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {iframeStatusAnnouncement}
       </div>
       <div
         ref={menuAnchorRef}
