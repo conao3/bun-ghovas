@@ -72,10 +72,12 @@ function MinimapKeyboardController() {
 
     const PAN_STEP = 100;
 
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        void fitView({ duration: 300 });
+        void fitView({ duration: reducedMotion ? 0 : 300 });
         return;
       }
       if (e.key === "Escape") {
@@ -92,7 +94,7 @@ function MinimapKeyboardController() {
       else return;
       e.preventDefault();
       const { x, y, zoom } = getViewport();
-      void setViewport({ x: x + dx, y: y + dy, zoom }, { duration: 100 });
+      void setViewport({ x: x + dx, y: y + dy, zoom }, { duration: reducedMotion ? 0 : 100 });
     };
 
     minimap.addEventListener("keydown", onKeyDown);

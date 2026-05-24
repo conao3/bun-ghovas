@@ -106,6 +106,17 @@ input:focus-visible {
   outline-offset: 2px;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 .react-flow {
   --xy-background-color-default: var(--color-dark-canvas);
   --xy-background-pattern-dots-color-default: var(--color-dark-canvas-grid);
