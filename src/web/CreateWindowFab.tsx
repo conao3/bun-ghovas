@@ -48,6 +48,7 @@ export function CreateWindowFab({
           style={{
             borderRadius: "50%",
             padding: 0,
+            color: "var(--color-ink)",
           }}
         >
           <Plus size={20} aria-hidden />
