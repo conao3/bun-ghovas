@@ -495,7 +495,8 @@ export function App() {
       id: "reset-workspace",
       label: "Reset workspace to default",
       category: "Workspace",
-      confirm: "This resets all layers and windows to the default workspace. Continue?",
+      confirmTitle: "Reset workspace?",
+      confirm: "This will close all windows and reset layers to the default state. This cannot be undone.",
       run: () => {
         setWorkspace(INITIAL_WORKSPACE);
         setActiveIds(INITIAL_ACTIVE);

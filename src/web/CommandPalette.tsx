@@ -44,6 +44,7 @@ export interface Command {
   id: string;
   label: string;
   category: string;
+  confirmTitle?: string;
   confirm?: string;
   run: () => void;
 }
@@ -169,12 +170,18 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} ariaLabel="Command palette">
-      {pendingConfirm ? (
+    <>
+      <Modal isOpen={!!pendingConfirm} onClose={handleCancel} ariaLabelledby="confirm-dialog-heading">
         <div className="w-[440px]">
-          <div className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">
-            {pendingConfirm.confirm}
-          </div>
+          <h2
+            id="confirm-dialog-heading"
+            className="text-on-dark-strong font-mono text-[14px] font-semibold mb-2 mt-0"
+          >
+            {pendingConfirm?.confirmTitle ?? pendingConfirm?.label}
+          </h2>
+          <p id="confirm-dialog-desc" className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">
+            {pendingConfirm?.confirm}
+          </p>
           <div className="flex gap-2 justify-end">
             <button
               onClick={handleCancel}
@@ -184,6 +191,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             </button>
             <button
               autoFocus
+              aria-describedby="confirm-dialog-desc"
               onClick={handleConfirm}
               className="py-[5px] px-[14px] rounded-[3px] border-0 bg-error text-white font-mono text-[13px] cursor-pointer"
             >
@@ -191,7 +199,8 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             </button>
           </div>
         </div>
-      ) : (
+      </Modal>
+      <Modal isOpen={isOpen && !pendingConfirm} onClose={onClose} ariaLabel="Command palette">
         <div onKeyDown={handleKeyDown}>
           <input
             autoFocus
@@ -297,7 +306,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
             )}
           </div>
         </div>
-      )}
-    </Modal>
+      </Modal>
+    </>
   );
 }
