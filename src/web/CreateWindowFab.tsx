@@ -99,7 +99,13 @@ export function CreateWindowFab({
         </Popover>
       </DialogTrigger>
 
-      <Modal isOpen={urlModalOpen} onClose={handleCancel} ariaLabel="New iframe window">
+      <Modal isOpen={urlModalOpen} onClose={handleCancel} ariaLabelledby="iframe-url-modal-title">
+        <h2
+          id="iframe-url-modal-title"
+          className="text-[11px] font-mono text-on-dark-weak uppercase tracking-wider mb-2"
+        >
+          New iframe window
+        </h2>
         <form
           onSubmit={(e) => {
             e.preventDefault();
