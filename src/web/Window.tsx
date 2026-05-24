@@ -15,6 +15,7 @@ import { loadBackendSettings } from "./lib/backendSettings";
 import { loadConfirmWindowClose } from "./lib/generalSettings";
 import { useFlowZoom } from "./lib/useFlowZoom";
 import { normalizeUrl } from "./lib/normalizeUrl";
+import { useAnnounce } from "./lib/LiveAnnouncer";
 
 type IframeLoadState = "idle" | "loading" | "loaded" | "failed" | "likely-blocked";
 
@@ -55,8 +56,7 @@ export function Window({
     history: [win.url ?? ""],
     index: 0,
   });
-  const [resizeAnnouncement, setResizeAnnouncement] = useState("");
-  const [iframeStatusAnnouncement, setIframeStatusAnnouncement] = useState("");
+  const announce = useAnnounce();
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeContainerRef = useRef<HTMLDivElement>(null);
@@ -66,10 +66,10 @@ export function Window({
   useEffect(() => {
     const prev = prevDimsRef.current;
     if (prev.width !== win.width || prev.height !== win.height) {
-      setResizeAnnouncement(`Window resized to ${win.width} by ${win.height} pixels`);
+      announce(`Window resized to ${win.width} by ${win.height} pixels`);
       prevDimsRef.current = { width: win.width, height: win.height };
     }
-  }, [win.width, win.height]);
+  }, [win.width, win.height, announce]);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -83,15 +83,11 @@ export function Window({
   useEffect(() => {
     if (win.kind !== "iframe") return;
     if (iframeState === "likely-blocked") {
-      setIframeStatusAnnouncement(
-        `${win.title}: site blocked iframe embedding. Press Retry or change URL.`,
-      );
+      announce(`${win.title}: site blocked iframe embedding. Press Retry or change URL.`);
     } else if (iframeState === "failed") {
-      setIframeStatusAnnouncement(`${win.title}: failed to load.`);
-    } else {
-      setIframeStatusAnnouncement("");
+      announce(`${win.title}: failed to load.`);
     }
-  }, [iframeState, win.title, win.kind]);
+  }, [iframeState, win.title, win.kind, announce]);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -283,22 +279,6 @@ export function Window({
 
   return (
     <>
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {resizeAnnouncement}
-      </div>
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {iframeStatusAnnouncement}
-      </div>
       <div
         ref={menuAnchorRef}
         className="fixed w-0 h-0 pointer-events-none"
