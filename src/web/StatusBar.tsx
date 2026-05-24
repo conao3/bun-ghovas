@@ -65,7 +65,11 @@ export function StatusBar({
           </span>
         ))}
       </span>
-      <span>{focusedWindowTitle ?? "—"}</span>
+      <span>
+        {focusedWindowTitle != null
+          ? `${focusedWindowTitle} · ↑↓←→ move · Alt+↑↓←→ resize`
+          : "—"}
+      </span>
       <span className="flex gap-3 whitespace-nowrap">
         <DialogTrigger>
           <Button

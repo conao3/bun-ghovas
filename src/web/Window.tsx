@@ -210,6 +210,16 @@ export function Window({
       </Modal>
       <div
         onMouseDown={handleWindowMouseDown}
+        onKeyDownCapture={(e) => {
+          if (e.key !== "Escape") return;
+          const t = e.target as HTMLElement;
+          if (t instanceof HTMLInputElement || t instanceof HTMLButtonElement) return;
+          const rfNode = (e.currentTarget as HTMLElement).closest(".react-flow__node");
+          if (rfNode instanceof HTMLElement) {
+            rfNode.focus();
+            e.stopPropagation();
+          }
+        }}
         className={clsx(
           "absolute box-border rounded-[6px] bg-surface-dark flex flex-col overflow-visible",
           isFocused ? "border-[1.5px] border-primary" : "border border-white/15",
@@ -265,7 +275,7 @@ export function Window({
         </div>
 
         {win.kind === "iframe" ? (
-          <div className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]">
+          <div data-window-content className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]">
             <form
               onSubmit={handleUrlSubmit}
               onMouseDown={(e) => e.stopPropagation()}
@@ -366,6 +376,7 @@ export function Window({
           </div>
         ) : (
           <div
+            data-window-content
             className="flex-1 overflow-hidden bg-surface-dark rounded-b-[5px]"
             onPointerDown={(e) => e.stopPropagation()}
             onWheel={(e) => e.stopPropagation()}

@@ -298,6 +298,82 @@ export function Canvas({
     [onCanvasChange],
   );
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const active = document.activeElement as HTMLElement | null;
+      if (!active?.classList.contains("react-flow__node-window")) return;
+
+      const nodeId = active.dataset["id"];
+      if (!nodeId) return;
+
+      if (e.key === "Enter") {
+        e.preventDefault();
+        onFocusWindow(nodeId);
+        const contentArea = active.querySelector<HTMLElement>("[data-window-content]");
+        const focusable = contentArea?.querySelector<HTMLElement>("iframe, canvas, textarea");
+        focusable?.focus();
+        return;
+      }
+
+      const isArrow =
+        e.key === "ArrowLeft" ||
+        e.key === "ArrowRight" ||
+        e.key === "ArrowUp" ||
+        e.key === "ArrowDown";
+      if (!isArrow) return;
+
+      e.preventDefault();
+      onFocusWindow(nodeId);
+
+      const prev = stateRef.current;
+      const updatedNodes = prev.nodes.map((n) => {
+        if (n.id !== nodeId) return n;
+
+        if (e.altKey) {
+          const delta = e.shiftKey ? 50 : 10;
+          let x = n.position.x;
+          let y = n.position.y;
+          let w = n.width;
+          let h = n.height;
+
+          if (e.key === "ArrowRight") w = Math.max(120, w + delta);
+          else if (e.key === "ArrowLeft") {
+            x -= delta;
+            w = Math.max(120, w + delta);
+          } else if (e.key === "ArrowDown") h = Math.max(60, h + delta);
+          else if (e.key === "ArrowUp") {
+            y -= delta;
+            h = Math.max(60, h + delta);
+          }
+
+          return {
+            ...n,
+            width: w,
+            height: h,
+            position: { x, y },
+            data: { ...n.data, x, y, width: w, height: h },
+          };
+        } else {
+          const delta = e.shiftKey ? 50 : 5;
+          let x = n.position.x;
+          let y = n.position.y;
+
+          if (e.key === "ArrowLeft") x -= delta;
+          else if (e.key === "ArrowRight") x += delta;
+          else if (e.key === "ArrowUp") y -= delta;
+          else if (e.key === "ArrowDown") y += delta;
+
+          return { ...n, position: { x, y }, data: { ...n.data, x, y } };
+        }
+      });
+
+      onCanvasChange({ ...prev, nodes: updatedNodes });
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onCanvasChange, onFocusWindow]);
+
   const handleViewportChange = useCallback(
     (viewport: Viewport) => {
       const prev = stateRef.current.viewport;
