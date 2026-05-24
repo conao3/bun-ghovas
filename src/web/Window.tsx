@@ -257,11 +257,19 @@ export function Window({
             isFocused ? "bg-dark-titlebar-focused" : "bg-dark-titlebar",
           )}
         >
-          <div className="flex gap-1.5 shrink-0">
-            <span className="w-3 h-3 rounded-full bg-error" />
-            <span className="w-3 h-3 rounded-full bg-warning" />
-            <span className="w-3 h-3 rounded-full bg-success" />
-          </div>
+          <button
+            type="button"
+            aria-label="Window menu"
+            aria-haspopup="menu"
+            tabIndex={-1}
+            className="flex gap-1.5 shrink-0 bg-transparent border-0 p-0 m-0 cursor-pointer outline-none"
+            onMouseDown={(e) => e.stopPropagation()}
+            onClick={handleTitleContextMenu}
+          >
+            <span className="w-3 h-3 rounded-full bg-error" aria-hidden="true" />
+            <span className="w-3 h-3 rounded-full bg-warning" aria-hidden="true" />
+            <span className="w-3 h-3 rounded-full bg-success" aria-hidden="true" />
+          </button>
           <span className="text-[13px] font-mono text-on-dark-strong truncate flex-1 min-w-0">
             {win.title}
           </span>
