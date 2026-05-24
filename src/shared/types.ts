@@ -16,6 +16,8 @@ export interface WindowState {
   title: string;
   sessionId?: string;
   url?: string;
+  minimized?: boolean;
+  heightBeforeMinimize?: number;
 }
 
 export type LayerLevel = 0 | 1 | 2 | 3;

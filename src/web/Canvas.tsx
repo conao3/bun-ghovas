@@ -65,6 +65,7 @@ function WindowNode({ data }: NodeProps) {
       isFocused={isFocused}
       onFocus={callbacks.onFocus}
       onClose={callbacks.onClose}
+      onMinimize={callbacks.onMinimize}
       onUrlChange={callbacks.onUrlChange}
       onRename={callbacks.onRename}
       onDuplicate={callbacks.onDuplicate}
@@ -207,6 +208,33 @@ export function Canvas({
     (id: string) => {
       const prev = stateRef.current;
       onCanvasChange({ ...prev, nodes: prev.nodes.filter((n) => n.id !== id) });
+    },
+    [onCanvasChange],
+  );
+
+  const handleWindowMinimize = useCallback(
+    (id: string) => {
+      const prev = stateRef.current;
+      const minimizedHeight = 32;
+      onCanvasChange({
+        ...prev,
+        nodes: prev.nodes.map((n) => {
+          if (n.id !== id) return n;
+          if (n.data.minimized) {
+            const restored = n.data.heightBeforeMinimize ?? 300;
+            return {
+              ...n,
+              height: restored,
+              data: { ...n.data, height: restored, minimized: false, heightBeforeMinimize: undefined },
+            };
+          }
+          return {
+            ...n,
+            height: minimizedHeight,
+            data: { ...n.data, height: minimizedHeight, minimized: true, heightBeforeMinimize: n.height },
+          };
+        }),
+      });
     },
     [onCanvasChange],
   );
@@ -461,11 +489,12 @@ export function Canvas({
     () => ({
       onFocus: onFocusWindow,
       onClose: handleWindowClose,
+      onMinimize: handleWindowMinimize,
       onUrlChange,
       onRename: handleWindowRename,
       onDuplicate: handleWindowDuplicate,
     }),
-    [onFocusWindow, handleWindowClose, onUrlChange, handleWindowRename, handleWindowDuplicate],
+    [onFocusWindow, handleWindowClose, handleWindowMinimize, onUrlChange, handleWindowRename, handleWindowDuplicate],
   );
 
   const nodes = useMemo(
