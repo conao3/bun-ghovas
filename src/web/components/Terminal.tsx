@@ -47,6 +47,8 @@ export function Terminal({ sessionId, shell, cwd, scrollbackMiB, env }: Terminal
         const fitAddon = new FitAddon();
         term.loadAddon(fitAddon);
         term.open(el);
+        el.removeAttribute("role");
+        el.removeAttribute("aria-label");
         fitAddon.fit();
 
         const dims = fitAddon.proposeDimensions();
