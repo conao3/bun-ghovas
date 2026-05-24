@@ -136,6 +136,9 @@ function SortableTabItem({
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
   }, [canvas.id, onContextMenuFromKeyboard]);
+  useEffect(() => {
+    elRef.current?.setAttribute("aria-roledescription", "sortable");
+  }, []);
   return (
     <Tab
       id={canvas.id}
@@ -200,6 +203,9 @@ function SortableVerticalTabItem({
     el.addEventListener("keydown", handleKeyDown);
     return () => el.removeEventListener("keydown", handleKeyDown);
   }, [canvas.id, onContextMenuFromKeyboard]);
+  useEffect(() => {
+    elRef.current?.setAttribute("aria-roledescription", "sortable");
+  }, []);
   return (
     <Tab
       id={canvas.id}

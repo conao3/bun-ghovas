@@ -80,11 +80,22 @@ function SortableFloatingTabItem({
     transition,
     ...(isDragging ? { opacity: 0.5, cursor: "grabbing" } : {}),
   };
+  const elRef = useRef<HTMLElement | null>(null);
+  const setRef = useCallback(
+    (node: HTMLElement | null) => {
+      elRef.current = node;
+      setNodeRef(node);
+    },
+    [setNodeRef],
+  );
+  useEffect(() => {
+    elRef.current?.setAttribute("aria-roledescription", "sortable");
+  }, []);
   return (
     <Tab
       id={canvas.id}
       variant={level === 3 ? "layer-l3" : "layer"}
-      ref={setNodeRef}
+      ref={setRef}
       style={style}
       className={isOver ? "border-l-2 border-primary" : undefined}
       {...attributes}
