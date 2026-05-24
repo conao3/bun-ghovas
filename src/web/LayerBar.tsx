@@ -623,6 +623,7 @@ export function LayerBar({
           verticalLevels.length > 0 && "border-r border-dark-hairline",
         )}
       >
+        <h2 className="sr-only">Layer navigation</h2>
         {verticalLevels.map((level) => (
           <VerticalColumn
             key={level}
