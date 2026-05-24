@@ -156,6 +156,9 @@ export function Canvas({
     ) {
       return;
     }
+    if (target.closest(".react-flow__node-window")) {
+      return;
+    }
     const actions = keyboardActionsRef.current;
     if (!actions) return;
     const step = e.shiftKey ? 200 : 50;
