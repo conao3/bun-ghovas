@@ -7,14 +7,18 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  KeyboardSensor,
   useDndContext,
   type DragEndEvent,
+  type Active,
+  type Over,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
   horizontalListSortingStrategy,
   verticalListSortingStrategy,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
@@ -32,6 +36,42 @@ import type {
   LayerUiMode,
   CanvasStateV2,
 } from "../shared/types";
+
+const dndAnnouncements = {
+  onDragStart({ active }: { active: Active }) {
+    return `${active.data.current?.label ?? active.id} grabbed.`;
+  },
+  onDragOver({ active, over }: { active: Active; over: Over | null }) {
+    if (over) {
+      return `${active.data.current?.label ?? active.id} moved over ${over.data.current?.label ?? over.id}.`;
+    }
+    return undefined;
+  },
+  onDragEnd({ active, over }: { active: Active; over: Over | null }) {
+    return over
+      ? `${active.data.current?.label ?? active.id} dropped.`
+      : `${active.data.current?.label ?? active.id} returned to original position.`;
+  },
+  onDragCancel({ active }: { active: Active; over: Over | null }) {
+    return `Cancelled. ${active.data.current?.label ?? active.id} returned to original position.`;
+  },
+};
+
+const horizontalDndAccessibility = {
+  screenReaderInstructions: {
+    draggable:
+      "Press Space or Enter to grab. Use left or right arrow keys to reorder. Press Space or Enter to drop, or Escape to cancel.",
+  },
+  announcements: dndAnnouncements,
+};
+
+const verticalDndAccessibility = {
+  screenReaderInstructions: {
+    draggable:
+      "Press Space or Enter to grab. Use up or down arrow keys to reorder. Press Space or Enter to drop, or Escape to cancel.",
+  },
+  announcements: dndAnnouncements,
+};
 
 interface LayerBarProps {
   workspace: WorkspaceState;
@@ -61,8 +101,9 @@ function SortableTabItem({
   level: LayerLevel;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
-  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
+    data: { label: canvas.name ?? canvas.id },
   });
   const { active, over } = useDndContext();
   const isOver = !isDragging && active !== null && over?.id === canvas.id;
@@ -79,6 +120,7 @@ function SortableTabItem({
       ref={setNodeRef}
       style={style}
       className={isOver ? "border-l-2 border-primary" : undefined}
+      {...attributes}
       {...listeners}
     >
       {canvas.statusHint && (
@@ -99,8 +141,9 @@ function SortableVerticalTabItem({
   canvas: CanvasStateV2;
   onContextMenu: (e: React.MouseEvent) => void;
 }) {
-  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
+    data: { label: canvas.name ?? canvas.id },
   });
   const { active, over } = useDndContext();
   const isOver = !isDragging && active !== null && over?.id === canvas.id;
@@ -117,6 +160,7 @@ function SortableVerticalTabItem({
       ref={setNodeRef}
       style={style}
       className={isOver ? "border-t-2 border-primary" : undefined}
+      {...attributes}
       {...listeners}
     >
       <span
@@ -230,7 +274,10 @@ function HorizontalStrip({
   );
   const shortcutDef = SHORTCUTS.find((s) => s.id === `cycle-l${level}-canvas`);
   const metaHint = shortcutDef ? formatShortcut(shortcutDef) : null;
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const ids = layer.canvases.map((c) => c.id);
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -336,6 +383,7 @@ function HorizontalStrip({
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
+          accessibility={horizontalDndAccessibility}
         >
           <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
             <Tabs
@@ -408,7 +456,10 @@ function VerticalColumn({
     onDeleteCanvas,
     onNewCanvas,
   );
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const ids = layer.canvases.map((c) => c.id);
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -504,6 +555,7 @@ function VerticalColumn({
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragEnd={handleDragEnd}
+          accessibility={verticalDndAccessibility}
         >
           <SortableContext items={ids} strategy={verticalListSortingStrategy}>
             <Tabs
