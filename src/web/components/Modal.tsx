@@ -6,9 +6,10 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   ariaLabel?: string;
+  ariaLabelledby?: string;
 }
 
-export function Modal({ isOpen, onClose, children, ariaLabel }: ModalProps) {
+export function Modal({ isOpen, onClose, children, ariaLabel, ariaLabelledby }: ModalProps) {
   return (
     <ModalOverlay
       isOpen={isOpen}
@@ -16,7 +17,7 @@ export function Modal({ isOpen, onClose, children, ariaLabel }: ModalProps) {
       className="fixed inset-0 bg-black/60 flex items-center justify-center z-[1000]"
     >
       <RACModal className="bg-surface-dark-elevated border border-white/15 rounded-md p-5 min-w-[320px] outline-none">
-        <Dialog aria-label={ariaLabel} aria-modal className="outline-none">
+        <Dialog aria-label={ariaLabel} aria-labelledby={ariaLabelledby} aria-modal className="outline-none">
           {children}
         </Dialog>
       </RACModal>

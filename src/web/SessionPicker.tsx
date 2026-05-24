@@ -86,13 +86,16 @@ export function SessionPicker({ isOpen, onClose, onAttach, windowTitles }: Sessi
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      ariaLabel={view === "form" ? "New terminal session" : "Open terminal"}
+      ariaLabelledby="session-picker-title"
     >
       {view === "picker" ? (
         <div className="flex flex-col w-72">
-          <div className="font-mono text-[11px] text-on-dark-muted px-1 pb-2">
+          <h2
+            id="session-picker-title"
+            className="font-mono text-[11px] text-on-dark-muted px-1 pb-2"
+          >
             terminal → session
-          </div>
+          </h2>
           <Button
             variant="ghost"
             className="justify-start gap-2 text-sm items-start py-1.5 w-full"
@@ -148,7 +151,9 @@ export function SessionPicker({ isOpen, onClose, onAttach, windowTitles }: Sessi
         </div>
       ) : (
         <div className="flex flex-col gap-3 min-w-[320px]">
-          <div className="font-mono text-[11px] text-on-dark-muted">new pty session</div>
+          <h2 id="session-picker-title" className="font-mono text-[11px] text-on-dark-muted">
+            new pty session
+          </h2>
           <TextField label="Shell" value={shell} onChange={setShell} />
           <TextField label="Working directory" value={cwd} onChange={setCwd} />
           <div className="flex flex-col gap-0.5 font-mono text-[12px]">
