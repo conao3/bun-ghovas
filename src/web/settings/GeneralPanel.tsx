@@ -60,9 +60,9 @@ export function GeneralPanel() {
   return (
     <div>
       <PanelHeader icon={Settings} title="General" />
-      <div className="flex flex-col gap-3">
-        <div className="flex flex-col gap-1">
-          <span className="text-body-strong font-mono text-[13px]">Windows</span>
+      <div className="flex flex-col gap-6">
+        <section>
+          <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-2">Windows</h3>
           <div className="flex items-center gap-3">
             <button
               type="button"
@@ -99,57 +99,54 @@ export function GeneralPanel() {
               Always confirm before closing windows
             </span>
           </div>
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="text-body-strong font-mono text-[13px]">Startup</span>
-          <div className="flex flex-col gap-3">
-            <div>
-              <div className="text-muted font-mono text-[12px] mb-2">
-                What to show when ghovas opens.
-              </div>
-              <div
-                role="radiogroup"
-                aria-label="Startup mode"
-                className="inline-flex bg-surface-card rounded-md p-[3px] gap-[2px]"
-              >
-                {STARTUP_OPTIONS.map((opt) => {
-                  const isActive = startupMode === opt.value;
-                  return (
-                    <button
-                      key={opt.value}
-                      role="radio"
-                      aria-checked={isActive}
-                      onClick={() => handleStartupModeChange(opt.value)}
-                      style={{
-                        background: isActive ? "var(--color-canvas)" : "transparent",
-                        border: 0,
-                        fontFamily: "var(--font-mono)",
-                        fontSize: 12,
-                        fontWeight: 500,
-                        color: isActive ? "var(--color-ink)" : "var(--color-body)",
-                        padding: "6px 14px",
-                        borderRadius: 5,
-                        cursor: "pointer",
-                        boxShadow: isActive ? "0 1px 2px rgba(20,20,19,0.08)" : "none",
-                      }}
-                    >
-                      {opt.label}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-            <div>
-              <Button variant="secondary" onPress={handleResetOnboarding}>
-                Reset onboarding
-              </Button>
-              <p className="text-muted font-mono text-[11px] mt-1">
-                Clears the "onboarded" / "tutorial seen" flags so the welcome screen and the tutorial
-                overlay appear on the next load.
-              </p>
-            </div>
+        </section>
+        <section>
+          <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-2">Startup mode</h3>
+          <div className="text-muted font-mono text-[12px] mb-2">
+            What to show when ghovas opens.
           </div>
-        </div>
+          <div
+            role="radiogroup"
+            aria-label="Startup mode"
+            className="inline-flex bg-surface-card rounded-md p-[3px] gap-[2px]"
+          >
+            {STARTUP_OPTIONS.map((opt) => {
+              const isActive = startupMode === opt.value;
+              return (
+                <button
+                  key={opt.value}
+                  role="radio"
+                  aria-checked={isActive}
+                  onClick={() => handleStartupModeChange(opt.value)}
+                  style={{
+                    background: isActive ? "var(--color-canvas)" : "transparent",
+                    border: 0,
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 12,
+                    fontWeight: 500,
+                    color: isActive ? "var(--color-ink)" : "var(--color-body)",
+                    padding: "6px 14px",
+                    borderRadius: 5,
+                    cursor: "pointer",
+                    boxShadow: isActive ? "0 1px 2px rgba(20,20,19,0.08)" : "none",
+                  }}
+                >
+                  {opt.label}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+        <section>
+          <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-2">Onboarding</h3>
+          <Button variant="secondary" onPress={handleResetOnboarding}>
+            Reset onboarding
+          </Button>
+          <p className="text-muted font-mono text-[11px] mt-1">
+            Clears the "onboarded" / "tutorial seen" flags so the welcome screen and the tutorial
+            overlay appear on the next load.
+          </p>
+        </section>
       </div>
     </div>
   );

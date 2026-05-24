@@ -147,9 +147,9 @@ export function WorkspacesPanel(props: {
     <div>
       <PanelHeader icon={LayoutGrid} title="Workspaces" />
       <div className="flex flex-col gap-4">
-        <div>
+        <section>
           <div className="flex items-center justify-between mb-2">
-            <span className="font-mono text-[11px] text-white/50 uppercase tracking-wide">Saved workspaces</span>
+            <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-0">Saved workspaces</h3>
             <Button onPress={handleSaveAsOpen} className="!bg-surface-card !text-body-strong !border-hairline text-[12px]">
               Save as...
             </Button>
@@ -189,9 +189,10 @@ export function WorkspacesPanel(props: {
               })}
             </tbody>
           </table>
-        </div>
+        </section>
 
-        <div className="flex flex-col gap-2 pt-2 border-t border-white/8">
+        <section className="flex flex-col gap-2 pt-2 border-t border-white/8">
+          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-1">Export / Import</h3>
           <div>
             <Button
               onPress={handleExport}
@@ -218,16 +219,18 @@ export function WorkspacesPanel(props: {
             </div>
             {importError && <span className="text-error font-mono text-[12px]">{importError}</span>}
           </div>
-          <div>
-            <Button
-              variant="secondary"
-              onPress={handleReset}
-              className="!bg-surface-card !text-body-strong !border-hairline"
-            >
-              Reset to default
-            </Button>
-          </div>
-        </div>
+        </section>
+
+        <section className="pt-2 border-t border-white/8">
+          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-2">Reset</h3>
+          <Button
+            variant="secondary"
+            onPress={handleReset}
+            className="!bg-surface-card !text-body-strong !border-hairline"
+          >
+            Reset to default
+          </Button>
+        </section>
       </div>
 
       <Modal isOpen={saveAsOpen} onClose={() => setSaveAsOpen(false)} ariaLabel="Save workspace as">
