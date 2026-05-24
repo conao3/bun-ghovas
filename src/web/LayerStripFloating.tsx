@@ -6,18 +6,48 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  KeyboardSensor,
   useDndContext,
   type DragEndEvent,
+  type Active,
+  type Over,
 } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
   horizontalListSortingStrategy,
+  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import type { CanvasStateV2, LayerLevel, LayerState } from "../shared/types";
+
+const floatingDndAccessibility = {
+  screenReaderInstructions: {
+    draggable:
+      "Press Space or Enter to grab. Use left or right arrow keys to reorder. Press Space or Enter to drop, or Escape to cancel.",
+  },
+  announcements: {
+    onDragStart({ active }: { active: Active }) {
+      return `${active.data.current?.label ?? active.id} grabbed.`;
+    },
+    onDragOver({ active, over }: { active: Active; over: Over | null }) {
+      if (over) {
+        return `${active.data.current?.label ?? active.id} moved over ${over.data.current?.label ?? over.id}.`;
+      }
+      return undefined;
+    },
+    onDragEnd({ active, over }: { active: Active; over: Over | null }) {
+      return over
+        ? `${active.data.current?.label ?? active.id} dropped.`
+        : `${active.data.current?.label ?? active.id} returned to original position.`;
+    },
+    onDragCancel({ active }: { active: Active; over: Over | null }) {
+      return `Cancelled. ${active.data.current?.label ?? active.id} returned to original position.`;
+    },
+  },
+};
 
 interface LayerStripFloatingProps {
   level: LayerLevel;
@@ -38,8 +68,9 @@ function SortableFloatingTabItem({
   canvas: CanvasStateV2;
   level: LayerLevel;
 }) {
-  const { listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
+    data: { label: canvas.name ?? canvas.id },
   });
   const { active, over } = useDndContext();
   const isOver = !isDragging && active !== null && over?.id === canvas.id;
@@ -55,6 +86,7 @@ function SortableFloatingTabItem({
       ref={setNodeRef}
       style={style}
       className={isOver ? "border-l-2 border-primary" : undefined}
+      {...attributes}
       {...listeners}
     >
       {canvas.statusHint && (
@@ -124,7 +156,10 @@ export function LayerStripFloating({
     }
   };
 
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  );
   const ids = layer.canvases.map((c) => c.id);
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -178,6 +213,7 @@ export function LayerStripFloating({
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
+        accessibility={floatingDndAccessibility}
       >
         <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
           <Tabs
