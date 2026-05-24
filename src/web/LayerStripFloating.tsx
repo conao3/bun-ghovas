@@ -184,6 +184,7 @@ export function LayerStripFloating({
           : { bottom: initialBottom, left: "50%", transform: "translateX(-50%)" }),
       }}
     >
+      <h2 className="sr-only">Floating layer strip</h2>
       <div
         onMouseDown={handleGripMouseDown}
         className="cursor-grab py-1.5 pl-2.5 pr-2 text-on-dark-muted select-none shrink-0"

@@ -421,6 +421,7 @@ export function Canvas({
       ref={containerRef}
       className="absolute inset-0 overflow-hidden bg-dark-canvas"
     >
+      <h2 className="sr-only">Workspace canvas</h2>
       <ReactFlow
         aria-label="Window manager canvas"
         tabIndex={0}

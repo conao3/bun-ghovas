@@ -50,6 +50,7 @@ export function StatusBar({
       className="[grid-area:bottom] h-[22px] flex items-center justify-between px-2
         bg-surface-dark border-t border-dark-hairline text-on-dark-soft text-[11px] font-mono select-none"
     >
+      <h2 className="sr-only">Status bar</h2>
       <span className="flex gap-1 items-center">
         {treeLevels.map(({ level, name }, idx) => (
           <span key={level} className="flex items-center gap-1">
