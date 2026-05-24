@@ -248,7 +248,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   })}
                 </ul>
                 {searchResults.length === 0 && (
-                  <div role="status" aria-live="polite" className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
+                  <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
                     No commands found
                   </div>
                 )}
@@ -313,7 +313,7 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   })()}
                 </ul>
                 {categoryItems.length === 0 && (
-                  <div role="status" aria-live="polite" className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
+                  <div className="px-[10px] py-[6px] text-white/40 font-mono text-[13px]">
                     No commands found
                   </div>
                 )}

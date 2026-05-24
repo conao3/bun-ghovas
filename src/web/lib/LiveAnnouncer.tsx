@@ -7,25 +7,17 @@ type AnnounceFunction = (message: string, politeness?: AnnouncePoliteness) => vo
 const LiveAnnouncerCtx = createContext<AnnounceFunction>(() => {});
 
 export function LiveAnnouncerProvider({ children }: { children: ReactNode }) {
-  const [politeMsg, setPoliteMsg] = useState("");
-  const [assertiveMsg, setAssertiveMsg] = useState("");
+  const [msg, setMsg] = useState("");
 
-  const announce = useCallback<AnnounceFunction>((message, politeness = "polite") => {
-    if (politeness === "assertive") {
-      setAssertiveMsg(message);
-    } else {
-      setPoliteMsg(message);
-    }
+  const announce = useCallback<AnnounceFunction>((message) => {
+    setMsg(message);
   }, []);
 
   return (
     <LiveAnnouncerCtx.Provider value={announce}>
       {children}
       <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
-        {politeMsg}
-      </div>
-      <div role="status" aria-live="assertive" aria-atomic="true" className="sr-only">
-        {assertiveMsg}
+        {msg}
       </div>
     </LiveAnnouncerCtx.Provider>
   );

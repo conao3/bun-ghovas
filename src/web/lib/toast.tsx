@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import clsx from "clsx";
 import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { useAnnounce } from "./LiveAnnouncer";
 
 export type ToastKind = "success" | "warning" | "error";
 
@@ -32,6 +33,7 @@ const KIND_ROLE: Record<ToastKind, "status" | "alert"> = {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const announce = useAnnounce();
 
   const dismiss = useCallback((id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
@@ -41,9 +43,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     (kind: ToastKind, message: string) => {
       const id = crypto.randomUUID();
       setToasts((prev) => [...prev, { id, kind, message }]);
+      announce(`${kind}: ${message}`, kind === "error" ? "assertive" : "polite");
       setTimeout(() => dismiss(id), 3000);
     },
-    [dismiss],
+    [dismiss, announce],
   );
 
   return (
@@ -52,8 +55,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="region"
         aria-label="Notifications"
-        aria-live="polite"
-        aria-atomic="false"
         className="fixed top-4 right-4 z-[1000] flex flex-col gap-2 pointer-events-none"
       >
         {toasts.map((toast) => {
