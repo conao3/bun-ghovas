@@ -110,77 +110,83 @@ export function KeyboardPanel() {
   return (
     <div>
       <PanelHeader icon={Keyboard} title="Keyboard" />
-      <div className="flex items-center gap-2 mb-3">
-        <Search size={14} className="text-muted shrink-0" />
-        <TextField label="Search" value={query} onChange={setQuery} />
-      </div>
-      <table className="w-full border-collapse font-mono text-[13px]">
-        <tbody>
-          {filtered.map((def) => {
-            const isCapturing = capturingId === def.id;
-            const hasOverride = overrides[def.id] != null;
-            const effectiveDef = hasOverride
-              ? { ...def, ...parseComboToFields(overrides[def.id]!) }
-              : def;
-
-            return (
-              <tr
-                key={def.id}
-                className={`border-b border-hairline cursor-pointer select-none ${
-                  isCapturing ? "bg-primary/20" : "hover:bg-surface-cream-strong/40"
-                }`}
-                onClick={() => {
-                  if (!isCapturing) {
-                    setCapturingId(def.id);
-                    setConflictMsg(null);
-                  }
-                }}
-              >
-                <td className="text-body py-[6px] px-0 w-full">
-                  {def.label}
-                  {isCapturing && conflictMsg && (
-                    <div className="text-error text-xs mt-0.5">{conflictMsg}</div>
-                  )}
-                </td>
-                <td className="text-right py-[6px] px-0 whitespace-nowrap">
-                  {isCapturing ? (
-                    <span className="text-muted italic">press the new shortcut…</span>
-                  ) : (
-                    <span
-                      className={
-                        hasOverride ? "text-primary" : "text-ink tracking-[0.05em]"
-                      }
-                    >
-                      {formatShortcut(effectiveDef)}
-                    </span>
-                  )}
-                </td>
-                <td className="py-[6px] pl-2 px-0 whitespace-nowrap">
-                  {!isCapturing && hasOverride && (
-                    <button
-                      className="text-muted-soft hover:text-error"
-                      title="Reset to default"
-                      onClick={(e) => handleResetOne(e, def.id)}
-                    >
-                      <RotateCcw size={12} />
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      {hasAnyOverride && (
-        <div className="mt-4 flex justify-end">
-          <button
-            className="text-xs text-muted hover:text-error"
-            onClick={handleResetAll}
-          >
-            Reset all
-          </button>
+      <section>
+        <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-3">Key bindings</h3>
+        <div className="flex items-center gap-2 mb-3">
+          <Search size={14} className="text-muted shrink-0" />
+          <TextField label="Search" value={query} onChange={setQuery} />
         </div>
-      )}
+        <table className="w-full border-collapse font-mono text-[13px]">
+          <tbody>
+            {filtered.map((def) => {
+              const isCapturing = capturingId === def.id;
+              const hasOverride = overrides[def.id] != null;
+              const effectiveDef = hasOverride
+                ? { ...def, ...parseComboToFields(overrides[def.id]!) }
+                : def;
+
+              return (
+                <tr
+                  key={def.id}
+                  className={`border-b border-hairline cursor-pointer select-none ${
+                    isCapturing ? "bg-primary/20" : "hover:bg-surface-cream-strong/40"
+                  }`}
+                  onClick={() => {
+                    if (!isCapturing) {
+                      setCapturingId(def.id);
+                      setConflictMsg(null);
+                    }
+                  }}
+                >
+                  <td className="text-body py-[6px] px-0 w-full">
+                    {def.label}
+                    {isCapturing && conflictMsg && (
+                      <div className="text-error text-xs mt-0.5">{conflictMsg}</div>
+                    )}
+                  </td>
+                  <td className="text-right py-[6px] px-0 whitespace-nowrap">
+                    {isCapturing ? (
+                      <span className="text-muted italic">press the new shortcut…</span>
+                    ) : (
+                      <span
+                        className={
+                          hasOverride ? "text-primary" : "text-ink tracking-[0.05em]"
+                        }
+                      >
+                        {formatShortcut(effectiveDef)}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-[6px] pl-2 px-0 whitespace-nowrap">
+                    {!isCapturing && hasOverride && (
+                      <button
+                        className="text-muted-soft hover:text-error"
+                        title="Reset to default"
+                        onClick={(e) => handleResetOne(e, def.id)}
+                      >
+                        <RotateCcw size={12} />
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </section>
+      <section className="mt-6">
+        <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-2">Reset</h3>
+        {hasAnyOverride && (
+          <div className="flex justify-end">
+            <button
+              className="text-xs text-muted hover:text-error"
+              onClick={handleResetAll}
+            >
+              Reset all
+            </button>
+          </div>
+        )}
+      </section>
     </div>
   );
 }

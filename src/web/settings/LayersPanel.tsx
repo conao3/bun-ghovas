@@ -137,7 +137,7 @@ function LayerRow(props: {
 
   return (
     <div className="py-4 border-b border-hairline-soft last:border-b-0">
-      <div className="text-ink font-medium text-[14px]">Layer {level}</div>
+      <h3 className="text-ink font-medium text-[14px] mt-0 mb-0.5">Layer {level}</h3>
       <div className="text-muted text-[12px] mt-0.5 mb-3">{layerDescription(level)}</div>
       <div className="flex items-center gap-4 mb-3">
         <div className="inline-flex bg-surface-card rounded-md p-[3px] gap-[2px]">

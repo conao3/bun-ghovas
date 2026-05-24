@@ -17,22 +17,30 @@ export function BackendPanel() {
   return (
     <div>
       <PanelHeader icon={Server} title="Backend" />
-      <div className="flex flex-col gap-3">
-        <TextField
-          label="Default shell"
-          value={settings.shell}
-          onChange={(v) => update({ shell: v })}
-        />
-        <TextField label="Default cwd" value={settings.cwd} onChange={(v) => update({ cwd: v })} />
-        <TextField
-          label="Scrollback limit (MiB)"
-          inputMode="numeric"
-          value={String(settings.scrollbackMiB)}
-          onChange={(v) => {
-            const n = parseFloat(v);
-            if (!Number.isNaN(n) && n > 0) update({ scrollbackMiB: n });
-          }}
-        />
+      <div className="flex flex-col gap-6">
+        <section>
+          <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-3">Shell</h3>
+          <div className="flex flex-col gap-3">
+            <TextField
+              label="Default shell"
+              value={settings.shell}
+              onChange={(v) => update({ shell: v })}
+            />
+            <TextField label="Default cwd" value={settings.cwd} onChange={(v) => update({ cwd: v })} />
+          </div>
+        </section>
+        <section>
+          <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-3">Output</h3>
+          <TextField
+            label="Scrollback limit (MiB)"
+            inputMode="numeric"
+            value={String(settings.scrollbackMiB)}
+            onChange={(v) => {
+              const n = parseFloat(v);
+              if (!Number.isNaN(n) && n > 0) update({ scrollbackMiB: n });
+            }}
+          />
+        </section>
       </div>
     </div>
   );

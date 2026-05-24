@@ -31,40 +31,48 @@ export function AboutPanel() {
   return (
     <div>
       <h2 className="text-ink font-mono mt-0">ghovas</h2>
-      <p className="text-muted font-mono text-[13px]">Version: {version}</p>
-      <p className="text-muted font-mono text-[13px]">Uptime: {uptime}</p>
-      <ul className="text-muted font-mono text-[13px] pl-4 m-0">
-        <li>
-          <a
-            href="https://github.com/conao3/bun-ghovas"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted inline-flex items-center gap-1"
-          >
-            GitHub <ExternalLink size={11} aria-hidden />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted inline-flex items-center gap-1"
-          >
-            Concept <ExternalLink size={11} aria-hidden />
-          </a>
-        </li>
-        <li>
-          <a
-            href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas-design.md"
-            target="_blank"
-            rel="noreferrer"
-            className="text-muted inline-flex items-center gap-1"
-          >
-            Design <ExternalLink size={11} aria-hidden />
-          </a>
-        </li>
-      </ul>
+      <div className="flex flex-col gap-4">
+        <section>
+          <h3 className="text-ink font-mono text-[13px] font-semibold mt-0 mb-2">Version</h3>
+          <p className="text-muted font-mono text-[13px] m-0">Version: {version}</p>
+          <p className="text-muted font-mono text-[13px] m-0">Uptime: {uptime}</p>
+        </section>
+        <section>
+          <h3 className="text-ink font-mono text-[13px] font-semibold mt-0 mb-2">Resources</h3>
+          <ul className="text-muted font-mono text-[13px] pl-4 m-0">
+            <li>
+              <a
+                href="https://github.com/conao3/bun-ghovas"
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted inline-flex items-center gap-1"
+              >
+                GitHub <ExternalLink size={11} aria-hidden />
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas.md"
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted inline-flex items-center gap-1"
+              >
+                Concept <ExternalLink size={11} aria-hidden />
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://github.com/conao3/idea/blob/master/projects/bun-ghovas-design.md"
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted inline-flex items-center gap-1"
+              >
+                Design <ExternalLink size={11} aria-hidden />
+              </a>
+            </li>
+          </ul>
+        </section>
+      </div>
     </div>
   );
 }
