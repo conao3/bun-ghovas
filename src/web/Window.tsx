@@ -52,6 +52,7 @@ export function Window({
   });
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const windowElRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -61,6 +62,24 @@ export function Window({
     }, 6000);
     return () => clearTimeout(timer);
   }, [win.url, win.kind]);
+
+  useEffect(() => {
+    const el = windowElRef.current?.closest<HTMLElement>(".react-flow__node");
+    if (!el) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.shiftKey && e.key === "F10") || e.key === "ContextMenu") {
+        e.preventDefault();
+        e.stopPropagation();
+        onFocus(win.id);
+        setMenuFromKeyboard(true);
+        const rect = el.getBoundingClientRect();
+        setMenuPos({ x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 });
+        setMenuOpen(true);
+      }
+    };
+    el.addEventListener("keydown", handleKeyDown);
+    return () => el.removeEventListener("keydown", handleKeyDown);
+  }, [win.id, onFocus]);
 
   const handleIframeLoad = useCallback(() => {
     setIframeState("loaded");
@@ -227,6 +246,7 @@ export function Window({
         </div>
       </Modal>
       <div
+        ref={windowElRef}
         onMouseDown={handleWindowMouseDown}
         onKeyDownCapture={(e) => {
           if (e.key !== "Escape") return;
