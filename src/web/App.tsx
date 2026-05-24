@@ -638,7 +638,7 @@ export function App() {
           onNewCanvas={handleNewCanvas}
           onReorderCanvas={handleReorderCanvas}
         />
-        <div className="[grid-area:center] relative overflow-hidden">
+        <main className="[grid-area:center] relative overflow-hidden" aria-label="Workspace canvas">
           <Canvas
             canvasState={activeCanvas}
             onCanvasChange={handleCanvasChange}
@@ -648,7 +648,7 @@ export function App() {
             onFocusWindow={handleFocusWindow}
             setZoomRef={setZoomRef}
           />
-        </div>
+        </main>
         <StatusBar
           workspace={workspace}
           activeIds={activeIds}

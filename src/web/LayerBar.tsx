@@ -591,7 +591,7 @@ export function LayerBar({
 
   return (
     <>
-      <div
+      <header
         data-tutorial="layer-bar"
         className={clsx(
           "[grid-area:top] bg-surface-dark shrink-0",
@@ -615,8 +615,9 @@ export function LayerBar({
             onReorderCanvas={(activeId, overId) => onReorderCanvas(level, activeId, overId)}
           />
         ))}
-      </div>
-      <div
+      </header>
+      <nav
+        aria-label="Layer navigation"
         className={clsx(
           "[grid-area:left] bg-surface-dark flex flex-row",
           verticalLevels.length > 0 && "border-r border-dark-hairline",
@@ -638,7 +639,7 @@ export function LayerBar({
             onReorderCanvas={(activeId, overId) => onReorderCanvas(level, activeId, overId)}
           />
         ))}
-      </div>
+      </nav>
       {hiddenLevels.length > 0 && (
         <div className="fixed top-1 right-1 flex gap-1 z-[100]">
           {hiddenLevels.map((level) => (
