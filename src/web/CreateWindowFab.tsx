@@ -56,9 +56,15 @@ export function CreateWindowFab({
           placement="top end"
           className="bg-surface-dark-elevated border border-white/15 rounded-[6px] p-1 outline-none z-20"
         >
-          <Dialog aria-label="New window" className="outline-none flex flex-col gap-0.5">
+          <Dialog aria-labelledby="new-window-title" className="outline-none flex flex-col gap-0.5">
             {({ close }) => (
               <>
+                <h2
+                  id="new-window-title"
+                  className="text-[11px] font-mono text-on-dark-weak uppercase tracking-wider mb-1 px-3"
+                >
+                  New window
+                </h2>
                 <Button
                   variant="ghost"
                   className="w-full"
