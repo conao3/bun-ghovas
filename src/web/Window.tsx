@@ -339,6 +339,7 @@ export function Window({
                 <iframe
                   ref={iframeRef}
                   src={win.url ?? "about:blank"}
+                  title={win.url ? `Embedded page: ${win.url}` : "Iframe pending URL"}
                   sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
                   onLoad={handleIframeLoad}
                   onError={handleIframeError}
