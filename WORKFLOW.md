@@ -24,7 +24,7 @@ agent:
   max_concurrent_agents: 10
   max_turns: 10
 codex:
-  command: source /run/secrets/rendered/helios-env && CLAUDE_CONFIG_DIR=$HOME/.agents/.claude.worker ANTHROPIC_BASE_URL=https://cli-proxy-api.sancode.dev ANTHROPIC_AUTH_TOKEN=$CLI_PROXY_API_TOKEN ANTHROPIC_MODEL=claude-sonnet-4-6 exec claude-app-server
+  command: source /run/secrets/rendered/helios-env && PATH=$HOME/.agents/.claude.worker/bin:$PATH CLAUDE_CONFIG_DIR=$HOME/.agents/.claude.worker ANTHROPIC_BASE_URL=https://cli-proxy-api.sancode.dev ANTHROPIC_AUTH_TOKEN=$CLI_PROXY_API_TOKEN ANTHROPIC_MODEL=claude-sonnet-4-6 exec claude-app-server
   approval_policy: never
   thread_sandbox: workspace-write
   turn_sandbox_policy:
