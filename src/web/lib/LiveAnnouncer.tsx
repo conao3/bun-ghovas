@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useState } from "react";
 import type { ReactNode } from "react";
 
-export type AnnouncePoliteness = "polite" | "assertive";
+type AnnouncePoliteness = "polite" | "assertive";
 type AnnounceFunction = (message: string, politeness?: AnnouncePoliteness) => void;
 
 const LiveAnnouncerCtx = createContext<AnnounceFunction>(() => {});
