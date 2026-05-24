@@ -238,10 +238,18 @@ export function App() {
           const canvas = workspace.l0.find((c) => c.id === activeIds[0]);
           if (!canvas || canvas.nodes.length === 0) break;
           const nodes = canvas.nodes;
-          const currentIdx = nodes.findIndex((n) => n.id === focusedWindowId);
+          const activeWindowId = document.activeElement
+            ?.closest("[data-window-id]")
+            ?.getAttribute("data-window-id");
+          const stateOrDomId = focusedWindowId ?? activeWindowId;
+          const currentIdx = nodes.findIndex((n) => n.id === stateOrDomId);
           const delta = def.id === "cycle-next-window" ? 1 : -1;
           const nextIdx =
-            currentIdx === -1 ? 0 : (currentIdx + delta + nodes.length) % nodes.length;
+            currentIdx === -1
+              ? delta > 0
+                ? 0
+                : nodes.length - 1
+              : (currentIdx + delta + nodes.length) % nodes.length;
           const targetId = nodes[nextIdx]!.id;
           e.preventDefault();
           setFocusedWindowId(targetId);

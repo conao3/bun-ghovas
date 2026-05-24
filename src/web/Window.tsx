@@ -296,6 +296,7 @@ export function Window({
       </Modal>
       <div
         ref={windowElRef}
+        data-window-id={win.id}
         onMouseDown={handleWindowMouseDown}
         onKeyDownCapture={(e) => {
           if (e.key !== "Escape") return;
