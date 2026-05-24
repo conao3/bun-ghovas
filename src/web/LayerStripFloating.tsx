@@ -1,53 +1,15 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeftRight, Eye, GripVertical } from "lucide-react";
-import {
-  DndContext,
-  closestCenter,
-  useSensor,
-  useSensors,
-  PointerSensor,
-  KeyboardSensor,
-  useDndContext,
-  type DragEndEvent,
-  type Active,
-  type Over,
-} from "@dnd-kit/core";
+import { useDndContext } from "@dnd-kit/core";
 import {
   SortableContext,
   useSortable,
   horizontalListSortingStrategy,
-  sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
 import type { CanvasStateV2, LayerLevel, LayerState } from "../shared/types";
-
-const floatingDndAccessibility = {
-  screenReaderInstructions: {
-    draggable:
-      "Press Space or Enter to grab. Use left or right arrow keys to reorder. Press Space or Enter to drop, or Escape to cancel.",
-  },
-  announcements: {
-    onDragStart({ active }: { active: Active }) {
-      return `${active.data.current?.label ?? active.id} grabbed.`;
-    },
-    onDragOver({ active, over }: { active: Active; over: Over | null }) {
-      if (over) {
-        return `${active.data.current?.label ?? active.id} moved over ${over.data.current?.label ?? over.id}.`;
-      }
-      return undefined;
-    },
-    onDragEnd({ active, over }: { active: Active; over: Over | null }) {
-      return over
-        ? `${active.data.current?.label ?? active.id} dropped.`
-        : `${active.data.current?.label ?? active.id} returned to original position.`;
-    },
-    onDragCancel({ active }: { active: Active; over: Over | null }) {
-      return `Cancelled. ${active.data.current?.label ?? active.id} returned to original position.`;
-    },
-  },
-};
 
 interface LayerStripFloatingProps {
   level: LayerLevel;
@@ -58,7 +20,6 @@ interface LayerStripFloatingProps {
   onUiModeChange: () => void;
   onVisibilityChange: () => void;
   onNewCanvas: () => void;
-  onReorderCanvas: (activeId: string, overId: string) => void;
 }
 
 function SortableFloatingTabItem({
@@ -70,7 +31,7 @@ function SortableFloatingTabItem({
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
-    data: { label: canvas.name ?? canvas.id },
+    data: { label: canvas.name ?? canvas.id, level },
     attributes: { roleDescription: "sortable" },
   });
   const { active, over } = useDndContext();
@@ -121,7 +82,6 @@ export function LayerStripFloating({
   onUiModeChange,
   onVisibilityChange,
   onNewCanvas,
-  onReorderCanvas,
 }: LayerStripFloatingProps) {
   const [pos, setPos] = useState<{ x: number; y: number } | null>(null);
   const dragRef = useRef<{ startX: number; startY: number; elemX: number; elemY: number } | null>(
@@ -168,20 +128,7 @@ export function LayerStripFloating({
     }
   };
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
-  );
   const ids = layer.canvases.map((c) => c.id);
-  const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      const { active, over } = event;
-      if (over && active.id !== over.id) {
-        onReorderCanvas(active.id as string, over.id as string);
-      }
-    },
-    [onReorderCanvas],
-  );
 
   const initialBottom = 24 + floatingIndex * 56;
 
@@ -222,32 +169,25 @@ export function LayerStripFloating({
       >
         <Eye size={14} aria-hidden />
       </Button>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragEnd={handleDragEnd}
-        accessibility={floatingDndAccessibility}
-      >
-        <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
-          <Tabs
-            selectedKey={activeId}
-            onSelectionChange={(key) => onSelectionChange(key as string)}
-          >
-            <TabList style={{ borderBottom: "none" }}>
-              {layer.canvases.map((canvas) => (
-                <SortableFloatingTabItem key={canvas.id} canvas={canvas} level={level} />
-              ))}
-            </TabList>
-            {layer.canvases.map((c) => (
-              <TabPanel
-                key={c.id}
-                id={c.id}
-                style={{ padding: 0, height: 0, overflow: "hidden" }}
-              />
+      <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
+        <Tabs
+          selectedKey={activeId}
+          onSelectionChange={(key) => onSelectionChange(key as string)}
+        >
+          <TabList style={{ borderBottom: "none" }}>
+            {layer.canvases.map((canvas) => (
+              <SortableFloatingTabItem key={canvas.id} canvas={canvas} level={level} />
             ))}
-          </Tabs>
-        </SortableContext>
-      </DndContext>
+          </TabList>
+          {layer.canvases.map((c) => (
+            <TabPanel
+              key={c.id}
+              id={c.id}
+              style={{ padding: 0, height: 0, overflow: "hidden" }}
+            />
+          ))}
+        </Tabs>
+      </SortableContext>
       <button
         aria-label="new canvas"
         onClick={onNewCanvas}
