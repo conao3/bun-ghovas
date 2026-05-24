@@ -644,6 +644,7 @@ export function LayerBar({
   return (
     <>
       <header
+        aria-label="Application bar"
         data-tutorial="layer-bar"
         className={clsx(
           "[grid-area:top] bg-surface-dark shrink-0",
