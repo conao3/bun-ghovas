@@ -89,8 +89,6 @@ function MinimapKeyboardController() {
       "Canvas overview minimap. Press Enter to fit view, arrow keys to pan.",
     );
 
-    const PAN_STEP = 100;
-
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const onKeyDown = (e: KeyboardEvent) => {
@@ -104,12 +102,13 @@ function MinimapKeyboardController() {
         document.querySelector<HTMLElement>(".react-flow__pane")?.focus();
         return;
       }
+      const step = e.shiftKey ? 200 : 50;
       let dx = 0;
       let dy = 0;
-      if (e.key === "ArrowLeft") dx = PAN_STEP;
-      else if (e.key === "ArrowRight") dx = -PAN_STEP;
-      else if (e.key === "ArrowUp") dy = PAN_STEP;
-      else if (e.key === "ArrowDown") dy = -PAN_STEP;
+      if (e.key === "ArrowLeft") dx = step;
+      else if (e.key === "ArrowRight") dx = -step;
+      else if (e.key === "ArrowUp") dy = step;
+      else if (e.key === "ArrowDown") dy = -step;
       else return;
       e.preventDefault();
       const { x, y, zoom } = getViewport();
