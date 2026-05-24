@@ -101,6 +101,9 @@
 button:focus-visible,
 [role="button"]:focus-visible,
 [role="tab"]:focus-visible,
+[role="group"]:focus-visible,
+[role="application"]:focus-visible,
+[tabindex="0"]:focus-visible,
 textarea:focus-visible,
 input:focus-visible {
   outline: 2px solid var(--color-primary);
