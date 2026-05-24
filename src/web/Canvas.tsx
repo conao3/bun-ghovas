@@ -277,6 +277,10 @@ export function Canvas({
         width: node.width,
         height: node.height,
         zIndex: focusedWindowId === node.id ? 100 : 1,
+        ariaLabel:
+          node.data.kind === "terminal"
+            ? `Terminal: ${node.data.sessionId ?? "new session"}`
+            : `iframe: ${node.data.url ?? "(no url)"}`,
         data: {
           win: node.data,
           isFocused: focusedWindowId === node.id,
