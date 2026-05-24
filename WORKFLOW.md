@@ -82,6 +82,7 @@ The agent talks to Linear via the configured Linear MCP server (`mcp__linear__*`
 - Move status only when the matching quality bar is met.
 - Operate autonomously end-to-end unless blocked by missing requirements, secrets, or permissions.
 - Use the blocked-access escape hatch only for true external blockers (missing required tools/auth) after exhausting documented fallbacks.
+- **Write all GitHub communication in English**: PR title, PR description (Summary / Test plan / etc.), commit messages, PR review replies, and any inline `gh pr comment` posts must be in English regardless of the language used in the Linear issue body or workpad. The Linear workpad itself may stay in the issue's language, but anything that surfaces on GitHub is English.
 
 ## Tools
 
@@ -284,6 +285,7 @@ Use this only when completion is blocked by missing required tools or missing au
 - If out-of-scope improvements are found, create a separate `Backlog` issue via `mcp__linear__save_issue` (with `state="Backlog"`, same `project`, `relatedTo=["{{ issue.identifier }}"]`, plus `blockedBy=["{{ issue.identifier }}"]` when applicable) rather than expanding current scope.
 - Never call `gh pr merge` outside the `Merging` flow.
 - Never amend or force-push history that is already on `origin`. Make a new commit for fixes.
+- Never write Japanese (or any non-English language) in PR titles, PR descriptions, commit messages, or PR review comments. All GitHub-visible text is English-only.
 - Do not move to `Merging` unless the `Completion bar before Merging` is satisfied.
 - Do not transition to `Merging` while PR checks are pending, failing, or absent on the latest pushed commit.
 - `Human Review` is reserved for the blocked-access escape hatch; do not route there from the normal completion flow.
