@@ -1,4 +1,4 @@
-import { useRef, useCallback, useMemo } from "react";
+import { useRef, useCallback, useMemo, useEffect } from "react";
 import type { RefObject } from "react";
 import { Plus } from "lucide-react";
 import { ReactFlow, Background, Controls, MiniMap, useReactFlow } from "@xyflow/react";
@@ -78,6 +78,14 @@ export function Canvas({
   const stateRef = useRef(canvasState);
   stateRef.current = canvasState;
   const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const minimap = document.querySelector(".react-flow__minimap");
+    if (minimap) {
+      minimap.setAttribute("aria-label", "Canvas overview minimap");
+      minimap.setAttribute("role", "img");
+    }
+  }, []);
 
   const handleWindowClose = useCallback(
     (id: string) => {
