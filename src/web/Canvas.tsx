@@ -313,6 +313,7 @@ export function Canvas({
         <Controls />
         {setZoomRef && <ZoomController setZoomRef={setZoomRef} containerRef={containerRef} />}
         <MiniMap
+          aria-label="Canvas overview minimap"
           style={{
             width: 156,
             height: 96,
