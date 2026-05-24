@@ -538,6 +538,7 @@ export function Canvas({
         minZoom={0.25}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
+        ariaLabelConfig={{ 'controls.interactive.ariaLabel': 'Toggle pan and zoom' }}
       >
         <Background />
         <Controls />
