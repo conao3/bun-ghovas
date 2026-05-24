@@ -309,9 +309,9 @@ function HorizontalStrip({
       </Modal>
       <div className={rowCls}>
         {level === 3 && (
-          <span className="font-serif text-on-dark-strong text-[12px] mr-2 select-none shrink-0">
+          <h1 className="font-serif text-on-dark-strong text-[12px] mr-2 select-none shrink-0">
             ghovas
-          </span>
+          </h1>
         )}
         <span className="text-on-dark-muted text-[10px] font-mono tracking-[0.08em] uppercase mr-3 select-none shrink-0">
           L{level}
