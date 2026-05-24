@@ -52,9 +52,19 @@ export function Window({
     history: [win.url ?? ""],
     index: 0,
   });
+  const [resizeAnnouncement, setResizeAnnouncement] = useState("");
   const menuAnchorRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const windowElRef = useRef<HTMLDivElement>(null);
+  const prevDimsRef = useRef({ width: win.width, height: win.height });
+
+  useEffect(() => {
+    const prev = prevDimsRef.current;
+    if (prev.width !== win.width || prev.height !== win.height) {
+      setResizeAnnouncement(`Window resized to ${win.width} by ${win.height} pixels`);
+      prevDimsRef.current = { width: win.width, height: win.height };
+    }
+  }, [win.width, win.height]);
 
   useEffect(() => {
     if (win.kind !== "iframe") return;
@@ -201,6 +211,14 @@ export function Window({
 
   return (
     <>
+      <div
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+        className="sr-only"
+      >
+        {resizeAnnouncement}
+      </div>
       <div
         ref={menuAnchorRef}
         className="fixed w-0 h-0 pointer-events-none"

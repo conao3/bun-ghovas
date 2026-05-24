@@ -358,28 +358,20 @@ export function Canvas({
         if (n.id !== nodeId) return n;
 
         if (e.altKey) {
-          const delta = e.shiftKey ? 50 : 10;
-          let x = n.position.x;
-          let y = n.position.y;
+          const delta = e.shiftKey ? 10 : 1;
           let w = n.width;
           let h = n.height;
 
           if (e.key === "ArrowRight") w = Math.max(120, w + delta);
-          else if (e.key === "ArrowLeft") {
-            x -= delta;
-            w = Math.max(120, w + delta);
-          } else if (e.key === "ArrowDown") h = Math.max(60, h + delta);
-          else if (e.key === "ArrowUp") {
-            y -= delta;
-            h = Math.max(60, h + delta);
-          }
+          else if (e.key === "ArrowLeft") w = Math.max(120, w - delta);
+          else if (e.key === "ArrowDown") h = Math.max(60, h + delta);
+          else if (e.key === "ArrowUp") h = Math.max(60, h - delta);
 
           return {
             ...n,
             width: w,
             height: h,
-            position: { x, y },
-            data: { ...n.data, x, y, width: w, height: h },
+            data: { ...n.data, width: w, height: h },
           };
         } else {
           const delta = e.shiftKey ? 50 : 5;
