@@ -3,6 +3,7 @@ import { Settings } from "lucide-react";
 import { Button } from "../components/Button";
 import { PanelHeader } from "./PanelHeader";
 import { useToast } from "../lib/toast";
+import { loadConfirmWindowClose, saveConfirmWindowClose } from "../lib/generalSettings";
 
 type StartupMode = "restore-last" | "blank";
 
@@ -26,6 +27,7 @@ function readStartupMode(): StartupMode {
 export function GeneralPanel() {
   const toast = useToast();
   const [startupMode, setStartupMode] = useState<StartupMode>(readStartupMode);
+  const [confirmWindowClose, setConfirmWindowClose] = useState(loadConfirmWindowClose);
 
   function handleStartupModeChange(mode: StartupMode) {
     try {
@@ -33,6 +35,15 @@ export function GeneralPanel() {
       setStartupMode(mode);
     } catch {
       toast.show("error", "Failed to save startup mode.");
+    }
+  }
+
+  function handleConfirmWindowCloseChange(value: boolean) {
+    try {
+      saveConfirmWindowClose(value);
+      setConfirmWindowClose(value);
+    } catch {
+      toast.show("error", "Failed to save setting.");
     }
   }
 
@@ -50,6 +61,45 @@ export function GeneralPanel() {
     <div>
       <PanelHeader icon={Settings} title="General" />
       <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-1">
+          <span className="text-body-strong font-mono text-[13px]">Windows</span>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              role="switch"
+              aria-checked={confirmWindowClose}
+              onClick={() => handleConfirmWindowCloseChange(!confirmWindowClose)}
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                width: 36,
+                height: 20,
+                borderRadius: 10,
+                border: 0,
+                padding: 2,
+                cursor: "pointer",
+                background: confirmWindowClose ? "var(--color-primary)" : "rgba(255,255,255,0.15)",
+                transition: "background 150ms",
+                flexShrink: 0,
+              }}
+            >
+              <span
+                style={{
+                  display: "block",
+                  width: 16,
+                  height: 16,
+                  borderRadius: "50%",
+                  background: "white",
+                  transform: confirmWindowClose ? "translateX(16px)" : "translateX(0)",
+                  transition: "transform 150ms",
+                }}
+              />
+            </button>
+            <span className="text-body-strong font-mono text-[12px]">
+              Always confirm before closing windows
+            </span>
+          </div>
+        </div>
         <div className="flex flex-col gap-1">
           <span className="text-body-strong font-mono text-[13px]">Startup</span>
           <div className="flex flex-col gap-3">
