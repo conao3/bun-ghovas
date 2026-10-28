@@ -29,7 +29,9 @@ export function UrlComboBox({
   inputStyle,
   ...rest
 }: UrlComboBoxProps) {
-  const [items, setItems] = useState<HistoryItem[]>(() => loadHistory().map((url) => ({ id: url })));
+  const [items, setItems] = useState<HistoryItem[]>(() =>
+    loadHistory().map((url) => ({ id: url })),
+  );
   const filtered = items.filter((item) => item.id.toLowerCase().includes(value.toLowerCase()));
 
   return (

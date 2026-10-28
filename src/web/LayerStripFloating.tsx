@@ -1,11 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { ArrowLeftRight, Eye, GripVertical } from "lucide-react";
 import { useDndContext } from "@dnd-kit/core";
-import {
-  SortableContext,
-  useSortable,
-  horizontalListSortingStrategy,
-} from "@dnd-kit/sortable";
+import { SortableContext, useSortable, horizontalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { Tabs, TabList, Tab, TabPanel } from "./components/Tabs";
 import { Button } from "./components/Button";
@@ -22,13 +18,7 @@ interface LayerStripFloatingProps {
   onNewCanvas: () => void;
 }
 
-function SortableFloatingTabItem({
-  canvas,
-  level,
-}: {
-  canvas: CanvasStateV2;
-  level: LayerLevel;
-}) {
+function SortableFloatingTabItem({ canvas, level }: { canvas: CanvasStateV2; level: LayerLevel }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: canvas.id,
     data: { label: canvas.name ?? canvas.id, level },
@@ -167,21 +157,14 @@ export function LayerStripFloating({
         <Eye size={14} aria-hidden />
       </Button>
       <SortableContext items={ids} strategy={horizontalListSortingStrategy}>
-        <Tabs
-          selectedKey={activeId}
-          onSelectionChange={(key) => onSelectionChange(key as string)}
-        >
+        <Tabs selectedKey={activeId} onSelectionChange={(key) => onSelectionChange(key as string)}>
           <TabList style={{ borderBottom: "none" }}>
             {layer.canvases.map((canvas) => (
               <SortableFloatingTabItem key={canvas.id} canvas={canvas} level={level} />
             ))}
           </TabList>
           {layer.canvases.map((c) => (
-            <TabPanel
-              key={c.id}
-              id={c.id}
-              style={{ padding: 0, height: 0, overflow: "hidden" }}
-            />
+            <TabPanel key={c.id} id={c.id} style={{ padding: 0, height: 0, overflow: "hidden" }} />
           ))}
         </Tabs>
       </SortableContext>

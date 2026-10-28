@@ -67,9 +67,7 @@ export function StatusBar({
         ))}
       </span>
       <span>
-        {focusedWindowTitle != null
-          ? `${focusedWindowTitle} · ↑↓←→ move · Alt+↑↓←→ resize`
-          : "—"}
+        {focusedWindowTitle != null ? `${focusedWindowTitle} · ↑↓←→ move · Alt+↑↓←→ resize` : "—"}
       </span>
       <span className="flex gap-3 whitespace-nowrap">
         <DialogTrigger>
@@ -108,7 +106,7 @@ export function StatusBar({
           </Popover>
         </DialogTrigger>
         <span>F6 exit terminal</span>
-        <span>↑↓←→ pan  +/- zoom  0 fit</span>
+        <span>↑↓←→ pan +/- zoom 0 fit</span>
         {paletteDef && <span>{formatShortcut(paletteDef)} palette</span>}
         {settingsDef && <span>{formatShortcut(settingsDef)} settings</span>}
         <span>Shift+F10 menu</span>

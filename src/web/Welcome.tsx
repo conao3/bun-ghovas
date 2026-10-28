@@ -8,11 +8,23 @@ interface WelcomeProps {
 
 export function Welcome({ onDismiss }: WelcomeProps) {
   return (
-    <Modal isOpen={true} onClose={onDismiss} ariaLabelledby="welcome-heading" ariaDescribedby="welcome-description">
+    <Modal
+      isOpen={true}
+      onClose={onDismiss}
+      ariaLabelledby="welcome-heading"
+      ariaDescribedby="welcome-description"
+    >
       <div className="flex flex-col items-center gap-4 py-3 px-2 text-center font-mono text-ink bg-canvas rounded-md -m-5">
         <LayoutGrid size={56} className="text-primary" aria-hidden />
-        <h2 id="welcome-heading" className="m-0 text-[28px] font-bold font-serif tracking-[2px] text-ink">Welcome to ghovas</h2>
-        <p id="welcome-description" className="m-0 text-sm text-muted">a browser-native window manager</p>
+        <h2
+          id="welcome-heading"
+          className="m-0 text-[28px] font-bold font-serif tracking-[2px] text-ink"
+        >
+          Welcome to ghovas
+        </h2>
+        <p id="welcome-description" className="m-0 text-sm text-muted">
+          a browser-native window manager
+        </p>
         <Button variant="primary" onPress={onDismiss} autoFocus className="mt-2 !py-[6px] !px-6">
           Get started
         </Button>

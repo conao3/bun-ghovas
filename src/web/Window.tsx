@@ -430,153 +430,157 @@ export function Window({
           </div>
         </div>
 
-        {!win.minimized && (win.kind === "iframe" ? (
-          <div data-window-content className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]">
-            <form
-              onSubmit={handleUrlSubmit}
-              onMouseDown={(e) => e.stopPropagation()}
-              className="px-2 py-1 shrink-0 flex items-center gap-1"
+        {!win.minimized &&
+          (win.kind === "iframe" ? (
+            <div
+              data-window-content
+              className="flex-1 overflow-hidden bg-surface-dark flex flex-col rounded-b-[5px]"
             >
-              <Button
-                variant="ghost"
-                aria-label="back"
-                isDisabled={urlNav.index <= 0}
-                onPress={handleBack}
-                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
-                className="data-[disabled]:cursor-not-allowed"
+              <form
+                onSubmit={handleUrlSubmit}
+                onMouseDown={(e) => e.stopPropagation()}
+                className="px-2 py-1 shrink-0 flex items-center gap-1"
               >
-                <ArrowLeft size={14} aria-hidden />
-              </Button>
-              <Button
-                variant="ghost"
-                aria-label="forward"
-                isDisabled={urlNav.index >= urlNav.history.length - 1}
-                onPress={handleForward}
-                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
-                className="data-[disabled]:cursor-not-allowed"
-              >
-                <ArrowRight size={14} aria-hidden />
-              </Button>
-              <Button
-                variant="ghost"
-                aria-label="reload"
-                onPress={handleReload}
-                style={{ padding: "0 4px", minWidth: 24, height: 24 }}
-              >
-                <RotateCw size={14} aria-hidden />
-              </Button>
-              <div className="flex-1">
-                <UrlComboBox
-                  value={urlInput}
-                  onChange={setUrlInput}
-                  aria-label="URL"
-                  inputStyle={{ width: "100%" }}
-                />
-              </div>
-              {iframeState === "loading" && (
-                <Loader2
-                  size={14}
-                  className="animate-spin text-on-dark-soft"
-                  aria-label="loading"
-                  role="status"
-                />
-              )}
-            </form>
-            <div className="flex-1 overflow-hidden relative" ref={iframeContainerRef}>
-              <span id={`iframe-escape-hint-${win.id}`} className="sr-only">
-                Press F6 to exit iframe and return to canvas
-              </span>
-              {iframeFocused && (
-                <div
-                  className="absolute top-0 left-0 right-0 z-10 bg-surface-dark/80 py-0.5 px-2 text-[11px] text-on-dark-soft text-center pointer-events-none"
-                  aria-hidden="true"
+                <Button
+                  variant="ghost"
+                  aria-label="back"
+                  isDisabled={urlNav.index <= 0}
+                  onPress={handleBack}
+                  style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+                  className="data-[disabled]:cursor-not-allowed"
                 >
-                  Press F6 to exit
+                  <ArrowLeft size={14} aria-hidden />
+                </Button>
+                <Button
+                  variant="ghost"
+                  aria-label="forward"
+                  isDisabled={urlNav.index >= urlNav.history.length - 1}
+                  onPress={handleForward}
+                  style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+                  className="data-[disabled]:cursor-not-allowed"
+                >
+                  <ArrowRight size={14} aria-hidden />
+                </Button>
+                <Button
+                  variant="ghost"
+                  aria-label="reload"
+                  onPress={handleReload}
+                  style={{ padding: "0 4px", minWidth: 24, height: 24 }}
+                >
+                  <RotateCw size={14} aria-hidden />
+                </Button>
+                <div className="flex-1">
+                  <UrlComboBox
+                    value={urlInput}
+                    onChange={setUrlInput}
+                    aria-label="URL"
+                    inputStyle={{ width: "100%" }}
+                  />
                 </div>
-              )}
+                {iframeState === "loading" && (
+                  <Loader2
+                    size={14}
+                    className="animate-spin text-on-dark-soft"
+                    aria-label="loading"
+                    role="status"
+                  />
+                )}
+              </form>
+              <div className="flex-1 overflow-hidden relative" ref={iframeContainerRef}>
+                <span id={`iframe-escape-hint-${win.id}`} className="sr-only">
+                  Press F6 to exit iframe and return to canvas
+                </span>
+                {iframeFocused && (
+                  <div
+                    className="absolute top-0 left-0 right-0 z-10 bg-surface-dark/80 py-0.5 px-2 text-[11px] text-on-dark-soft text-center pointer-events-none"
+                    aria-hidden="true"
+                  >
+                    Press F6 to exit
+                  </div>
+                )}
+                <div
+                  style={{
+                    transform: `scale(${1 / flowZoom})`,
+                    transformOrigin: "top left",
+                    width: `${100 * flowZoom}%`,
+                    height: `${100 * flowZoom}%`,
+                    position: "relative",
+                  }}
+                >
+                  <iframe
+                    ref={iframeRef}
+                    src={win.url ?? "about:blank"}
+                    title={win.url ? `Embedded page: ${win.url}` : "Iframe pending URL"}
+                    sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+                    onLoad={handleIframeLoad}
+                    onError={handleIframeError}
+                    className="absolute inset-0 border-0 w-full h-full"
+                    aria-describedby={`iframe-escape-hint-${win.id}`}
+                  />
+                  {(iframeState === "failed" || iframeState === "likely-blocked") && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-surface-dark/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
+                      <span>This page may not allow embedding.</span>
+                      <button
+                        type="button"
+                        aria-label="retry"
+                        className="inline-flex items-center gap-1 text-primary hover:text-on-dark bg-transparent border-0 p-0 cursor-pointer"
+                        onClick={() => {
+                          setIframeState("loading");
+                          if (iframeRef.current) {
+                            // oxlint-disable-next-line no-self-assign
+                            iframeRef.current.src = iframeRef.current.src;
+                          }
+                        }}
+                      >
+                        <RotateCw size={12} aria-hidden /> Retry
+                      </button>
+                      <a
+                        href={win.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-primary no-underline"
+                      >
+                        Open in new tab
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div
+              data-window-content
+              className="flex-1 overflow-hidden bg-surface-dark rounded-b-[5px]"
+              onPointerDown={(e) => e.stopPropagation()}
+              onWheel={(e) => e.stopPropagation()}
+              onKeyDown={(e) => {
+                e.stopPropagation();
+              }}
+            >
               <div
                 style={{
                   transform: `scale(${1 / flowZoom})`,
                   transformOrigin: "top left",
                   width: `${100 * flowZoom}%`,
                   height: `${100 * flowZoom}%`,
-                  position: "relative",
                 }}
               >
-                <iframe
-                  ref={iframeRef}
-                  src={win.url ?? "about:blank"}
-                  title={win.url ? `Embedded page: ${win.url}` : "Iframe pending URL"}
-                  sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
-                  onLoad={handleIframeLoad}
-                  onError={handleIframeError}
-                  className="absolute inset-0 border-0 w-full h-full"
-                  aria-describedby={`iframe-escape-hint-${win.id}`}
-                />
-                {(iframeState === "failed" || iframeState === "likely-blocked") && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-surface-dark/92 border-t border-white/10 py-2 px-3 flex items-center gap-2 font-mono text-[12px] text-white/50">
-                    <span>This page may not allow embedding.</span>
-                    <button
-                      type="button"
-                      aria-label="retry"
-                      className="inline-flex items-center gap-1 text-primary hover:text-on-dark bg-transparent border-0 p-0 cursor-pointer"
-                      onClick={() => {
-                        setIframeState("loading");
-                        if (iframeRef.current) {
-                          // oxlint-disable-next-line no-self-assign
-                          iframeRef.current.src = iframeRef.current.src;
-                        }
-                      }}
-                    >
-                      <RotateCw size={12} aria-hidden /> Retry
-                    </button>
-                    <a
-                      href={win.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-primary no-underline"
-                    >
-                      Open in new tab
-                    </a>
+                {win.sessionId ? (
+                  <Terminal
+                    sessionId={win.sessionId}
+                    shell={sessionOpts?.shell ?? (backendSettings.shell || undefined)}
+                    cwd={sessionOpts?.cwd ?? (backendSettings.cwd || undefined)}
+                    scrollbackMiB={backendSettings.scrollbackMiB}
+                    env={sessionOpts?.env}
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
+                    no session bound
                   </div>
                 )}
               </div>
             </div>
-          </div>
-        ) : (
-          <div
-            data-window-content
-            className="flex-1 overflow-hidden bg-surface-dark rounded-b-[5px]"
-            onPointerDown={(e) => e.stopPropagation()}
-            onWheel={(e) => e.stopPropagation()}
-            onKeyDown={(e) => {
-              e.stopPropagation();
-            }}
-          >
-            <div
-              style={{
-                transform: `scale(${1 / flowZoom})`,
-                transformOrigin: "top left",
-                width: `${100 * flowZoom}%`,
-                height: `${100 * flowZoom}%`,
-              }}
-            >
-              {win.sessionId ? (
-                <Terminal
-                  sessionId={win.sessionId}
-                  shell={sessionOpts?.shell ?? (backendSettings.shell || undefined)}
-                  cwd={sessionOpts?.cwd ?? (backendSettings.cwd || undefined)}
-                  scrollbackMiB={backendSettings.scrollbackMiB}
-                  env={sessionOpts?.env}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/20 font-mono text-[12px]">
-                  no session bound
-                </div>
-              )}
-            </div>
-          </div>
-        ))}
+          ))}
 
         <NodeResizer
           isVisible={isFocused && !win.minimized}

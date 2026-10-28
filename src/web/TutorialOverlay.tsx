@@ -132,9 +132,13 @@ export function TutorialOverlay({ onDone }: TutorialOverlayProps) {
           <span className="text-muted text-[11px] font-mono">
             {stepIndex + 1} / {STEPS.length}
           </span>
-          <h2 id="tutorial-heading" className="m-0 text-ink text-sm font-serif font-semibold">{step.title}</h2>
+          <h2 id="tutorial-heading" className="m-0 text-ink text-sm font-serif font-semibold">
+            {step.title}
+          </h2>
         </div>
-        <p id="tutorial-description" className="m-0 text-body text-[13px] font-mono">{step.description}</p>
+        <p id="tutorial-description" className="m-0 text-body text-[13px] font-mono">
+          {step.description}
+        </p>
         <div className="flex justify-between items-center">
           <Button
             variant="ghost"

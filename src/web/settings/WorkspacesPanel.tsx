@@ -6,7 +6,12 @@ import { TextField } from "../components/TextField";
 import type { WorkspaceState } from "../../shared/types";
 import { INITIAL_WORKSPACE } from "../App";
 import { PanelHeader } from "./PanelHeader";
-import { listWorkspaces, loadWorkspace, saveWorkspaceAs, deleteWorkspace } from "../lib/workspaceClient";
+import {
+  listWorkspaces,
+  loadWorkspace,
+  saveWorkspaceAs,
+  deleteWorkspace,
+} from "../lib/workspaceClient";
 import { useToast } from "../lib/toast";
 
 const NAME_RE = /^[a-zA-Z0-9_-]+$/;
@@ -149,8 +154,13 @@ export function WorkspacesPanel(props: {
       <div className="flex flex-col gap-4">
         <section>
           <div className="flex items-center justify-between mb-2">
-            <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-0">Saved workspaces</h3>
-            <Button onPress={handleSaveAsOpen} className="!bg-surface-card !text-body-strong !border-hairline text-[12px]">
+            <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-0">
+              Saved workspaces
+            </h3>
+            <Button
+              onPress={handleSaveAsOpen}
+              className="!bg-surface-card !text-body-strong !border-hairline text-[12px]"
+            >
               Save as...
             </Button>
           </div>
@@ -192,7 +202,9 @@ export function WorkspacesPanel(props: {
         </section>
 
         <section className="flex flex-col gap-2 pt-2 border-t border-white/8">
-          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-1">Export / Import</h3>
+          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-1">
+            Export / Import
+          </h3>
           <div>
             <Button
               onPress={handleExport}
@@ -222,7 +234,9 @@ export function WorkspacesPanel(props: {
         </section>
 
         <section className="pt-2 border-t border-white/8">
-          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-2">Reset</h3>
+          <h3 className="font-mono text-[11px] text-white/50 uppercase tracking-wide mt-0 mb-2">
+            Reset
+          </h3>
           <Button
             variant="secondary"
             onPress={handleReset}
@@ -235,7 +249,9 @@ export function WorkspacesPanel(props: {
 
       <Modal isOpen={saveAsOpen} onClose={() => setSaveAsOpen(false)} ariaLabel="Save workspace as">
         <div className="flex flex-col gap-4">
-          <h3 className="font-mono text-[14px] font-semibold text-on-dark-strong">Save workspace as</h3>
+          <h3 className="font-mono text-[14px] font-semibold text-on-dark-strong">
+            Save workspace as
+          </h3>
           <TextField
             label="Name (a-z, 0-9, _, -)"
             value={saveAsName}
@@ -248,7 +264,9 @@ export function WorkspacesPanel(props: {
           />
           {saveAsError && <span className="font-mono text-[12px] text-error">{saveAsError}</span>}
           <div className="flex justify-end gap-2">
-            <Button onPress={() => setSaveAsOpen(false)} variant="secondary">Cancel</Button>
+            <Button onPress={() => setSaveAsOpen(false)} variant="secondary">
+              Cancel
+            </Button>
             <Button onPress={() => void handleSaveAsSubmit()} isDisabled={saving}>
               {saving ? "Saving..." : "Save"}
             </Button>

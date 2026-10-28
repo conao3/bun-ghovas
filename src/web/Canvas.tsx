@@ -227,13 +227,23 @@ export function Canvas({
             return {
               ...n,
               height: restored,
-              data: { ...n.data, height: restored, minimized: false, heightBeforeMinimize: undefined },
+              data: {
+                ...n.data,
+                height: restored,
+                minimized: false,
+                heightBeforeMinimize: undefined,
+              },
             };
           }
           return {
             ...n,
             height: minimizedHeight,
-            data: { ...n.data, height: minimizedHeight, minimized: true, heightBeforeMinimize: n.height },
+            data: {
+              ...n.data,
+              height: minimizedHeight,
+              minimized: true,
+              heightBeforeMinimize: n.height,
+            },
           };
         }),
       });
@@ -488,7 +498,14 @@ export function Canvas({
       onRename: handleWindowRename,
       onDuplicate: handleWindowDuplicate,
     }),
-    [onFocusWindow, handleWindowClose, handleWindowMinimize, onUrlChange, handleWindowRename, handleWindowDuplicate],
+    [
+      onFocusWindow,
+      handleWindowClose,
+      handleWindowMinimize,
+      onUrlChange,
+      handleWindowRename,
+      handleWindowDuplicate,
+    ],
   );
 
   const nodes = useMemo(
@@ -538,7 +555,7 @@ export function Canvas({
         minZoom={0.25}
         maxZoom={2}
         proOptions={{ hideAttribution: true }}
-        ariaLabelConfig={{ 'controls.interactive.ariaLabel': 'Toggle pan and zoom' }}
+        ariaLabelConfig={{ "controls.interactive.ariaLabel": "Toggle pan and zoom" }}
       >
         <Background />
         <Controls />
