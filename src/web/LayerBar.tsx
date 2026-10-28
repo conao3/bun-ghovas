@@ -583,10 +583,7 @@ function VerticalColumn({
             onSelectionChange={(key) => onSelectionChange(key as string)}
             orientation="vertical"
           >
-            <TabList
-              orientation="vertical"
-              style={{ borderRight: "none", gap: "2px" }}
-            >
+            <TabList orientation="vertical" style={{ borderRight: "none", gap: "2px" }}>
               {layer.canvases.map((canvas) => (
                 <SortableVerticalTabItem
                   key={canvas.id}

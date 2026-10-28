@@ -83,11 +83,7 @@ export function SessionPicker({ isOpen, onClose, onAttach, windowTitles }: Sessi
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      ariaLabelledby="session-picker-title"
-    >
+    <Modal isOpen={isOpen} onClose={onClose} ariaLabelledby="session-picker-title">
       {view === "picker" ? (
         <div className="flex flex-col w-72">
           <h2

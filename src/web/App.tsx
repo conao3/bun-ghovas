@@ -185,7 +185,8 @@ export function App() {
       setTutorialOpen(true);
     }
   }, []);
-  const { currentName: currentWorkspaceName, switchCurrent: switchWorkspace } = useWorkspacePersistence(workspace, setWorkspace);
+  const { currentName: currentWorkspaceName, switchCurrent: switchWorkspace } =
+    useWorkspacePersistence(workspace, setWorkspace);
 
   const cycleCanvas = useCallback(
     (level: LayerLevel) => {
@@ -510,7 +511,8 @@ export function App() {
       label: "Reset workspace to default",
       category: "Workspace",
       confirmTitle: "Reset workspace?",
-      confirm: "This will close all windows and reset layers to the default state. This cannot be undone.",
+      confirm:
+        "This will close all windows and reset layers to the default state. This cannot be undone.",
       run: () => {
         setWorkspace(INITIAL_WORKSPACE);
         setActiveIds(INITIAL_ACTIVE);
@@ -659,7 +661,12 @@ export function App() {
           onNewCanvas={handleNewCanvas}
           onReorderCanvas={handleReorderCanvas}
         />
-        <main id="main-workspace" tabIndex={-1} className="[grid-area:center] relative overflow-hidden" aria-label="Workspace canvas">
+        <main
+          id="main-workspace"
+          tabIndex={-1}
+          className="[grid-area:center] relative overflow-hidden"
+          aria-label="Workspace canvas"
+        >
           <Canvas
             canvasState={activeCanvas}
             onCanvasChange={handleCanvasChange}
@@ -677,7 +684,9 @@ export function App() {
           zoom={activeCanvas.viewport.zoom}
           focusedWindowTitle={focusedWindowTitle}
           onCycleLayer={cycleCanvas}
-          onSetZoom={(z) => { setZoomRef.current?.(z); }}
+          onSetZoom={(z) => {
+            setZoomRef.current?.(z);
+          }}
         />
         <CommandPalette
           isOpen={paletteOpen}

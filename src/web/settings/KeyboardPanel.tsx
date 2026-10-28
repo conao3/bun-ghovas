@@ -148,11 +148,7 @@ export function KeyboardPanel() {
                     {isCapturing ? (
                       <span className="text-muted italic">press the new shortcut…</span>
                     ) : (
-                      <span
-                        className={
-                          hasOverride ? "text-primary" : "text-ink tracking-[0.05em]"
-                        }
-                      >
+                      <span className={hasOverride ? "text-primary" : "text-ink tracking-[0.05em]"}>
                         {formatShortcut(effectiveDef)}
                       </span>
                     )}
@@ -178,10 +174,7 @@ export function KeyboardPanel() {
         <h3 className="text-body-strong font-mono text-[13px] mt-0 mb-2">Reset</h3>
         {hasAnyOverride && (
           <div className="flex justify-end">
-            <button
-              className="text-xs text-muted hover:text-error"
-              onClick={handleResetAll}
-            >
+            <button className="text-xs text-muted hover:text-error" onClick={handleResetAll}>
               Reset all
             </button>
           </div>

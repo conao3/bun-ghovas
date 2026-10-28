@@ -171,7 +171,11 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
 
   return (
     <>
-      <Modal isOpen={!!pendingConfirm} onClose={handleCancel} ariaLabelledby="confirm-dialog-heading">
+      <Modal
+        isOpen={!!pendingConfirm}
+        onClose={handleCancel}
+        ariaLabelledby="confirm-dialog-heading"
+      >
         <div className="w-[440px]">
           <h2
             id="confirm-dialog-heading"
@@ -179,7 +183,10 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
           >
             {pendingConfirm?.confirmTitle ?? pendingConfirm?.label}
           </h2>
-          <p id="confirm-dialog-desc" className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]">
+          <p
+            id="confirm-dialog-desc"
+            className="text-on-dark-strong font-mono text-[13px] mb-4 leading-[1.5]"
+          >
             {pendingConfirm?.confirm}
           </p>
           <div className="flex gap-2 justify-end">
@@ -241,7 +248,9 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                       >
                         <span>{cmd.label}</span>
                         {def && (
-                          <span aria-hidden="true" className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                          <span aria-hidden="true" className="text-white/40 ml-4">
+                            {formatShortcut(def)}
+                          </span>
                         )}
                       </li>
                     );
@@ -262,8 +271,14 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                   className="list-none p-0 m-0"
                 >
                   {(() => {
-                    const sections: { label: string; items: { cmd: Command; itemIndex: number }[] }[] = [];
-                    let currentSection: { label: string; items: { cmd: Command; itemIndex: number }[] } | null = null;
+                    const sections: {
+                      label: string;
+                      items: { cmd: Command; itemIndex: number }[];
+                    }[] = [];
+                    let currentSection: {
+                      label: string;
+                      items: { cmd: Command; itemIndex: number }[];
+                    } | null = null;
                     for (const row of categoryRows) {
                       if (row.type === "header") {
                         currentSection = { label: row.label, items: [] };
@@ -273,7 +288,11 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                       }
                     }
                     return sections.map((section) => (
-                      <div role="group" aria-labelledby={`cat-header-${section.label}`} key={section.label}>
+                      <div
+                        role="group"
+                        aria-labelledby={`cat-header-${section.label}`}
+                        key={section.label}
+                      >
                         <li
                           id={`cat-header-${section.label}`}
                           role="presentation"
@@ -298,12 +317,16 @@ export function CommandPalette({ isOpen, onClose, commands }: CommandPaletteProp
                               onMouseEnter={() => setHighlightIndex(item.itemIndex)}
                               className={clsx(
                                 "px-[10px] py-[6px] rounded-[3px] cursor-pointer text-on-dark-strong font-mono text-[13px] flex justify-between items-center",
-                                item.itemIndex === highlightIndex ? "bg-white/12" : "bg-transparent",
+                                item.itemIndex === highlightIndex
+                                  ? "bg-white/12"
+                                  : "bg-transparent",
                               )}
                             >
                               <span>{item.cmd.label}</span>
                               {def && (
-                                <span aria-hidden="true" className="text-white/40 ml-4">{formatShortcut(def)}</span>
+                                <span aria-hidden="true" className="text-white/40 ml-4">
+                                  {formatShortcut(def)}
+                                </span>
                               )}
                             </li>
                           );

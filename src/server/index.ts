@@ -179,8 +179,18 @@ const server = Bun.serve({
       if (await workspaceExists(name)) {
         return Response.json({ error: `workspace '${name}' already exists` }, { status: 400 });
       }
-      if (!ws || !Array.isArray(ws.l3) || !Array.isArray(ws.l2) || !Array.isArray(ws.l1) || !Array.isArray(ws.l0) || !ws.layerConfig) {
-        return Response.json({ error: "workspace must have l3/l2/l1/l0/layerConfig" }, { status: 400 });
+      if (
+        !ws ||
+        !Array.isArray(ws.l3) ||
+        !Array.isArray(ws.l2) ||
+        !Array.isArray(ws.l1) ||
+        !Array.isArray(ws.l0) ||
+        !ws.layerConfig
+      ) {
+        return Response.json(
+          { error: "workspace must have l3/l2/l1/l0/layerConfig" },
+          { status: 400 },
+        );
       }
       await saveNamedWorkspace(name, ws);
       return Response.json({ ok: true });
