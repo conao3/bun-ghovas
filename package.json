@@ -15,29 +15,29 @@
   "trustedDependencies": ["node-pty"],
   "devDependencies": {
     "@types/bun": "latest",
-    "@types/react": "^19.2.15",
-    "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.184.1",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/three": "^0.186.0",
     "bun-plugin-tailwind": "^0.1.2",
     "electrobun": "^1.18.1",
-    "knip": "^6.14.2",
-    "oxfmt": "^0.51.0",
-    "oxlint": "^1.66.0",
-    "tailwindcss": "^4.3.0",
-    "typescript": "^5.9.3",
-    "vitest": "^4.1.7"
+    "knip": "^6.43.0",
+    "oxfmt": "^0.75.0",
+    "oxlint": "^1.90.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
-    "@xyflow/react": "^12.10.2",
+    "@xyflow/react": "^12.12.0",
     "clsx": "^2.1.1",
     "ghostty-web": "^0.4.0",
-    "lucide-react": "^1.16.0",
+    "lucide-react": "^1.63.0",
     "node-pty": "^1",
-    "react": "^19.2.6",
-    "react-aria-components": "^1.17.0",
-    "react-dom": "^19.2.6"
+    "react": "^19.3.1",
+    "react-aria-components": "^1.22.1",
+    "react-dom": "^19.3.1"
   }
 }
