@@ -74,7 +74,7 @@ Requires Nix flake + direnv (`nix develop` activates the devShell with Bun and n
 One-shot startup via [devo](https://github.com/conao3/rust-devo):
 
 ```sh
-devo run
+devo session start-session
 ```
 
 Or manually:
