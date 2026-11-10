@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { TerminalSessionCtx } from "./SessionPicker";
 import clsx from "clsx";
 import { ArrowLeft, ArrowRight, Copy, Loader2, Minimize2, Pencil, RotateCw, X } from "lucide-react";
@@ -33,7 +33,7 @@ interface WindowProps extends WindowCallbacks {
   isFocused: boolean;
 }
 
-export function Window({
+function WindowImpl({
   win,
   isFocused,
   onFocus,
@@ -364,10 +364,7 @@ export function Window({
             e.stopPropagation();
           }
         }}
-        className={clsx(
-          "absolute box-border rounded-[6px] bg-surface-dark flex flex-col overflow-visible",
-          isFocused ? "border-[1.5px] border-primary" : "border border-white/15",
-        )}
+        className="absolute box-border rounded-[6px] bg-surface-dark flex flex-col overflow-visible border border-white/15"
         style={{
           inset: 0,
           zIndex: isFocused ? 100 : 10,
@@ -438,7 +435,10 @@ export function Window({
             >
               <form
                 onSubmit={handleUrlSubmit}
-                onMouseDown={(e) => e.stopPropagation()}
+                onMouseDown={(e) => {
+                  e.stopPropagation();
+                  onFocus(win.id);
+                }}
                 className="px-2 py-1 shrink-0 flex items-center gap-1"
               >
                 <Button
@@ -497,6 +497,16 @@ export function Window({
                   >
                     Press F6 to exit
                   </div>
+                )}
+                {!isFocused && (
+                  <div
+                    className="absolute inset-0 z-20 cursor-pointer"
+                    aria-hidden="true"
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      onFocus(win.id);
+                    }}
+                  />
                 )}
                 <div
                   style={{
@@ -586,10 +596,12 @@ export function Window({
           isVisible={isFocused && !win.minimized}
           minWidth={120}
           minHeight={60}
-          lineClassName="!border-primary"
-          handleClassName="!bg-primary"
+          lineClassName="!border-transparent"
+          handleClassName="!bg-transparent !border-0"
         />
       </div>
     </>
   );
 }
+
+export const Window = memo(WindowImpl);

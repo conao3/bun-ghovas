@@ -164,6 +164,7 @@ export function App() {
   const [welcomeOpen, setWelcomeOpen] = useState(false);
   const [tutorialOpen, setTutorialOpen] = useState(false);
   const [focusedWindowId, setFocusedWindowId] = useState<string | null>(null);
+  const [stackOrder, setStackOrder] = useState<Record<string, number>>({});
   const [sessionOptsMap, setSessionOptsMap] = useState<
     Map<string, { shell?: string; cwd?: string; env?: Record<string, string> }>
   >(new Map());
@@ -459,6 +460,10 @@ export function App() {
 
   const handleFocusWindow = useCallback((id: string) => {
     setFocusedWindowId(id);
+    setStackOrder((prev) => {
+      const max = Object.values(prev).reduce((m, v) => (v > m ? v : m), 0);
+      return { ...prev, [id]: max + 1 };
+    });
   }, []);
 
   const handleAddWindow = useCallback(
@@ -674,6 +679,7 @@ export function App() {
             onAddWindow={handleAddWindow}
             focusedWindowId={focusedWindowId}
             onFocusWindow={handleFocusWindow}
+            stackOrder={stackOrder}
             setZoomRef={setZoomRef}
           />
         </main>

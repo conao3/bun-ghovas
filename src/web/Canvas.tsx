@@ -129,6 +129,7 @@ interface CanvasProps {
   onAddWindow: (node: WorkspaceNode) => void;
   focusedWindowId: string | null;
   onFocusWindow: (id: string) => void;
+  stackOrder: Record<string, number>;
   setZoomRef?: RefObject<((zoom: number) => void) | null>;
 }
 
@@ -139,6 +140,7 @@ export function Canvas({
   onAddWindow,
   focusedWindowId,
   onFocusWindow,
+  stackOrder,
   setZoomRef,
 }: CanvasProps) {
   const stateRef = useRef(canvasState);
@@ -311,12 +313,18 @@ export function Canvas({
 
       for (const change of changes) {
         if (change.type === "position" && change.position) {
-          if (change.dragging === true) continue;
           const { x, y } = change.position;
           const node = nodes.find((n) => n.id === change.id);
           if (node && node.position.x === x && node.position.y === y) continue;
+          const dragging = change.dragging === true;
           nodes = nodes.map((n) =>
-            n.id === change.id ? { ...n, position: { x, y }, data: { ...n.data, x, y } } : n,
+            n.id === change.id
+              ? {
+                  ...n,
+                  position: { x, y },
+                  data: dragging ? n.data : { ...n.data, x, y },
+                }
+              : n,
           );
           changed = true;
         } else if (change.type === "dimensions" && change.dimensions) {
@@ -516,7 +524,8 @@ export function Canvas({
         position: node.position,
         width: node.width,
         height: node.height,
-        zIndex: focusedWindowId === node.id ? 100 : 1,
+        className: "focus:outline-none focus-visible:outline-none",
+        zIndex: stackOrder[node.id] ?? 0,
         ariaLabel:
           node.data.kind === "terminal"
             ? `Terminal: ${node.data.sessionId ?? "new session"}`
@@ -528,7 +537,7 @@ export function Canvas({
         },
         dragHandle: ".drag-handle",
       })),
-    [canvasState.nodes, focusedWindowId, callbacks],
+    [canvasState.nodes, focusedWindowId, stackOrder, callbacks],
   );
 
   return (
@@ -554,8 +563,25 @@ export function Canvas({
         }}
         minZoom={0.25}
         maxZoom={2}
+        elevateNodesOnSelect={false}
         proOptions={{ hideAttribution: true }}
         ariaLabelConfig={{ "controls.interactive.ariaLabel": "Toggle pan and zoom" }}
+        style={
+          {
+            "--xy-background-color-default": "var(--color-dark-canvas)",
+            "--xy-background-pattern-dots-color-default": "var(--color-dark-canvas-grid)",
+            "--xy-background-pattern-lines-color-default": "var(--color-dark-canvas-grid)",
+            "--xy-background-pattern-cross-color-default": "var(--color-dark-canvas-grid)",
+            "--xy-controls-button-background-color-default": "var(--color-surface-dark)",
+            "--xy-controls-button-background-color-hover-default": "var(--color-surface-dark-soft)",
+            "--xy-controls-button-color-default": "var(--color-on-dark-soft)",
+            "--xy-controls-button-color-hover-default": "var(--color-on-dark)",
+            "--xy-controls-button-border-color-default": "var(--color-dark-hairline)",
+            "--xy-minimap-background-color-default": "var(--color-surface-dark-elevated)",
+            "--xy-node-background-color-default": "var(--color-surface-dark)",
+            "--xy-node-border-default": "1px solid var(--color-dark-hairline)",
+          } as React.CSSProperties
+        }
       >
         <Background />
         <Controls />

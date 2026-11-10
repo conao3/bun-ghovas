@@ -24,7 +24,7 @@
   --color-dark-hairline: #2a2723;
   --color-dark-hairline-soft: #211e1b;
   --color-dark-titlebar: #1f1e1b;
-  --color-dark-titlebar-focused: #252320;
+  --color-dark-titlebar-focused: #3a3733;
 
   /* Hairlines (cream) */
   --color-hairline: #e6dfd8;
@@ -74,24 +74,6 @@
   --font-mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, monospace;
 }
 
-@layer base {
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    background: var(--color-surface-dark);
-    color: var(--color-on-dark);
-    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
-
-  #app {
-    height: 100%;
-    font-size: 14px;
-    letter-spacing: 0.02em;
-  }
-}
-
 button:focus-visible,
 [role="button"]:focus-visible,
 [role="tab"]:focus-visible,
@@ -113,19 +95,4 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
-}
-
-.react-flow {
-  --xy-background-color-default: var(--color-dark-canvas);
-  --xy-background-pattern-dots-color-default: var(--color-dark-canvas-grid);
-  --xy-background-pattern-lines-color-default: var(--color-dark-canvas-grid);
-  --xy-background-pattern-cross-color-default: var(--color-dark-canvas-grid);
-  --xy-controls-button-background-color-default: var(--color-surface-dark);
-  --xy-controls-button-background-color-hover-default: var(--color-surface-dark-soft);
-  --xy-controls-button-color-default: var(--color-on-dark-soft);
-  --xy-controls-button-color-hover-default: var(--color-on-dark);
-  --xy-controls-button-border-color-default: var(--color-dark-hairline);
-  --xy-minimap-background-color-default: var(--color-surface-dark-elevated);
-  --xy-node-background-color-default: var(--color-surface-dark);
-  --xy-node-border-default: 1px solid var(--color-dark-hairline);
 }
